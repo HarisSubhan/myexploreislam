@@ -3,3 +3,36 @@
     background-color: rgba(0, 0, 0, 0.5); /* Example styling */
     transition: opacity 0.3s ease;
   }
+
+  .about-container {
+    display: flex;
+    background-color: #e0f7fa; /* Light blue background */
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
+  }
+  
+  .image-container {
+    flex: 1;
+  }
+  
+  .about-image {
+    max-width: 100%; /* Make image responsive */
+    height: auto;
+  }
+  
+  .text-container {
+    flex: 2;
+    padding: 20px;
+  }
+  
+  .about-title {
+    color: #ff4081; /* Pink color for the title */
+    font-size: 2em;
+  }
+  
+  p {
+    font-size: 1.2em;
+    line-height: 1.5;
+  }
+  

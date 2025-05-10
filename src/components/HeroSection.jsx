@@ -110,11 +110,7 @@ const HeroSection = () => {
           zIndex: 1
         }}></div>
       </Container>
-      <div>
-        <Container className='p-2' fluid style={{backgroundColor:"#06d6a0", }}>
-          <p className='text-center display-6 fw-bold text-uppercase'>An Interactive Learning Platform for Children  Animated Cartoon, Worksheets, E-books & more -All in one Place</p>
-        </Container>
-      </div>
+      
     </div>
 
 
