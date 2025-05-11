@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Container, Navbar, Nav, Button, Offcanvas } from "react-bootstrap";
-import logo from "../assets/images/logo.png";
+import logo from "@images/logo.png";
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -10,7 +10,7 @@ const Header = () => {
 
   return (
     <>
-      <Navbar style={{ backgroundColor: "#00D7A9", }}>
+      <Navbar style={{ backgroundColor: "#00D7A9" }}>
         <Container>
           <Navbar.Brand href="/">
             <img
@@ -46,13 +46,13 @@ const Header = () => {
       </Navbar>
 
       <Offcanvas
-  show={showMenu}
-  onHide={handleClose}
-  placement="start"
-  className="custom-offcanvas"
-  backdrop={true}  // This enables the backdrop
-  scroll={false}
->
+        show={showMenu}
+        onHide={handleClose}
+        placement="start"
+        className="custom-offcanvas"
+        backdrop={true} // This enables the backdrop
+        scroll={false}
+      >
         <Offcanvas.Header closeButton>
           <Navbar.Brand href="/" className="m-0">
             <img

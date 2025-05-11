@@ -1,0 +1,37 @@
+/* Bootstrap-compatible styles */
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa; /* Bootstrap light background */
+  padding: 2rem;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 0.25rem; /* Bootstrap's default border-radius */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Bootstrap shadow-sm */
+}
+
+.auth-content {
+  margin: 2rem 0;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1rem;
+  color: #6c757d; /* Bootstrap secondary text color */
+}
+
+.auth-footer a {
+  color: #0d6efd; /* Bootstrap primary color */
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import star from "../assets/images/Star___Moon_Drops.png";
+import star from "@images/Star___Moon_Drops.png";
 
 const WhyChoose = () => {
   const features = [
