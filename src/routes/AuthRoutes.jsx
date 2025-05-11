@@ -1,3 +1,4 @@
+// src/routes/AuthRoutes.jsx
 import LoginPage from "../pages/SharedPortal/auth/LoginPage";
 import RegisterPage from "../pages/SharedPortal/auth/RegisterPage";
 import RoleRedirector from "@/pages/SharedPortal/auth/RoleRedirector";

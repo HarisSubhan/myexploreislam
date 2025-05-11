@@ -10,7 +10,7 @@ const LoginPage = () => {
   const handleSubmit = async (credentials) => {
     try {
       await login(credentials);
-      navigate("/auth/redirect");
+      navigate("/auth/redirect"); // Goes to RoleRedirector
     } catch (error) {
       console.error("Login failed:", error);
     }
