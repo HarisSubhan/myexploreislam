@@ -54,3 +54,160 @@ body.dark-mode {
   --bs-body-bg-rgb: 33, 37, 41;
   /* Add other custom dark mode variables as needed */
 }
+.trending-now-section {
+  text-align: center;
+}
+
+.trending-card {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.trending-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.trending-number {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #6c757d;
+  background: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.book-image {
+  height: 200px;
+  object-fit: cover; /* Ensures image covers the space without stretching */
+}
+
+.card-body {
+  padding-top: 20px;
+}
+
+
+.video-slider-section {
+  position: relative;
+  padding: 0 40px; /* Add padding for arrow space */
+}
+
+.video-card {
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.video-thumbnail {
+  position: relative;
+}
+
+.play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.9);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-card:hover .play-icon {
+  opacity: 1;
+}
+
+.video-duration {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.video-meta {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Arrow styles */
+.slick-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translate(10% 10%);
+  /* transform: translate(-50%); */
+  z-index: 2;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.slick-arrow:hover {
+  background: #f0f0f0;
+  color: #000;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.next-arrow {
+  right: 0;
+}
+
+.prev-arrow {
+  left: 0;
+}
+.video-slider-section .slick-slider {
+  padding: 0 30px; /* So arrows don't overlap cards */
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .video-slider-section {
+    padding: 0 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .video-slider-section {
+    padding: 0 20px;
+  }
+  
+  .slick-arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+  }
+}

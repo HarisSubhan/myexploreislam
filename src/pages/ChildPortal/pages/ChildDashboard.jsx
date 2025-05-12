@@ -11,11 +11,12 @@ import {
 } from "react-bootstrap";
 import logo from "@images/logo.png";
 import { CiBellOn, CiDark, CiLight } from "react-icons/ci";
-import avatar from "@images/c.png";
+import avatar from "@images/DES.png";
+import writtenlogo from "@images/WRITTEN.png";
 
 const ChildDashboard = () => {
   const [darkMode, setDarkMode] = useState(() => {
-    // Check localStorage for saved preference or use system preference
+ 
     if (typeof window !== "undefined") {
       const savedMode = localStorage.getItem("darkMode");
       if (savedMode !== null) return savedMode === "true";
@@ -24,14 +25,14 @@ const ChildDashboard = () => {
     return false;
   });
 
-  // Toggle dark/light mode
+
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     localStorage.setItem("darkMode", newMode.toString());
   };
 
-  // Apply dark/light mode to the entire document
+  
   useEffect(() => {
     if (darkMode) {
       document.documentElement.setAttribute("data-bs-theme", "dark");
@@ -49,11 +50,12 @@ const ChildDashboard = () => {
       className={`py-2 py-md-3 ${darkMode ? "navbar-dark" : "navbar-light"}`}
       data-bs-theme={darkMode ? "dark" : "light"}
     >
-      <Container fluid>
-        {/* Mobile layout (collapsed) */}
+      <Container >
+        
         <div className="d-flex d-lg-none w-100 align-items-center justify-content-between">
           <Navbar.Brand href="#home" className="me-0">
             <img src={logo} alt="Company Logo" height="30" />
+            <img src={writtenlogo} alt="Company Logo" height="30" />
           </Navbar.Brand>
 
           <div className="d-flex align-items-center gap-2">
