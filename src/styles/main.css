@@ -93,121 +93,53 @@ body.dark-mode {
 .card-body {
   padding-top: 20px;
 }
-
-
-.video-slider-section {
-  position: relative;
-  padding: 0 40px; /* Add padding for arrow space */
+/* index.css or globals.css */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.video-card {
-  transition: transform 0.3s ease;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
+/* Existing styles for thumbnail-card, thumbnail-image */
 
-.video-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-.video-thumbnail {
+.position-relative {
   position: relative;
 }
 
-.play-icon {
+.on-image-popup-container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.9);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.9); /* Darker background */
+  color: white;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  padding: 15px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
+  width: 80%; /* Adjust width of the popup */
+  max-height: 80%; /* Adjust max height of the popup */
 }
 
-.video-card:hover .play-icon {
+.thumbnail-card:hover .on-image-popup-container {
   opacity: 1;
 }
 
-.video-duration {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
+.on-image-popup-container .popup-image {
+  max-height: 70%; /* Adjust image size within the popup */
+  max-width: 90%;
+  object-fit: contain; /* Or 'cover' if you want it to fill the space */
+  margin-bottom: 10px;
 }
 
-.video-meta {
-  font-size: 14px;
-  color: #666;
-}
-
-/* Arrow styles */
-.slick-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translate(10% 10%);
-  /* transform: translate(-50%); */
-  z-index: 2;
-  background: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border: none;
-  color: #333;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.slick-arrow:hover {
-  background: #f0f0f0;
-  color: #000;
-  transform: translateY(-50%) scale(1.1);
-}
-
-.next-arrow {
-  right: 0;
-}
-
-.prev-arrow {
-  left: 0;
-}
-.video-slider-section .slick-slider {
-  padding: 0 30px; /* So arrows don't overlap cards */
-  position: relative;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .video-slider-section {
-    padding: 0 30px;
-  }
-}
-
-@media (max-width: 576px) {
-  .video-slider-section {
-    padding: 0 20px;
-  }
-  
-  .slick-arrow {
-    width: 30px;
-    height: 30px;
-    font-size: 18px;
-  }
+.on-image-popup-container .popup-title {
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 0;
 }

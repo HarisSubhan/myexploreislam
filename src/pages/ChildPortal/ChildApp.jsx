@@ -1,16 +1,14 @@
-// src/pages/ChildPortal/ChildApp.jsx
-import { Outlet } from "react-router-dom";
-import ChildDashboard from "./pages/ChildDashboard";
-import Book from "./pages/Book";
-import ChildVideos from "./pages/ChildVideos";
+import React from "react";
+import { Outlet, Link } from "react-router-dom";
+import Childheader from "./pages/components/childheader";
 
 const ChildApp = () => {
   return (
     <div>
-      <ChildDashboard/>
-      <Book/>
-      <ChildVideos/>
-      {/* <Outlet /> */}
+      <Childheader/>
+      <main className="p-4">
+        <Outlet />
+      </main>
     </div>
   );
 };
