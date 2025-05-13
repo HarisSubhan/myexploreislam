@@ -5,9 +5,8 @@ import Book from "./components/Book";
 const ChildDashboard = () => {
   return (
     <div className="p-6">
-      <VideoSlider/>
-      <Book/>
-      
+      <Book />
+      <VideoSlider />
     </div>
   );
 };
