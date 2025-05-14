@@ -29,19 +29,36 @@ const ChildHeader = () => {
 
   return (
     <>
-      <Navbar bg="light" expand="lg" className="py-2 py-md-3 navbar-light" data-bs-theme="light">
+      <Navbar
+        style={{ backgroundColor: "#00D7A9" }}
+        expand="lg"
+        className="py-2 py-md-3"
+      >
         <Container className="px-3 px-md-4">
           <div className="d-flex w-100 align-items-center justify-content-between">
             {/* Mobile Layout (small screens) */}
             <div className="d-flex d-lg-none w-100 align-items-center">
               {/* Left: Menu Toggle */}
-              <CiMenuBurger size={24} className="cursor-pointer me-3" onClick={handleShowOffcanvas} />
+              <CiMenuBurger
+                size={24}
+                className="cursor-pointer me-3"
+                onClick={handleShowOffcanvas}
+              />
 
               {/* Middle: Logo */}
               <Navbar.Brand as={Link} to="/child" className="mx-auto">
                 <div className="d-flex align-items-center">
-                  <Image src={logo} alt="Company Logo" height={logoHeightMobile} className="me-2" />
-                  <Image src={writtenlogo} alt="Company Name" height={writtenLogoHeightMobile} />
+                  <Image
+                    src={logo}
+                    alt="Company Logo"
+                    height={logoHeightMobile}
+                    className="me-2"
+                  />
+                  <Image
+                    src={writtenlogo}
+                    alt="Company Name"
+                    height={writtenLogoHeightMobile}
+                  />
                 </div>
               </Navbar.Brand>
 
@@ -93,7 +110,11 @@ const ChildHeader = () => {
             <div className="d-none d-lg-flex w-100 align-items-center justify-content-between">
               {/* Desktop Logo */}
               <Navbar.Brand as={Link} to="/child">
-                <Image src={logo} alt="Company Logo" height={logoHeightDesktop} />
+                <Image
+                  src={logo}
+                  alt="Company Logo"
+                  height={logoHeightDesktop}
+                />
               </Navbar.Brand>
 
               {/* Center Menu */}
@@ -175,29 +196,56 @@ const ChildHeader = () => {
       </Navbar>
 
       {/* Mobile Offcanvas Menu */}
-      <Offcanvas show={showOffcanvas} onHide={handleCloseOffcanvas} placement="start" bg="light" text="dark">
+      <Offcanvas
+        show={showOffcanvas}
+        onHide={handleCloseOffcanvas}
+        placement="start"
+        bg="light"
+        text="dark"
+      >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>
             <div className="d-flex align-items-center">
-              <Image src={logo} alt="Company Logo" height={logoHeightMobile} className="me-2" />
-              <Image src={writtenlogo} alt="Company Name" height={writtenLogoHeightMobile} />
+              <Image
+                src={logo}
+                alt="Company Logo"
+                height={logoHeightMobile}
+                className="me-2"
+              />
+              <Image
+                src={writtenlogo}
+                alt="Company Name"
+                height={writtenLogoHeightMobile}
+              />
             </div>
           </Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body className="d-flex flex-column justify-content-between h-100">
           <Nav className="flex-column">
             <Nav.Item className="mb-2">
-              <Link to="/child" className="nav-link fw-bold text-dark" onClick={handleCloseOffcanvas}>
+              <Link
+                to="/child"
+                className="nav-link fw-bold text-dark"
+                onClick={handleCloseOffcanvas}
+              >
                 Home
               </Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Link to="/child/book" className="nav-link fw-bold text-dark" onClick={handleCloseOffcanvas}>
+              <Link
+                to="/child/book"
+                className="nav-link fw-bold text-dark"
+                onClick={handleCloseOffcanvas}
+              >
                 Book
               </Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Link to="/child/video" className="nav-link fw-bold text-dark" onClick={handleCloseOffcanvas}>
+              <Link
+                to="/child/video"
+                className="nav-link fw-bold text-dark"
+                onClick={handleCloseOffcanvas}
+              >
                 Video
               </Link>
             </Nav.Item>
@@ -205,13 +253,25 @@ const ChildHeader = () => {
           <div>
             <hr className="border-dark-subtle" />
             <div className="d-flex flex-column align-items-start">
-              <Link to="/profile" className="nav-link small text-dark mb-2" onClick={handleCloseOffcanvas}>
+              <Link
+                to="/profile"
+                className="nav-link small text-dark mb-2"
+                onClick={handleCloseOffcanvas}
+              >
                 <i className="bi bi-person me-2"></i> Profile
               </Link>
-              <Link to="/settings" className="nav-link small text-dark mb-2" onClick={handleCloseOffcanvas}>
+              <Link
+                to="/settings"
+                className="nav-link small text-dark mb-2"
+                onClick={handleCloseOffcanvas}
+              >
                 <i className="bi bi-gear me-2"></i> Settings
               </Link>
-              <Link to="/logout" className="nav-link small text-dark mb-2" onClick={handleCloseOffcanvas}>
+              <Link
+                to="/logout"
+                className="nav-link small text-dark mb-2"
+                onClick={handleCloseOffcanvas}
+              >
                 <i className="bi bi-box-arrow-right me-2"></i> Logout
               </Link>
             </div>
