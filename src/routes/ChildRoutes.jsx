@@ -2,8 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import ChildApp from "../pages/ChildPortal/ChildApp";
 import ChildDashboard from "../pages/ChildPortal/pages/ChildDashboard";
 import ChildBookpage from "../pages/ChildPortal/pages/ChildBookpage";
-import ChildVideopage from "../pages/ChildPortal/pages/childVideopage";
 import BookDetail from "../pages/ChildPortal/pages/components/BookDetail";
+import ChildVideopage from "../pages/ChildPortal/pages/ChildVideopage"
 
 const ChildRoutes = () => {
   return (
@@ -13,7 +13,6 @@ const ChildRoutes = () => {
         <Route path="book" element={<ChildBookpage />} />
         <Route path="/books/:slug" element={<BookDetail />} />
         <Route path="video" element={<ChildVideopage />} />
-
       </Route>
     </Routes>
   );
