@@ -1,14 +1,12 @@
-import React from 'react'
-import Videohomepage  from './components/Videohomepage'
-
+import React from "react";
+import { VideoHomepage } from "./components/Videohomepage";
 
 const ChildVideopage = () => {
   return (
     <div className="p-6">
-      
-    <Videohomepage/>
-  </div>
-  )
-}
+      <VideoHomepage />
+    </div>
+  );
+};
 
-export default ChildVideopage
+export default ChildVideopage;

@@ -72,7 +72,7 @@ const VideoCard = ({ video }) => (
   </Card>
 );
 
-export const Videohomepage = () => (
+export const VideoHomepage = () => (
     
   <Container className="py-4">
 

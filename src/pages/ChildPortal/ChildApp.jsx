@@ -1,11 +1,11 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
-import Childheader from "./pages/components/childheader";
+import ChildHeader from "./pages/components/ChildHeader";
 
 const ChildApp = () => {
   return (
     <div>
-      <Childheader/>
+      <ChildHeader />
       <main className="p-4">
         <Outlet />
       </main>
