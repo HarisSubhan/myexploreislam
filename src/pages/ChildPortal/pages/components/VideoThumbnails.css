@@ -321,7 +321,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  
 }
 
 .season-selector {
@@ -331,6 +331,16 @@
   padding: 5px 10px;
   border-radius: 4px;
 }
+
+.season-selector {
+  min-height: 40px;
+}
+
+
+.episodes-header h2 {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
 
 .episodes-list {
   display: flex;
@@ -383,4 +393,40 @@
   }
 }
 
+/*─── on small and touch devices ───*/
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  /* never show the hover overlay on mobile */
+  .netflix-hover-card {
+    display: none !important;
+  }
+
+  /* no zoom on tap */
+  .thumbnail-col:hover {
+    transform: none !important;
+  }
+
+  /* hint that it's tappable */
+  .thumbnail-col {
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 480px) {
+  .episodes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .episode-thumb img {
+    width: 120px;
+    height: 68px;
+  }
+
+  .episode {
+    gap: 0.5rem;
+  }
+}
 

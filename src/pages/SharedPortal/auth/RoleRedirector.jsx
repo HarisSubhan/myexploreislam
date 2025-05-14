@@ -9,10 +9,11 @@ const RoleRedirector = () => {
 
   useEffect(() => {
     if (!user) return;
-
+  
     const redirectPath = location.state?.from || getDefaultRoute(user.role);
     navigate(redirectPath);
-  }, [user, navigate, location]);
+  }, [user]);
+  
 
   const getDefaultRoute = (role) => {
     switch (role) {
@@ -27,7 +28,7 @@ const RoleRedirector = () => {
     }
   };
 
-  return null; // This component doesn't render anything
+  return null; 
 };
 
-export default RoleRedirector; // Critical default export
+export default RoleRedirector; 

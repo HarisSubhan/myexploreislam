@@ -1,12 +1,12 @@
 import React from 'react'
+import { Videohomepage } from './components/Videohomepage'
+
 
 const ChildVideopage = () => {
   return (
     <div className="p-6">
-    <h1 className="text-2xl font-bold mb-4">Video Page</h1>
-    <p className="text-gray-700">
-      Welcome to the Child Video Page. Here you can view or manage your books.
-    </p>
+      
+    <Videohomepage/>
   </div>
   )
 }

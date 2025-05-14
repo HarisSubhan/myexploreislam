@@ -56,16 +56,19 @@ const VideoThumbnails = () => {
     <Container fluid className="netflix-container">
       <Row className="thumbnails-row">
         {videoData.map((video) => (
-          <Col
-            key={video.id}
-            xs={6}
-            sm={4}
-            md={3}
-            lg={2}
-            className="thumbnail-col"
-            onMouseEnter={() => setHoveredVideo(video.id)}
-            onMouseLeave={() => setHoveredVideo(null)}
-          >
+         <Col
+         key={video.id}
+         xs={12}
+         sm={6}
+         md={4}
+         lg={3}
+         xl={2}
+         className="thumbnail-col"
+         onMouseEnter={() => setHoveredVideo(video.id)}
+         onMouseLeave={() => setHoveredVideo(null)}
+         onClick={() => setExpandedVideo(video.id)}
+       >
+       
             <div className="netflix-card-wrapper">
               <Card className="netflix-thumbnail">
                 <div className="thumbnail-image-container">
@@ -94,12 +97,8 @@ const VideoThumbnails = () => {
                       </div>
                       <button
                         className="action-btn more-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpandedVideo(
-                            expandedVideo === video.id ? null : video.id
-                          );
-                        }}
+                        onClick={() => setExpandedVideo(video.id)}
+
                       >
                         <FaChevronDown />
                       </button>

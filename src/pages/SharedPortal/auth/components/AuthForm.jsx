@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Form, FloatingLabel } from "react-bootstrap";
 
-const AuthForm = ({ onSubmit, loading, showRegisterLink }) => {
+const AuthForm = ({ onSubmit, loading, showRegisterLink = true, type = "login" }) => {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -22,6 +22,7 @@ const AuthForm = ({ onSubmit, loading, showRegisterLink }) => {
       }}
     >
       <FloatingLabel controlId="email" label="Email" className="mb-3">
+        
         <Form.Control
           type="email"
           name="email"
@@ -42,7 +43,9 @@ const AuthForm = ({ onSubmit, loading, showRegisterLink }) => {
       </FloatingLabel>
 
       <Button
-        variant="primary"
+       style={{
+        backgroundColor: '#f1066c'
+       }}
         type="submit"
         disabled={loading}
         className="w-100"

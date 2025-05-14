@@ -35,3 +35,20 @@
 .auth-footer a:hover {
   text-decoration: underline;
 }
+
+.auth-container {
+  background-color: #f8f9fa;
+}
+
+.auth-brand-section {
+  background-size: cover;
+  background-position: center;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .auth-container {
+    padding: 1rem !important;
+  }
+}

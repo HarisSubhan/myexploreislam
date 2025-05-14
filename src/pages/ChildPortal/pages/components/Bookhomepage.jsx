@@ -7,7 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { Navigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-const Book = () => {
+const BookHomepage = () => {
   const trendingItems = [
     { 
       id: 1, 
@@ -45,7 +45,6 @@ const Book = () => {
       description: 'A lone astronaut must save the earth from disaster in this science fiction adventure.',
       image: 'https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg' 
     },
-    // Add more books if needed
   ];
 
   // Custom arrow components
@@ -128,29 +127,46 @@ const Book = () => {
 
   return (
     <Container className="trending-now-section my-5" style={{ position: 'relative' }}>
-<div className="d-flex justify-content-between align-items-center"> 
-  <h2 className="mb-3">All Books</h2>
-  <div>
-    <Button as={Link} to="/child/book">Explore All</Button>
-  </div>
-</div>
+      <h2 className="mb-3">All Books</h2>
+
       <Slider {...settings}>
-        {trendingItems.map((item, index) => (
+        {trendingItems.map((item) => (
           <div key={item.id} className="px-2">
-            <Card className="h-100">
-              <Card.Img 
-                variant="top" 
-                src={item.image} 
-                alt={item.title}
-                style={{ 
-                  height: '200px', 
-                  objectFit: 'cover',
-                  width: '100%'
-                }}
-              />
-              <Card.Body>
-                <Card.Title>{item.title}</Card.Title>
-                <Card.Text className="text-truncate">{item.description}</Card.Text>
+            <Card className="h-100" style={{ height: '500px' }}>
+              <Link to={`/books/${item.slug}`}>
+                <Card.Img 
+                  variant="top" 
+                  src={item.image} 
+                  alt={item.title}
+                  style={{ 
+                    height: '250px',
+                    objectFit: 'cover',
+                    width: '100%',
+                    cursor: 'pointer' // Show it's clickable
+                  }}
+                />
+              </Link>
+              <Card.Body className="d-flex flex-column">
+                <Card.Title className="text-truncate">{item.title}</Card.Title>
+                <Card.Text 
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical'
+                  }}
+                >
+                  {item.description}
+                </Card.Text>
+                <Button 
+                  as={Link} 
+                  to={`/books/${item.slug}`} 
+                  variant="primary" 
+                  className="mt-auto"
+                >
+                  More Detail
+                </Button>
               </Card.Body>
             </Card>
           </div>
@@ -160,4 +176,4 @@ const Book = () => {
   );
 };
 
-export default Book;
+export default BookHomepage;
