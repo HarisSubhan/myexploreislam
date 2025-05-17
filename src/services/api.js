@@ -4,7 +4,7 @@ import axios from "axios";
 // http://localhost:5173/
 
 const api = axios.create({
-  baseURL: "https://myexploreislam.vercel.app/",
+  baseURL: "hhttp://localhost:5173/",
 });
 
 export default api;
