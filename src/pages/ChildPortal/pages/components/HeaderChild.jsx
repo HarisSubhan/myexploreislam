@@ -17,7 +17,7 @@ import { CiBellOn, CiMenuBurger } from "react-icons/ci";
 import avatar from "@images/DES.png";
 import writtenlogo from "@images/WRITTEN.png";
 
-const ChildHeader = () => {
+const HeaderChild = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
   const handleCloseOffcanvas = () => setShowOffcanvas(false);
@@ -282,4 +282,4 @@ const ChildHeader = () => {
   );
 };
 
-export default ChildHeader;
+export default HeaderChild;

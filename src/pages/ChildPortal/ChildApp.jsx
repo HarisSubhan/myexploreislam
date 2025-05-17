@@ -1,15 +1,13 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
-import ChildHeader from "./pages/components/ChildHeader";
-
 import Banner from "./pages/components/Banner";
-
+import HeaderChild from "./pages/components/HeaderChild";
 
 const ChildApp = () => {
   return (
     <div>
-      <ChildHeader/>
-      <Banner/>
+      <HeaderChild />
+      <Banner />
       <main className="p-4">
         <Outlet />
       </main>
