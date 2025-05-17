@@ -5,7 +5,6 @@ import path from "path";
 
 export default defineConfig({
   base: "./",
-  rewrites: [{ source: "/(.*)", destination: "/" }],
   plugins: [react()],
   resolve: {
     alias: {
