@@ -12,8 +12,7 @@ const RoleRedirector = () => {
   
     const redirectPath = location.state?.from || getDefaultRoute(user.role);
     navigate(redirectPath);
-  }, [user]);
-  
+  }, [user, navigate, location]);
 
   const getDefaultRoute = (role) => {
     switch (role) {
@@ -31,4 +30,4 @@ const RoleRedirector = () => {
   return null; 
 };
 
-export default RoleRedirector; 
+export default RoleRedirector;

@@ -1,161 +1,282 @@
-import React from 'react';
-import { Container, Card, Button } from 'react-bootstrap';
-import Slider from 'react-slick';
-import { MdNavigateNext, MdNavigateBefore } from 'react-icons/md';
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
-import { Navigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Card, Container, Row, Col, Button } from "react-bootstrap";
+import { FaPlay, FaPlus, FaThumbsUp, FaChevronDown } from "react-icons/fa";
+import { IoMdCloseCircleOutline } from "react-icons/io";
+import "./VideoThumbnails.css";
 
 const Book = () => {
-  const trendingItems = [
-    { 
-      id: 1, 
-      title: 'The Silent Patient', 
-      description: 'A psychological thriller about a woman who shoots her husband and then stops speaking.',
-      image: 'https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg' 
+  const [hoveredBook, setHoveredBook] = useState(null);
+  const [expandedBook, setExpandedBook] = useState(null);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+    const [activeTab, setActiveTab] = useState("pdf");
+  
+
+  const handleClose = () => {
+    setIsFadingOut(true);
+    setTimeout(() => {
+      setExpandedBook(null);
+      setIsFadingOut(false);
+    }, 300); // match fade-out duration
+  };
+
+  const BookData = [
+    {
+      id: 1,
+      thumbnailUrl:
+        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
+      title: "THE RECRUIT",
+      match: "95% Match",
+      rating: "TV-MA",
+      seasons: "2 Seasons",
+      quality: "HD",
+      pdf: [
+        { id: 1, title: "Chapter 1 pdf", questions: 10, duration: "15 min" },
+        { id: 2, title: "Midterm pdf", questions: 20, duration: "30 min" }
+      ],
+      quizzes: [
+        { id: 1, title: "Chapter 1 Quiz", questions: 10, duration: "15 min" },
+        { id: 2, title: "Midterm Quiz", questions: 20, duration: "30 min" }
+      ],
+      assignments: [
+        { id: 1, title: "Essay Assignment", due: "May 30", points: 100 },
+        { id: 2, title: "Group Project", due: "June 15", points: 200 }
+      ],
+      genres: ["pdf", "quiz", "assignment"],
+      description:
+        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
     },
-    { 
-      id: 2, 
-      title: 'Atomic Habits', 
-      description: 'Learn how to build good habits and break bad ones with proven strategies.',
-      image: 'https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg' 
+    {
+      id: 2,
+      thumbnailUrl:
+        "https://m.media-amazon.com/images/M/MV5BODIyNzk5NDg5M15BMl5BanBnXkFtZTgwMTE5NjA5MjI@._V1_.jpg",
+      title: "STRANGER THINGS",
+      match: "98% Match",
+      rating: "TV-14",
+      seasons: "4 Seasons",
+      quality: "4K",
+      genres: ["pdf", "quiz", "assignment"],
+      description:
+        "When a boy vanishes, a small town uncovers a mystery involving secret experiments and terrifying supernatural forces.",
     },
-    { 
-      id: 3, 
-      title: 'Where the Crawdads Sing', 
-      description: 'A murder mystery and coming-of-age story set in the marshes of North Carolina.',
-      image: 'https://m.media-amazon.com/images/I/81O1oy0y9eL._AC_UF1000,1000_QL80_.jpg' 
+    {
+      id: 3,
+      thumbnailUrl:
+        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
+      title: "THE RECRUIT",
+      match: "95% Match",
+      rating: "TV-MA",
+      seasons: "2 Seasons",
+      quality: "HD",
+      genres: ["pdf", "quiz", "assignment"],
+      description:
+        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
     },
-    { 
-      id: 4, 
-      title: 'Educated', 
-      description: 'A memoir about a woman who leaves her survivalist family and goes on to earn a PhD.',
-      image: 'https://m.media-amazon.com/images/I/81O1oy0y9eL._AC_UF1000,1000_QL80_.jpg' 
+    {
+      id: 4,
+      thumbnailUrl:
+        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
+      title: "THE RECRUIT",
+      match: "95% Match",
+      rating: "TV-MA",
+      seasons: "2 Seasons",
+      quality: "HD",
+      genres: ["pdf", "quiz", "assignment"],
+      description:
+        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
     },
-    { 
-      id: 5, 
-      title: 'The Midnight Library', 
-      description: 'A novel about a library between life and death where each book represents a different life path.',
-      image: 'https://m.media-amazon.com/images/I/81WcnNQ-TBL._AC_UF1000,1000_QL80_.jpg' 
+    {
+      id: 5,
+      thumbnailUrl:
+        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
+      title: "THE RECRUIT",
+      match: "95% Match",
+      rating: "TV-MA",
+      seasons: "2 Seasons",
+      quality: "HD",
+      genres: ["pdf", "quiz", "assignment"],
+      description:
+        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
     },
-    { 
-      id: 6, 
-      title: 'Project Hail Mary', 
-      description: 'A lone astronaut must save the earth from disaster in this science fiction adventure.',
-      image: 'https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg' 
-    },
-    // Add more books if needed
+
   ];
 
-  // Custom arrow components
-  const NextArrow = (props) => {
-    const { onClick } = props;
-    return (
-      <button 
-        className="slick-arrow slick-next" 
-        onClick={onClick}
-        style={{
-          right: '-25px',
-          zIndex: 1,
-          background: 'transparent',
-          border: 'none',
-          fontSize: '24px',
-          color: '#000'
-        }}
-      >
-        <MdNavigateNext />
-      </button>
-    );
-  };
+  const selectedBook = BookData.find((v) => v.id === expandedBook);
 
-  const PrevArrow = (props) => {
-    const { onClick } = props;
-    return (
-      <button 
-        className="slick-arrow slick-prev" 
-        onClick={onClick}
-        style={{
-          left: '-25px',
-          zIndex: 1,
-          background: 'transparent',
-          border: 'none',
-          fontSize: '24px',
-          color: '#000'
-        }}
-      >
-        <MdNavigateBefore />
-      </button>
-    );
-  };
+  useEffect(() => {
+    document.body.style.overflow = expandedBook ? "hidden" : "auto";
+  }, [expandedBook]);
 
-  // Slider settings
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: 4,
-        }
-      },
-      {
-        breakpoint: 992,
-        settings: {
-          slidesToShow: 3,
-        }
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-        }
-      },
-      {
-        breakpoint: 576,
-        settings: {
-          slidesToShow: 1,
-        }
-      }
-    ]
+  const renderTabContent = () => {
+    if (!selectedBook) return null; 
+    
+    switch (activeTab) {
+      case "pdf":
+        return (
+          <div className="quiz-content">
+            <h4>PDF</h4>
+            <div className="quiz-list">
+              {(selectedBook.quizzes || []).map((quiz) => ( 
+                <div className="quiz-item" key={quiz.id}>
+                  <h5>{quiz.title}</h5>
+                  <div className="quiz-meta">
+                    <span>{quiz.questions} questions</span>
+                    <span>{quiz.duration}</span>
+                  </div>
+                  <button className="start-quiz-btn">Start Quiz</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case "Quiz":
+        return (
+          <div className="quiz-content">
+            <h4>Quizzes</h4>
+            <div className="quiz-list">
+              {(selectedBook.quizzes || []).map((quiz) => ( 
+                <div className="quiz-item" key={quiz.id}>
+                  <h5>{quiz.title}</h5>
+                  <div className="quiz-meta">
+                    <span>{quiz.questions} questions</span>
+                    <span>{quiz.duration}</span>
+                  </div>
+                  <button className="start-quiz-btn">Start Quiz</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case "Assignment":
+        return (
+          <div className="assignment-content">
+            <h4>Assignments</h4>
+            <div className="assignment-list">
+              {(selectedBook.assignments || []).map((assignment) => ( // Added null check
+                <div className="assignment-item" key={assignment.id}>
+                  <h5>{assignment.title}</h5>
+                  <div className="assignment-meta">
+                    <span>Due: {assignment.due}</span>
+                    <span>Points: {assignment.points}</span>
+                  </div>
+                  <button className="view-assignment-btn">View Assignment</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <Container className="trending-now-section my-5" style={{ position: 'relative' }}>
-<div className="d-flex justify-content-between align-items-center"> 
-  <h2 className="mb-3">All Books</h2>
-  <div>
-    <Button as={Link} to="/child/book">Explore All</Button>
-  </div>
-</div>
-      <Slider {...settings}>
-        {trendingItems.map((item, index) => (
-          <div key={item.id} className="px-2">
-            <Card className="h-100">
-              <Card.Img 
-                variant="top" 
-                src={item.image} 
-                alt={item.title}
-                style={{ 
-                  height: '200px', 
-                  objectFit: 'cover',
-                  width: '100%'
-                }}
-              />
-              <Card.Body>
-                <Card.Title>{item.title}</Card.Title>
-                <Card.Text className="text-truncate">{item.description}</Card.Text>
-              </Card.Body>
-            </Card>
-          </div>
+    <Container  className="netflix-container">
+      <Row className="thumbnails-row">
+        {BookData.map((video) => (
+         <Col
+         key={video.id}
+         xs={12}
+         sm={6}
+         md={4}
+         lg={3}
+         xl={2}
+         className="thumbnail-col"
+         onMouseEnter={() => setHoveredBook(video.id)}
+         onMouseLeave={() => setHoveredBook(null)}
+         onClick={() => setExpandedBook(video.id)}
+       >
+       
+            <div className="netflix-card-wrapper-book">
+              <Card className="netflix-thumbnail-book">
+                <div className="thumbnail-image-container-book">
+                  <img src={video.thumbnailUrl} alt={video.title} />
+                  <span className="Book-quality">{video.quality}</span>
+                </div>
+              </Card>
+
+              {hoveredBook === video.id && (
+                <div className="netflix-hover-card-book">
+                  <div className="hover-thumbnail">
+                    <img src={video.thumbnailUrl} alt={video.title} />
+                  </div>
+                  <div className="hover-details">
+                    <div className="action-buttons d-flex justify-content-between align-items-center">
+                      <div className="d-flex gap-2">
+                        {/* <button className="action-btn play-btn">
+                          <FaPlay />
+                        </button> */}
+                        <button className="action-btn">
+                          <FaPlus />
+                        </button>
+                        <button className="action-btn">
+                          <FaThumbsUp />
+                        </button>
+                      </div>
+                      <button
+                        className="action-btn more-btn"
+                        onClick={() => setExpandedBook(video.id)}
+
+                      >
+                        <FaChevronDown />
+                      </button>
+                    </div>
+                    <div className="match-rating">
+                      <span className="match">{video.match}</span>
+                      <span className="age-rating">{video.rating}</span>
+                      {/* <span>{video.seasons}</span> */}
+                      {/* <span className="hd-badge">{video.quality}</span> */}
+                    </div>
+                    <div className="genre-tags">
+                      {video.genres.map((genre, index) => (
+                        <span key={index}>{genre}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Col>
         ))}
-      </Slider>
+      </Row>
+
+      {selectedBook && (
+              <div className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
+                <div className="popup-header">
+                  <img src={selectedBook.thumbnailUrl} alt={selectedBook.title} className="banner-image" />
+                  <IoMdCloseCircleOutline className="close-btn" onClick={handleClose} />
+                </div>
+      
+                <div className="popup-content mx-auto">
+                  <div className="metadata">
+                    <span className="match">{selectedBook.match}</span>
+                    <span className="year">2022</span>
+                    <span className="rating">{selectedBook.rating}</span>
+                    <span className="seasons">{selectedBook.seasons}</span>
+                    <span className="genres">{selectedBook.genres.join(", ")}</span>
+                  </div>
+      
+                  <p className="description">{selectedBook.description}</p>
+                  
+                  {/* Tab Navigation */}
+                  <div className="language-tabs">
+                    <div className="tab-buttons">
+                      {['PDF', 'Quiz', 'Assignment'].map((tab) => (
+                        <button 
+                          key={tab} 
+                          className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                          onClick={() => setActiveTab(tab)}
+                        >
+                          {tab}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+      
+                
+                  {renderTabContent()}
+                </div>
+              </div>
+            )}
     </Container>
   );
 };

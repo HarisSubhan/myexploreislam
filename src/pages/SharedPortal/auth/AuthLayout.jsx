@@ -59,14 +59,14 @@ const AuthFormContainer = ({ children, type }) => (
       <Card.Body className="p-4 p-md-5">
         <AuthHeader type={type} />
         
-        <div className="my-4">
-        <Image 
-      src={logo} 
-      alt="Company Logo" 
-      fluid 
-      style={{ maxWidth: "200px" }} 
-      className="mb-4"
-    />
+        <div className="my-4 text-center"> {/* Added text-center here */}
+          <Image 
+            src={logo} 
+            alt="Company Logo" 
+            fluid 
+            style={{ maxWidth: "200px", margin: "0 auto" }} 
+            className="mb-4"
+          />
           {children}
         </div>
 

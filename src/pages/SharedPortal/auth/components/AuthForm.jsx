@@ -41,6 +41,7 @@ const AuthForm = ({ onSubmit, loading, showRegisterLink = true, type = "login" }
           required
         />
       </FloatingLabel>
+      
 
       <Button
        style={{

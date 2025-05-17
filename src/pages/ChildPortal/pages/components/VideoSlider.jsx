@@ -8,13 +8,14 @@ const VideoThumbnails = () => {
   const [hoveredVideo, setHoveredVideo] = useState(null);
   const [expandedVideo, setExpandedVideo] = useState(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [activeTab, setActiveTab] = useState("Episodes");
 
   const handleClose = () => {
     setIsFadingOut(true);
     setTimeout(() => {
       setExpandedVideo(null);
       setIsFadingOut(false);
-    }, 300); // match fade-out duration
+    }, 300); 
   };
 
   const videoData = [
@@ -27,6 +28,14 @@ const VideoThumbnails = () => {
       rating: "TV-MA",
       seasons: "2 Seasons",
       quality: "HD",
+      quizzes: [
+        { id: 1, title: "Chapter 1 Quiz", questions: 10, duration: "15 min" },
+        { id: 2, title: "Midterm Quiz", questions: 20, duration: "30 min" }
+      ],
+      assignments: [
+        { id: 1, title: "Essay Assignment", due: "May 30", points: 100 },
+        { id: 2, title: "Group Project", due: "June 15", points: 200 }
+      ],
       genres: ["Action", "Thriller", "Drama"],
       description:
         "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
@@ -51,6 +60,78 @@ const VideoThumbnails = () => {
   useEffect(() => {
     document.body.style.overflow = expandedVideo ? "hidden" : "auto";
   }, [expandedVideo]);
+
+  const renderTabContent = () => {
+    if (!selectedVideo) return null; // Add this safety check
+    
+    switch (activeTab) {
+      case "Episodes":
+        return (
+          <>
+            <div className="episodes-header">
+              <h4>Episodes</h4>
+              <select className="season-selector">
+                <option>Season 1 (10 EP)</option>
+              </select>
+            </div>
+            <div className="episodes-list">
+              {[...Array(10)].map((_, i) => (
+                <div className="episode" key={i}>
+                  <div className="episode-thumb">
+                    <img src={selectedVideo.thumbnailUrl} alt={`Episode ${i + 1}`} />
+                  </div>
+                  <div className="episode-details">
+                    <div className="episode-title">Episode {i + 1}</div>
+                    <div className="episode-duration">44m</div>
+                    <div className="episode-desc">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        );
+      case "Quiz":
+        return (
+          <div className="quiz-content">
+            <h4>Quizzes</h4>
+            <div className="quiz-list">
+              {(selectedVideo.quizzes || []).map((quiz) => ( // Added null check
+                <div className="quiz-item" key={quiz.id}>
+                  <h5>{quiz.title}</h5>
+                  <div className="quiz-meta">
+                    <span>{quiz.questions} questions</span>
+                    <span>{quiz.duration}</span>
+                  </div>
+                  <button className="start-quiz-btn">Start Quiz</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case "Assignment":
+        return (
+          <div className="assignment-content">
+            <h4>Assignments</h4>
+            <div className="assignment-list">
+              {(selectedVideo.assignments || []).map((assignment) => ( // Added null check
+                <div className="assignment-item" key={assignment.id}>
+                  <h5>{assignment.title}</h5>
+                  <div className="assignment-meta">
+                    <span>Due: {assignment.due}</span>
+                    <span>Points: {assignment.points}</span>
+                  </div>
+                  <button className="view-assignment-btn">View Assignment</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <Container fluid className="netflix-container">
@@ -123,22 +204,13 @@ const VideoThumbnails = () => {
       </Row>
 
       {selectedVideo && (
-        <div
-          className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}
-        >
+        <div className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
           <div className="popup-header">
-            <img
-              src={selectedVideo.thumbnailUrl}
-              alt={selectedVideo.title}
-              className="banner-image"
-            />
-            <IoMdCloseCircleOutline
-              className="close-btn"
-              onClick={handleClose}
-            />
+            <img src={selectedVideo.thumbnailUrl} alt={selectedVideo.title} className="banner-image" />
+            <IoMdCloseCircleOutline className="close-btn" onClick={handleClose} />
           </div>
 
-          <div className="popup-content">
+          <div className="popup-content mx-auto">
             <div className="metadata">
               <span className="match">{selectedVideo.match}</span>
               <span className="year">2022</span>
@@ -148,33 +220,24 @@ const VideoThumbnails = () => {
             </div>
 
             <p className="description">{selectedVideo.description}</p>
-
-            <div className="episodes-header">
-              <h4>Episodes</h4>
-              <select className="season-selector">
-                <option>Season 1 (10 EP)</option>
-              </select>
+            
+            {/* Tab Navigation */}
+            <div className="language-tabs">
+              <div className="tab-buttons">
+                {['Episodes', 'Quiz', 'Assignment'].map((tab) => (
+                  <button 
+                    key={tab} 
+                    className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="episodes-list">
-              {[...Array(10)].map((_, i) => (
-                <div className="episode" key={i}>
-                  <div className="episode-thumb">
-                    <img
-                      src={selectedVideo.thumbnailUrl}
-                      alt={`Episode ${i + 1}`}
-                    />
-                  </div>
-                  <div className="episode-details">
-                    <div className="episode-title">Episode {i + 1}</div>
-                    <div className="episode-duration">44m</div>
-                    <div className="episode-desc">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* Tab Content */}
+            {renderTabContent()}
           </div>
         </div>
       )}

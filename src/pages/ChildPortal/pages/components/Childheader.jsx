@@ -30,7 +30,7 @@ const ChildHeader = () => {
   return (
     <>
       <Navbar
-        style={{ backgroundColor: "#00D7A9" }}
+        style={{ backgroundColor: "#00d7a9" }}
         expand="lg"
         className="py-2 py-md-3"
       >

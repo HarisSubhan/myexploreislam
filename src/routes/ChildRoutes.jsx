@@ -5,6 +5,7 @@ import ChildBookpage from "../pages/ChildPortal/pages/ChildBookpage";
 import BookDetail from "../pages/ChildPortal/pages/components/BookDetail";
 import ChildVideopage from "../pages/ChildPortal/pages/ChildVideopage";
 import VideoDetail from "../pages/ChildPortal/pages/components/VideoDetail";
+import QuizPage from "../pages/ChildPortal/pages/QuizPage";
 
 const ChildRoutes = () => {
   return (
@@ -15,6 +16,9 @@ const ChildRoutes = () => {
         <Route path="book/:bookId" element={<BookDetail />} />
         <Route path="video" element={<ChildVideopage />} />
         <Route path="video/:videoId" element={<VideoDetail />} />
+        <Route path="quiz" element={<QuizPage />} />
+
+
       </Route>
     </Routes>
   );
