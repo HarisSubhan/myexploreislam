@@ -16,7 +16,7 @@ const Book = () => {
     setTimeout(() => {
       setExpandedBook(null);
       setIsFadingOut(false);
-    }, 300); // match fade-out duration
+    }, 300); 
   };
 
   const BookData = [
@@ -151,7 +151,7 @@ const Book = () => {
           <div className="assignment-content">
             <h4>Assignments</h4>
             <div className="assignment-list">
-              {(selectedBook.assignments || []).map((assignment) => ( // Added null check
+              {(selectedBook.assignments || []).map((assignment) => ( 
                 <div className="assignment-item" key={assignment.id}>
                   <h5>{assignment.title}</h5>
                   <div className="assignment-meta">
