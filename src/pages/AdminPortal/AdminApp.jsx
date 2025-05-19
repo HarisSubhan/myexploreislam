@@ -1,14 +1,17 @@
-// src/routes/AdminRoutes.jsx
-import { Routes, Route } from "react-router-dom";
-import AdminDashboard from "../pages/AdminPortal/Dashboard";
-import AdminSettings from "../pages/AdminPortal/Settings";
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./pages/components/Header";
 
-const AdminRoutes = () => (
-  <Routes>
-    <Route path="dashboard" element={<AdminDashboard />} />
-    <Route path="settings" element={<AdminSettings />} />
-    {/* Other admin routes... */}
-  </Routes>
-);
 
-export default AdminRoutes;
+const AdminApp = () => {
+  return (
+    <>
+      <Header />
+      <main style={{ padding: "1rem" }}>
+        <Outlet />
+      </main>
+    </>
+  );
+};
+
+export default AdminApp;
