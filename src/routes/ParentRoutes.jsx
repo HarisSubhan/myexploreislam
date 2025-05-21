@@ -1,14 +1,21 @@
 import React from "react";
 import ParentApp from "../pages/ParentPortal/ParentApp";
+import ParentDashboard from "../pages/ParentPortal/ParentDashboard";
+import { Route, Routes } from "react-router-dom";
 
 const ParentRoutes = () => {
-  <Routes>
-    <Route path="/" element={<ParentApp />}>
-      {/* <Route index element={<ChildDashboard />} />
-      <Route path="book" element={<ChildBookpage />} />
-      <Route path="book/:bookId" element={<BookDetail />} /> */}
-    </Route>
-  </Routes>;
+  return (
+    <Routes>
+      <Route path="/" element={<ParentApp />}>
+        <Route index element={<ParentDashboard />} />
+        {/* Add more child routes here as needed */}
+        {/* Example:
+        <Route path="profile" element={<ParentProfile />} />
+        <Route path="settings" element={<ParentSettings />} />
+        */}
+      </Route>
+    </Routes>
+  );
 };
 
 export default ParentRoutes;
