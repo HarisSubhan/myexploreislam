@@ -1,5 +1,7 @@
 import React from "react";
 import HeaderChild from "../ChildPortal/pages/components/HeaderChild";
+import { Outlet } from "react-router-dom";
+
 
 const ParentApp = () => {
   return (
