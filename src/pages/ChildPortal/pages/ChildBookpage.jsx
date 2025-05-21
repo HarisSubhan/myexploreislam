@@ -1,10 +1,10 @@
 import React from "react";
-import Bookhomepage from "./components/Bookhomepage";
+import BookHomepage from "../../../components/child/Bookhomepage";
 
 const ChildBookpage = () => {
   return (
     <div className="p-6">
-     <Bookhomepage/>
+     <BookHomepage/>
     </div>
   );
 };

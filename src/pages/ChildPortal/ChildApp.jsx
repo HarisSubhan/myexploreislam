@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
-import Banner from "./pages/components/Banner";
-import HeaderChild from "./pages/components/HeaderChild";
+import Banner from "../../components/child/Banner";
+import HeaderChild from "../../components/child/HeaderChild";
 
 const ChildApp = () => {
   return (

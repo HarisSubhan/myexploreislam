@@ -1,23 +1,3 @@
-// import React from "react";
-// import { Button } from "react-bootstrap";
-// import { useNavigate, useParams } from "react-router-dom";
-
-// function BookDetail() {
-//   const navigate = useNavigate();
-//   const { bookId } = useParams();
-
-//   return (
-//     <div className="container py-4">
-//       <Button onClick={() => navigate(-1)} variant="secondary" className="mb-4">
-//         Back to Home
-//       </Button>
-//       <h1>Book Details for ID: {bookId}</h1>
-//       <p>This is the detail page for book with ID: {bookId}</p>
-//     </div>
-//   );
-// }
-
-// export default BookDetail; // Make sure this line exists
 import React from "react";
 import { Button, Card, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
