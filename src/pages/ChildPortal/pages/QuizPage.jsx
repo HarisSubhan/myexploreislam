@@ -1,5 +1,5 @@
 import React from 'react'
-import BookDetail from './components/BookDetail'
+import BookDetail from '../../../components/child/BookDetail'
 
 const QuizPage = () => {
   return (

@@ -1,18 +1,23 @@
 import React from "react";
-import ParentApp from "../pages/ParentPortal/ParentApp";
-import ParentDashboard from "../pages/ParentPortal/ParentDashboard";
+
+import ParentDashboard from "../pages/ParentPortal/pages/ParentDashboard";
 import { Route, Routes } from "react-router-dom";
+import ParentApp from "../pages/ParentPortal/ParentApp";
+import Subscription from "../pages/ParentPortal/pages/Subscription";
+import Payments from "../pages/ParentPortal/pages/Payments";
+import Profile from "../pages/ParentPortal/pages/Profile";
+import ChangePassword from "../pages/ParentPortal/pages/ChangePassword";
 
 const ParentRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<ParentApp />}>
         <Route index element={<ParentDashboard />} />
-        {/* Add more child routes here as needed */}
-        {/* Example:
-        <Route path="profile" element={<ParentProfile />} />
-        <Route path="settings" element={<ParentSettings />} />
-        */}
+        <Route path="subscription" element={<Subscription />} />
+        <Route path="payments" element={<Payments />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="changepassword" element={<ChangePassword />} />
+      
       </Route>
     </Routes>
   );

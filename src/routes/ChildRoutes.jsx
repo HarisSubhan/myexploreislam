@@ -2,9 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import ChildApp from "../pages/ChildPortal/ChildApp";
 import ChildDashboard from "../pages/ChildPortal/pages/ChildDashboard";
 import ChildBookpage from "../pages/ChildPortal/pages/ChildBookpage";
-import BookDetail from "../pages/ChildPortal/pages/components/BookDetail";
+import BookDetail from "../components/child/BookDetail";
 import ChildVideopage from "../pages/ChildPortal/pages/ChildVideopage";
-import VideoDetail from "../pages/ChildPortal/pages/components/VideoDetail";
+import VideoDetail from "../components/child/VideoDetail";
 import QuizPage from "../pages/ChildPortal/pages/QuizPage";
 
 const ChildRoutes = () => {
@@ -17,8 +17,6 @@ const ChildRoutes = () => {
         <Route path="video" element={<ChildVideopage />} />
         <Route path="video/:videoId" element={<VideoDetail />} />
         <Route path="quiz" element={<QuizPage />} />
-
-
       </Route>
     </Routes>
   );

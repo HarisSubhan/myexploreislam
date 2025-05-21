@@ -1,5 +1,6 @@
 import React from "react";
-import { VideoHomepage } from "./components/Videohomepage";
+import { VideoHomepage } from "../../../components/child/Videohomepage";
+
 
 const ChildVideopage = () => {
   return (
