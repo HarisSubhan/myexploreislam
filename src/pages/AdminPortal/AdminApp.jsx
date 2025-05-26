@@ -1,12 +1,13 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./pages/components/Header";
+import ParentHeader from "../../components/admin/Header";
+
 
 
 const AdminApp = () => {
   return (
     <>
-      <Header />
+      <ParentHeader />
       <main style={{ padding: "1rem" }}>
         <Outlet />
       </main>
