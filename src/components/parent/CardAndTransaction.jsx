@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Table, Container, Row, Col } from 'react-bootstrap';
+import { Card, Table, Container, Row, Col, Badge } from 'react-bootstrap';
+import { FiCreditCard, FiCalendar, FiDollarSign, FiCheckCircle, FiClock } from 'react-icons/fi';
 
 const transactions = [
   {
@@ -24,80 +25,131 @@ const transactions = [
 
 const CardAndTransaction = () => {
   return (
-    <Container fluid className="my-4">
-      <Row className="mb-4">
-        <Col md={6}>
-          <div
-            style={{
-              background: 'linear-gradient(to right, #b7d3a8, #f7e4ad)',
-              borderRadius: '16px',
-              padding: '20px',
-              width: '60%',
-              height:"200px",
-              color: '#000',
-              position: 'relative',
-              minHeight: '150px',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
-              5762 **** **** **45
-            </div>
-            <div className="mt-3">
-              <div>Cardholder Name: <strong>John Doe</strong></div>
-              <div>Valid Upto: <strong>10/26</strong></div>
-            </div>
-            <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
-              <img
-                src="https://img.icons8.com/color/48/000000/mastercard-logo.png"
-                alt="Mastercard"
-                width="50"
-              />
-            </div>
-          </div>
+    <Container  className="my-4 px-2 px-md-3">
+      {/* Credit Card Section */}
+      <Row className="mb-4 g-3">
+        <Col xs={12} md={6} lg={5} xl={4}>
+          <Card className="border-0 shadow-sm" style={{
+            background: 'linear-gradient(135deg, #b7d3a8 0%, #f7e4ad 100%)',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            minHeight: '180px'
+          }}>
+            <Card.Body className="p-3 p-md-4 position-relative">
+              <div className="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                  <div className="text-muted small mb-1">Card Number</div>
+                  <h3 className="mb-0 fs-5 fw-bold">5762 **** **** **45</h3>
+                </div>
+                <img
+                  src="https://img.icons8.com/color/48/000000/mastercard-logo.png"
+                  alt="Mastercard"
+                  width="40"
+                />
+              </div>
+              
+              <Row className="g-3">
+                <Col xs={6}>
+                  <div className="text-muted small">Cardholder Name</div>
+                  <div className="fw-medium">John Doe</div>
+                </Col>
+                <Col xs={6}>
+                  <div className="text-muted small">Valid Thru</div>
+                  <div className="fw-medium">10/26</div>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
 
+      {/* Transactions Section */}
       <Row>
-        <Col>
-          <Card>
-            <Card.Body>
-              <Card.Title>Transaction Details</Card.Title>
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    <th>Sr No</th>
-                    <th>Card Number</th>
-                    <th>Expiry Date</th>
-                    <th>Due Date</th>
-                    <th>Amount</th>
-                    <th>Date Paid</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((tx) => (
-                    <tr key={tx.id}>
-                      <td>{tx.id}</td>
-                      <td>{tx.cardNumber}</td>
-                      <td>{tx.expiry}</td>
-                      <td>{tx.dueDate}</td>
-                      <td>{tx.amount}</td>
-                      <td>{tx.paidDate || '-'}</td>
-                      <td>
-                        <span
-                          style={{
-                            color: tx.status === 'Paid' ? 'green' : 'red',
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          {tx.status}
-                        </span>
-                      </td>
+        <Col xs={12}>
+          <Card className="border-0 shadow-sm">
+            <Card.Body className="p-2 p-md-3">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <Card.Title className="mb-0 fs-5 fw-semibold">Transaction Details</Card.Title>
+                <div className="text-muted small">2 transactions</div>
+              </div>
+
+              {/* Desktop Table */}
+              <div className="d-none d-md-block">
+                <Table hover className="mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Card</th>
+                      <th>Expiry</th>
+                      <th>Due Date</th>
+                      <th>Amount</th>
+                      <th>Paid Date</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {transactions.map((tx) => (
+                      <tr key={tx.id}>
+                        <td>{tx.id}</td>
+                        <td>{tx.cardNumber}</td>
+                        <td>{tx.expiry}</td>
+                        <td>{tx.dueDate}</td>
+                        <td className="fw-medium">{tx.amount}</td>
+                        <td>{tx.paidDate || '-'}</td>
+                        <td>
+                          <Badge bg={tx.status === 'Paid' ? 'success' : 'danger'} className="d-flex align-items-center gap-1">
+                            {tx.status === 'Paid' ? <FiCheckCircle size={14} /> : <FiClock size={14} />}
+                            {tx.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="d-md-none">
+                {transactions.map((tx) => (
+                  <Card key={tx.id} className="mb-3 border-0 shadow-sm">
+                    <Card.Body className="p-3">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <div className="fw-medium">Transaction #{tx.id}</div>
+                        <Badge bg={tx.status === 'Paid' ? 'success' : 'danger'}>
+                          {tx.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="mb-2">
+                        <div className="text-muted small">Card Number</div>
+                        <div>{tx.cardNumber}</div>
+                      </div>
+                      
+                      <Row className="g-2 mb-2">
+                        <Col xs={6}>
+                          <div className="text-muted small">Expiry</div>
+                          <div>{tx.expiry}</div>
+                        </Col>
+                        <Col xs={6}>
+                          <div className="text-muted small">Due Date</div>
+                          <div>{tx.dueDate}</div>
+                        </Col>
+                      </Row>
+                      
+                      <Row className="g-2">
+                        <Col xs={6}>
+                          <div className="text-muted small">Amount</div>
+                          <div className="fw-medium">{tx.amount}</div>
+                        </Col>
+                        <Col xs={6}>
+                          <div className="text-muted small">Paid Date</div>
+                          <div>{tx.paidDate || '-'}</div>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+                ))}
+              </div>
             </Card.Body>
           </Card>
         </Col>
