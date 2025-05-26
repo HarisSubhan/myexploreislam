@@ -7,19 +7,23 @@ import Subscription from "../pages/ParentPortal/pages/Subscription";
 import Payments from "../pages/ParentPortal/pages/Payments";
 import Profile from "../pages/ParentPortal/pages/Profile";
 import ChangePassword from "../pages/ParentPortal/pages/ChangePassword";
+import DefaultTheme from "../pages/ParentPortal/pages/DefaultTheme";
+// import { ThemeProvider } from "../context/ThemeContext";
 
 const ParentRoutes = () => {
   return (
-    <Routes>
-      <Route path="/" element={<ParentApp />}>
-        <Route index element={<ParentDashboard />} />
-        <Route path="subscription" element={<Subscription />} />
-        <Route path="payments" element={<Payments />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="changepassword" element={<ChangePassword />} />
-      
-      </Route>
-    </Routes>
+    // <ThemeProvider>
+      <Routes>
+        <Route path="/" element={<ParentApp />}>
+          <Route index element={<ParentDashboard />} />
+          <Route path="subscription" element={<Subscription />} />
+          <Route path="payments" element={<Payments />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="changepassword" element={<ChangePassword />} />
+          <Route path="defaulttheme" element={<DefaultTheme />} />
+        </Route>
+      </Routes>
+    // </ThemeProvider>
   );
 };
 
