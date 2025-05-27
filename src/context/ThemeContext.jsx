@@ -12,14 +12,14 @@ export const ThemeProvider = ({ children }) => {
 
   const updateTheme = (color, name, textColor) => {
     setTheme({ color, name, textColor });
-    // Update CSS variables
+    
     document.documentElement.style.setProperty("--primary-color", color);
     document.documentElement.style.setProperty("--text-on-primary", textColor);
-    // Save to localStorage
+   
     localStorage.setItem("theme", JSON.stringify({ color, name, textColor }));
   };
 
-  // Initialize theme from localStorage
+  
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
@@ -35,7 +35,7 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the theme context
+
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {

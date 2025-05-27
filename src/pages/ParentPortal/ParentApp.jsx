@@ -36,8 +36,18 @@ const NAVIGATION = [
     title: "Subscription",
     icon: <ArticleIcon />,
   },
+  {
+    path: "/parent/addchild",
+    title: "Add Child",
+    icon: <ProfileIcon/>
+  },
   { path: "/parent/payments", title: "Payments", icon: <PaymentIcon /> },
   { kind: "divider" },
+  {
+    path: "/parent/account",
+    title: "Account",
+    icon: <ProfileIcon />,
+  },
   {
     path: "/parent/profile",
     title: "Profile",
@@ -48,6 +58,8 @@ const NAVIGATION = [
     title: "Change Password",
     icon: <ChangePasswordIcon />,
   },
+  { kind: "divider" },
+  
   {
     path: "/parent/defaulttheme",
     title: "Theme Settings",
@@ -57,7 +69,7 @@ const NAVIGATION = [
 
 const ParentApp = () => {
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const { color: themeColor, textColor } = useTheme();
   const muiGlobalTheme = useMuiTheme();
