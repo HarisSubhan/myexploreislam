@@ -3,12 +3,15 @@ import { Card, Container, Row, Col } from "react-bootstrap";
 import { FaPlay, FaPlus, FaThumbsUp, FaChevronDown } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import "./VideoThumbnails.css";
+import { useTheme } from "../../context/ThemeContext";
 
 const VideoThumbnails = () => {
   const [hoveredVideo, setHoveredVideo] = useState(null);
   const [expandedVideo, setExpandedVideo] = useState(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("Episodes");
+  const { color: themeColor, textColor } = useTheme(); 
+
 
   const handleClose = () => {
     setIsFadingOut(true);
@@ -163,7 +166,7 @@ const VideoThumbnails = () => {
                   <div className="hover-thumbnail">
                     <img src={video.thumbnailUrl} alt={video.title} />
                   </div>
-                  <div className="hover-details">
+                  <div style={{ backgroundColor: themeColor, color: textColor }} className="hover-details">
                     <div className="action-buttons d-flex justify-content-between align-items-center">
                       <div className="d-flex gap-2">
                         <button className="action-btn play-btn">
@@ -204,13 +207,13 @@ const VideoThumbnails = () => {
       </Row>
 
       {selectedVideo && (
-        <div className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
+        <div style={{ backgroundColor: themeColor, color: textColor }} className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
           <div className="popup-header">
             <img src={selectedVideo.thumbnailUrl} alt={selectedVideo.title} className="banner-image" />
             <IoMdCloseCircleOutline className="close-btn" onClick={handleClose} />
           </div>
 
-          <div className="popup-content mx-auto">
+          <div style={{ backgroundColor: themeColor, color: textColor }} className="popup-content mx-auto">
             <div className="metadata">
               <span className="match">{selectedVideo.match}</span>
               <span className="year">2022</span>

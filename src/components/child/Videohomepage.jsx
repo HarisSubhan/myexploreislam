@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Row, Col, Card, Badge } from "react-bootstrap";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 const videos = [
   {
@@ -52,6 +53,9 @@ const videos = [
 
 const VideoCard = ({ video }) => {
   const navigate = useNavigate();
+      const { color: themeColor, textColor } = useTheme(); 
+  
+  
 
   const handleClick = () => {
     navigate(`/child/video/${video.id}`);
@@ -66,9 +70,9 @@ const VideoCard = ({ video }) => {
       <div className="position-relative">
         <Card.Img variant="top" src={video.thumbnail} />
         <Badge
-          bg="dark"
+          style={{ backgroundColor: themeColor, color: textColor, opacity: 0.85 }}
           className="position-absolute bottom-0 end-0 m-2"
-          style={{ opacity: 0.85 }}
+          // style={{ opacity: 0.85 }}
         >
           {video.duration}
         </Badge>

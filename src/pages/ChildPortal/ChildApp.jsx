@@ -7,8 +7,6 @@ import { ThemeProvider } from "../../context/ThemeContext"; // Import ThemeProvi
 const ChildApp = () => {
   return (
     <ThemeProvider>
-      {" "}
-      {/* Wrap with ThemeProvider */}
       <div
         style={{
           backgroundColor: "var(--primary-color)",

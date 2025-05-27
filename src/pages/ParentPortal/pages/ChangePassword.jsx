@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Card, Form, Container, Alert } from 'react-bootstrap';
 import { LockFill, Eye, EyeSlash } from 'react-bootstrap-icons';
+import { useTheme } from '../../../context/ThemeContext';
 
 const ChangePassword = () => {
+  const { color: themeColor, textColor } = useTheme(); 
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -168,7 +171,7 @@ const ChangePassword = () => {
                 variant="primary"
                 type="submit"
                 className="w-100 py-2"
-                style={{ backgroundColor: "#F1066C", borderColor: "#F1066C" }}
+                style={{ backgroundColor: themeColor, color: textColor }}
               >
                 Update Password
               </Button>

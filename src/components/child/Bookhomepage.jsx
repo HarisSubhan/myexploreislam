@@ -150,7 +150,6 @@ const BookHomepage = () => {
         {trendingItems.map((item) => (
           <div key={item.id} className="px-2">
             <Card className="h-100" style={{ height: "500px" }}>
-              {/* Change this to a div with onClick handler */}
               <div
                 onClick={() => navigate(`/child/book/${item.id}`)}
                 style={{ cursor: "pointer" }}
