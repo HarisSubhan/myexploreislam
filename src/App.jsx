@@ -71,6 +71,7 @@ import AdminRoutes from "./routes/AdminRoutes";
 import ParentRoutes from "./routes/ParentRoutes";
 import ChildRoutes from "./routes/ChildRoutes";
 import HomePage from "./pages/SharedPortal/pages/HomePage";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   // Temporarily disable authentication checks
@@ -120,20 +121,24 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
+    <ThemeProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
 
-        {AuthRoutes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} />
-        ))}
-        {/* Protected Routes */}
-        <Route path="/parent/*" element={<ParentRoutes />} />
-        <Route path="/child/*" element={<ChildRoutes />} />
-        <Route path="/admin/*" element={<AdminRoutes />} />
-        {/* Fallback Route */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
+          {AuthRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+          {/* Protected Routes */}
+
+          <Route path="/parent/*" element={<ParentRoutes />} />
+          <Route path="/child/*" element={<ChildRoutes />} />
+
+          <Route path="/admin/*" element={<AdminRoutes />} />
+          {/* Fallback Route */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+    </ThemeProvider>
+      </BrowserRouter>
   );
 }
 

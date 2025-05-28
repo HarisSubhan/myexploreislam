@@ -16,36 +16,37 @@ import logo from "@images/logo.png";
 import { CiBellOn, CiMenuBurger } from "react-icons/ci";
 import avatar from "@images/DES.png";
 import writtenlogo from "@images/WRITTEN.png";
+import { useTheme } from "../../context/ThemeContext";
 
 const HeaderChild = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-
+  const { color: themeColor, textColor } = useTheme(); 
   const handleCloseOffcanvas = () => setShowOffcanvas(false);
   const handleShowOffcanvas = () => setShowOffcanvas(true);
 
-  const logoHeightMobile = 40; // Increased logo height for mobile
-  const logoHeightDesktop = 50; // Increased logo height for desktop
-  const writtenLogoHeightMobile = 40; // Increased written logo height for mobile
+  const logoHeightMobile = 40; 
+  const logoHeightDesktop = 50; 
+  const writtenLogoHeightMobile = 40; 
 
   return (
     <>
       <Navbar
-        style={{ backgroundColor: "#00d7a9" }}
+        style={{ backgroundColor: themeColor, color: textColor }}
         expand="lg"
         className="py-2 py-md-3"
       >
         <Container className="px-3 px-md-4">
           <div className="d-flex w-100 align-items-center justify-content-between">
-            {/* Mobile Layout (small screens) */}
+           
             <div className="d-flex d-lg-none w-100 align-items-center">
-              {/* Left: Menu Toggle */}
+             
               <CiMenuBurger
                 size={24}
                 className="cursor-pointer me-3"
                 onClick={handleShowOffcanvas}
               />
 
-              {/* Middle: Logo */}
+             
               <Navbar.Brand as={Link} to="/child" className="mx-auto">
                 <div className="d-flex align-items-center">
                   <Image
@@ -62,7 +63,7 @@ const HeaderChild = () => {
                 </div>
               </Navbar.Brand>
 
-              {/* Right: User Dropdown */}
+             
               <Dropdown className="ms-auto">
                 <Dropdown.Toggle
                   variant="link"
@@ -106,9 +107,9 @@ const HeaderChild = () => {
               </Dropdown>
             </div>
 
-            {/* Desktop Layout (large screens) */}
+           
             <div className="d-none d-lg-flex w-100 align-items-center justify-content-between">
-              {/* Desktop Logo */}
+            
               <Navbar.Brand as={Link} to="/child">
                 <Image
                   src={logo}
@@ -117,7 +118,7 @@ const HeaderChild = () => {
                 />
               </Navbar.Brand>
 
-              {/* Center Menu */}
+             
               <Nav className="mx-auto">
                 <Nav.Item className="mx-3">
                   <Link to="/child" className="nav-link fw-bold">
@@ -136,7 +137,7 @@ const HeaderChild = () => {
                 </Nav.Item>
               </Nav>
 
-              {/* Desktop Right Icons */}
+             
               <div className="d-flex align-items-center gap-3">
                 <Form className="d-flex me-2">
                   <FormControl
@@ -200,8 +201,7 @@ const HeaderChild = () => {
         show={showOffcanvas}
         onHide={handleCloseOffcanvas}
         placement="start"
-        bg="light"
-        text="dark"
+        style={{ backgroundColor: themeColor, color: textColor }}
       >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>

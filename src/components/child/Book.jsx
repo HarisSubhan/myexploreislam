@@ -3,12 +3,16 @@ import { Card, Container, Row, Col, Button } from "react-bootstrap";
 import { FaPlay, FaPlus, FaThumbsUp, FaChevronDown } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import "./VideoThumbnails.css";
+import { useTheme } from "../../context/ThemeContext";
 
 const Book = () => {
   const [hoveredBook, setHoveredBook] = useState(null);
   const [expandedBook, setExpandedBook] = useState(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
+    const { color: themeColor, textColor } = useTheme(); 
+  
     const [activeTab, setActiveTab] = useState("pdf");
+    
   
 
   const handleClose = () => {
@@ -195,16 +199,13 @@ const Book = () => {
               </Card>
 
               {hoveredBook === video.id && (
-                <div className="netflix-hover-card-book">
+                <div style={{ backgroundColor: themeColor, color: textColor }} className="netflix-hover-card-book">
                   <div className="hover-thumbnail">
                     <img src={video.thumbnailUrl} alt={video.title} />
                   </div>
-                  <div className="hover-details">
-                    <div className="action-buttons d-flex justify-content-between align-items-center">
+                  <div  className="hover-details">
+                    <div  className="action-buttons d-flex justify-content-between align-items-center">
                       <div className="d-flex gap-2">
-                        {/* <button className="action-btn play-btn">
-                          <FaPlay />
-                        </button> */}
                         <button className="action-btn">
                           <FaPlus />
                         </button>
@@ -223,8 +224,7 @@ const Book = () => {
                     <div className="match-rating">
                       <span className="match">{video.match}</span>
                       <span className="age-rating">{video.rating}</span>
-                      {/* <span>{video.seasons}</span> */}
-                      {/* <span className="hd-badge">{video.quality}</span> */}
+                      
                     </div>
                     <div className="genre-tags">
                       {video.genres.map((genre, index) => (
@@ -240,13 +240,13 @@ const Book = () => {
       </Row>
 
       {selectedBook && (
-              <div className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
+              <div style={{ backgroundColor: themeColor, color: textColor }} className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
                 <div className="popup-header">
                   <img src={selectedBook.thumbnailUrl} alt={selectedBook.title} className="banner-image" />
                   <IoMdCloseCircleOutline className="close-btn" onClick={handleClose} />
                 </div>
       
-                <div className="popup-content mx-auto">
+                <div style={{ backgroundColor: themeColor, color: textColor }} className="popup-content mx-auto">
                   <div className="metadata">
                     <span className="match">{selectedBook.match}</span>
                     <span className="year">2022</span>

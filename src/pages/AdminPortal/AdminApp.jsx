@@ -1,43 +1,22 @@
-// import React from "react";
-// import { Outlet } from "react-router-dom";
-// import Header from '../../../src/components/admin/Header';
-// import Sidebar from "../../../src/components/admin/Sidebar";
-// import StatCard from "../../../src/components/admin/StatCard";
-
-// const AdminApp = ({ children }) => {
-//   return (
-//     <div className="d-flex">
-//       {/* Left Sidebar */}
-//       <Sidebar />
-
-//       {/* Main Area */}
-//       <div style={{ width: "100%" }}>
-//         <Header />
-//         <main style={{ padding: "1rem" }}>
-//           <Outlet />
-//           <StatCard/>
-
-//           {/* {children} */}
-//         </main>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AdminApp;
-
-
 import React from "react";
-import Sidebar from "../../components/admin/Sidebar";
+import { Outlet } from "react-router-dom";
 import Header from "../../components/admin/Header";
+import Sidebar from "../../components/admin/Sidebar";
+import StatCard from "../../components/admin/StatCard";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   return (
     <div className="d-flex">
+      {/* Left Sidebar - keep if needed for navigation */}
       <Sidebar />
+
+      {/* Main Content Area */}
       <div className="flex-grow-1">
         <Header />
-        <main className="p-3">{children}</main>
+        <main className="p-3">
+          <Outlet /> {/* For nested routes */}
+          <StatCard /> {/* Keep if still needed */}
+        </main>
       </div>
     </div>
   );
