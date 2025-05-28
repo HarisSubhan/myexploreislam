@@ -1,10 +1,10 @@
 import React from 'react'
-import AccountDetailsTable from '../../../components/parent/AccountDetailsTable'
+
 
 const Profile = () => {
   return (
     <>
-    <AccountDetailsTable/>
+    <h1>Profile</h1>
     </>
   )
 }

@@ -1,58 +1,133 @@
-import React from 'react';
-import { AppBar, Toolbar, IconButton, Box, TextField, InputAdornment } from '@mui/material';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import SearchIcon from '@mui/icons-material/Search';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, IconButton, Typography, Box, useTheme, Menu, MenuItem, Divider } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import { Link as RouterLink } from 'react-router-dom'; // For MenuItem links
 
-const ParentHeader = ({ toggleSidebar, isSidebarOpen, drawerWidth }) => {
+// MUI Icons for theme toggle and profile
+import Brightness4Icon from '@mui/icons-material/Brightness4'; // Moon
+import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sun
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
+import logo from "@images/logo.png"; // Ensure this path is correct
+
+const ParentHeader = ({
+  toggleSidebar,
+  darkMode,
+  toggleTheme
+}) => {
+  const muiTheme = useTheme();
+  const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log("Logout action triggered");
+    handleCloseUserMenu();
+  };
+
   return (
-    <AppBar 
+    <AppBar
       position="fixed"
-      sx={{ 
-        width: `calc(100% - ${isSidebarOpen ? drawerWidth : 0}px)`,
-        backgroundColor: "white", 
-        color: "black",
-        boxShadow: "none",
-        borderBottom: "1px solid #e0e0e0",
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        transition: (theme) => theme.transitions.create('width', {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
+      sx={{
+        width: '100%',
+        marginLeft: 0,
+        zIndex: muiTheme.zIndex.drawer + 1,
+        // No need to adjust width/marginLeft based on sidebar for a fixed AppBar
       }}
     >
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={toggleSidebar} sx={{ mr: 2 }}>
-            {isSidebarOpen ? <FaTimes /> : <FaBars />}
-          </IconButton>
-          
-          <Box>
-            <h1 style={{ margin: 0, fontSize: "1.8rem", fontWeight: 700 }}>
-              EXPLORE ISLAM
-            </h1>
-            <p style={{ margin: "4px 0 0 0", fontSize: "0.9rem", color: "#666" }}>
-              Wisdom for Young Minds
-            </p>
-          </Box>
-        </Box>
-        
-        <TextField
-          size="small"
-          placeholder="Search..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            sx: {
-              borderRadius: "20px",
-              width: "250px",
-              backgroundColor: "#f5f5f5"
-            }
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={toggleSidebar}
+          sx={{ mr: { xs: 1, sm: 2 } }} // Slightly less margin on xs
+        >
+          <MenuIcon />
+        </IconButton>
+
+        <Box
+          component="img"
+          src={logo}
+          alt="Logo"
+          sx={{
+            height: { xs: 30, sm: 40, lg:60 }, // Responsive logo height
+            mr: 2,
+            // display: { xs: 'none', sm: 'block' } // Keep if you want to hide on xs
           }}
-          variant="outlined"
         />
+
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{
+            flexGrow: 1,
+            display: { xs: 'none', sm: 'block' } // Hide title on very small screens
+          }}
+        >
+          Explore Islam
+        </Typography>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton
+            onClick={toggleTheme}
+            color="inherit"
+            title="Toggle Theme"
+          >
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+
+          <IconButton
+            onClick={handleOpenUserMenu}
+            color="inherit"
+            title="User Profile"
+          >
+            <AccountCircleIcon />
+          </IconButton>
+          <Menu
+            sx={{ mt: '45px' }}
+            id="menu-appbar-user"
+            anchorEl={anchorElUser}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
+          >
+            <MenuItem
+              component={RouterLink}
+              to="/parent/profile"
+              onClick={handleCloseUserMenu}
+            >
+              <Typography textAlign="center">Profile</Typography>
+            </MenuItem>
+            <MenuItem
+              component={RouterLink}
+              to="/parent/settings" 
+              onClick={handleCloseUserMenu}
+            >
+              <Typography textAlign="center">Settings</Typography>
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <Typography textAlign="center">Logout</Typography>
+            </MenuItem>
+          </Menu>
+        </Box>
       </Toolbar>
     </AppBar>
   );
