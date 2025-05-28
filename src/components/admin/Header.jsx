@@ -59,8 +59,6 @@ const Header = () => {
                     </Dropdown>
                 </Nav>
             </Container>
-            {/* <Nav.Link href="/admin">Dashboard</Nav.Link> */}
-{/* <Nav.Link href="/admin/videos">Videos</Nav.Link> */}
         </Navbar>
 
     );
