@@ -23,6 +23,7 @@ const MainFooter = () => {
             <img
               src={logo}
               alt="Kids Learn Logo"
+            
               style={{ maxWidth: "150px", marginBottom: "1rem" }}
             />
            
