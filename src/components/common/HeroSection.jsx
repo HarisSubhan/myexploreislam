@@ -34,18 +34,18 @@ const HeroSection = () => {
               className="img-fluid"
               style={{
                 maxHeight: "40vh",
-                minHeight: "200px", // Added minimum height
+                minHeight: "200px", 
                 marginBottom: "0.5rem",
                 position: "relative",
                 zIndex: 2,
-                width: "auto", // Ensures proper aspect ratio
+                width: "auto", 
               }}
             />
             <div
               style={{
                 position: "relative",
                 height: "120px",
-                minHeight: "80px", // Added minimum height
+                minHeight: "80px", 
                 zIndex: 2,
               }}
             >
@@ -57,9 +57,9 @@ const HeroSection = () => {
                   bottom: 0,
                   right: 0,
                   maxHeight: "80vh",
-                  maxWidth: "150px", // Added maximum width
+                  maxWidth: "150px",
                   height: "auto",
-                  width: "auto", // Ensures proper aspect ratio
+                  width: "auto", 
                   marginTop: "-1rem",
                 }}
               />
