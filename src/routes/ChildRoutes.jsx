@@ -6,11 +6,10 @@ import BookDetail from "../components/child/BookDetail";
 import ChildVideopage from "../pages/ChildPortal/pages/ChildVideopage";
 import VideoDetail from "../components/child/VideoDetail";
 import QuizPage from "../pages/ChildPortal/pages/QuizPage";
-// import { ThemeProvider } from "../context/ThemeContext";
 
 const ChildRoutes = () => {
   return (
-    // <ThemeProvider>
+   
       <Routes>
         <Route path="/" element={<ChildApp />}>
           <Route index element={<ChildDashboard />} />
@@ -21,7 +20,7 @@ const ChildRoutes = () => {
           <Route path="quiz" element={<QuizPage />} />
         </Route>
       </Routes>
-    // </ThemeProvider>
+   
   );
 };
 

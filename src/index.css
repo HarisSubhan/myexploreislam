@@ -101,4 +101,8 @@ body {
   --bs-alert-border-color: rgba(255, 209, 102, 0.5);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 

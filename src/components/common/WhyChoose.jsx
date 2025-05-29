@@ -1,73 +1,66 @@
 import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import star from "@images/Star___Moon_Drops.png";
+import star from "@images/SideDesign.png";
 
 const WhyChoose = () => {
   const features = [
     {
       title: "Fun & Interactive Learning",
-      color: "#f95e1a", // orange
+      color: "#f95e1a",
       description:
         "Kids enjoy & learn from animated cartoons, quizzes, and worksheets.",
     },
     {
       title: "Easy for Parents",
-      color: "#ff6b6b", // red/orange
+      color: "#ff6b6b",
       description: "Track your child's progress in real time.",
     },
     {
       title: "Authentic & Reliable",
-      color: "#e86f0b", // darker orange
+      color: "#e86f0b",
       description: "Content is based on Quran and authentic Hadith.",
     },
   ];
 
   return (
-    <Container
-      fluid
-      className="p-0 d-flex"
-      style={{
-        backgroundColor: "#e7fcff",
-        // minHeight: "100vh", // Ensures full viewport height
-      }}
-    >
-      <Row className="g-0 w-100">
-        {/* Left Column */}
+    <Container fluid className="p-0" style={{ backgroundColor: "#e7fcff", minHeight: "100vh" }}>
+      <Row className="g-0" style={{ minHeight: "100vh" }}>
+        
         <Col
           xs={12}
           md={6}
-          className="d-flex flex-column justify-content-center align-items-center"
-          style={{ padding: "2rem" }}
+          className="d-flex flex-column align-items-center justify-content-center"
+          style={{ minHeight: "100vh", padding: 0 }}
         >
-          {/* Decorative Image */}
-          <div
+          <img
+            src={star}
+            alt="Side Design"
             style={{
               width: "100%",
-              maxWidth: "400px",
-              height: "300px",
-              background: `url(${star}) no-repeat center center`,
-              backgroundSize: "contain",
-              marginBottom: "2rem",
+              height: "auto",
+              display: "block",
             }}
           />
-          {/* Heading Text */}
-          <div className="text-center">
-            <h1
-              className="fw-bold"
-              style={{ color: "#fb5607", fontSize: "4rem" }}
-            >
-              Why Choose <br />
-              Explore Islam?
-            </h1>
-          </div>
+          <h1
+            className="fw-bold text-center"
+            style={{
+              color: "#fb5607",
+              fontSize: "3rem",
+              lineHeight: 1.2,
+              margin: "1rem 0 0 0",
+              padding: 0,
+            }}
+          >
+            Why Choose <br />
+            Explore Islam?
+          </h1>
         </Col>
 
-        {/* Right Column - Features */}
         <Col
           xs={12}
           md={6}
-          className="d-flex flex-column "
-          style={{ padding: "2rem" }}
+          className="d-flex flex-column justify-content-center p-4"
+          style={{ minHeight: "100vh" }}
         >
           {features.map((feature, index) => (
             <div key={index} className="mb-4 text-center text-md-start">

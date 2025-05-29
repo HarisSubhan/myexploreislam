@@ -5,12 +5,13 @@ import bottomRightImage from "@images/Muaz_Side_Page.png";
 
 const ExploreIslam = () => {
   return (
-    <Container
+    <section id="about-islam">
+  <Container
       fluid
       style={{ backgroundColor: "#e7fcff" }}
       className="position-relative py-lg-5 overflow-hidden"
     >
-      {/* Top-left image (partially outside) */}
+      
       <img
         src={bottomRightImage}
         alt="Decorative element"
@@ -26,7 +27,7 @@ const ExploreIslam = () => {
         }}
       />
 
-      {/* Bottom-right image (overlapping content) */}
+      
       <img
         src={topLeftImage}
         alt="Decorative element"
@@ -96,6 +97,8 @@ const ExploreIslam = () => {
         </Col>
       </Row>
     </Container>
+    </section>
+  
   );
 };
 
