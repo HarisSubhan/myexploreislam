@@ -3,10 +3,18 @@ import { Container, Navbar, Nav, Button, Offcanvas } from "react-bootstrap";
 import logo from "@images/logo.png";
 
 const Header = () => {
-  const [showMenu, setShowMenu] = useState(false);
 
+  
+  const [showMenu, setShowMenu] = useState(false);
   const handleClose = () => setShowMenu(false);
   const handleShow = () => setShowMenu(true);
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+    handleClose(); // close menu if open
+  };
 
   return (
     <>
@@ -29,14 +37,14 @@ const Header = () => {
             ☰
           </Button>
 
-          {/* Desktop Nav Links */}
+         
           <Nav className="mx-auto d-none d-lg-flex gap-4">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/about">About Islam</Nav.Link>
-            <Nav.Link href="/how-it-works">How It Works</Nav.Link>
+            <Nav.Link href="#about-islam">About Islam</Nav.Link>
+            <Nav.Link href="#how-it-works">How It Works</Nav.Link>
           </Nav>
 
-          {/* Desktop Log In Button */}
+        
           <div className="d-none d-lg-block">
             <Button variant="warning" href="/login">
               Log In
@@ -50,7 +58,7 @@ const Header = () => {
         onHide={handleClose}
         placement="start"
         className="custom-offcanvas"
-        backdrop={true} // This enables the backdrop
+        backdrop={true} 
         scroll={false}
       >
         <Offcanvas.Header closeButton>
@@ -68,10 +76,19 @@ const Header = () => {
             <Nav.Link href="/" onClick={handleClose}>
               Home
             </Nav.Link>
-            <Nav.Link href="/about" onClick={handleClose}>
-              About Islam
-            </Nav.Link>
-            <Nav.Link href="/how-it-works" onClick={handleClose}>
+            <Nav.Link
+  href="#about-islam"
+  onClick={(e) => {
+    e.preventDefault();
+    scrollToSection("about-islam");
+  }}
+>
+  About Islam
+</Nav.Link>
+            <Nav.Link href="#how-it-works" onClick={(e) => {
+    e.preventDefault();
+    scrollToSection("about-islam");
+  }}>
               How It Works
             </Nav.Link>
             <Button
