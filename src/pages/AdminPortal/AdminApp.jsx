@@ -1,14 +1,25 @@
-// src/routes/AdminRoutes.jsx
-import { Routes, Route } from "react-router-dom";
-import AdminDashboard from "../pages/AdminPortal/Dashboard";
-import AdminSettings from "../pages/AdminPortal/Settings";
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "../../components/admin/Header";
+import Sidebar from "../../components/admin/Sidebar";
+import StatCard from "../../components/admin/StatCard";
 
-const AdminRoutes = () => (
-  <Routes>
-    <Route path="dashboard" element={<AdminDashboard />} />
-    <Route path="settings" element={<AdminSettings />} />
-    {/* Other admin routes... */}
-  </Routes>
-);
+const AdminLayout = () => {
+  return (
+    <div className="d-flex">
+      {/* Left Sidebar - keep if needed for navigation */}
+      <Sidebar />
 
-export default AdminRoutes;
+      {/* Main Content Area */}
+      <div className="flex-grow-1">
+        <Header />
+        <main className="p-3">
+          <Outlet /> {/* For nested routes */}
+          <StatCard /> {/* Keep if still needed */}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLayout;

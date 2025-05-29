@@ -1,0 +1,696 @@
+/* Netflix-like styling */
+.netflix-container {
+  padding: 20px 40px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.thumbnails-row {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: visible;
+  gap: 5px;
+  padding: 10px 0;
+}
+
+.thumbnail-col {
+  flex: 0 0 auto;
+  transition: transform 0.3s ease;
+}
+
+.thumbnail-col:hover {
+  transform: scale(1.2) translateY(5%);
+  z-index: 10;
+}
+
+.netflix-thumbnail {
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.9s ease;
+}
+
+.thumbnail-image-container {
+  position: relative;
+  padding-top: 56.25%; /* Changed from 150% to 56.25% */
+}
+
+.thumbnail-image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-quality {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 5px;
+  font-size: 0.7rem;
+  border-radius: 3px;
+}
+
+/* Netflix Hover Card */
+.netflix-hover-card {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  width: 100%;
+  background: #181818;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  animation: netflixHover 0.9s ease forwards;
+}
+
+@keyframes netflixHover {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.hover-thumbnail {
+  position: relative;
+  padding-top: 56.25%;
+}
+
+.hover-thumbnail img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hover-details {
+  padding: 12px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.action-btn {
+  background: rgba(42, 42, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+}
+
+.play-btn {
+  background: white;
+  color: black;
+  width: 35px;
+  height: 35px;
+}
+
+.play-btn:hover {
+  background: #e50914;
+  color: white;
+}
+
+.match-rating {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #d2d2d2;
+  margin-bottom: 8px;
+}
+
+.match {
+  color: #46d369;
+  font-weight: bold;
+}
+
+.age-rating {
+  border: 1px solid #d2d2d2;
+  padding: 0 4px;
+}
+
+.hd-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 0.7rem;
+  color: #d2d2d2;
+}
+
+.netflix-expanded-card {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 1rem;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+  animation: fadeInUp 0.3s ease;
+}
+
+.expanded-thumbnail img {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.expanded-details {
+  margin-top: 1rem;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.netflix-fullscreen-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.95);
+  color: white;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px; /* Ensures space on small screens */
+  box-sizing: border-box;
+}
+
+.popup-content {
+  background: #141414;
+  max-width: 1000px;
+  width: 90%;
+  max-height: 90%;
+  height: auto;
+  overflow-y: auto;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-thumbnail img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.popup-details {
+  margin-top: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.expanded-video-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  background-color: #141414;
+  z-index: 1050;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  padding-bottom: 1rem;
+  animation: popupFadeIn 0.4s ease forwards;
+  opacity: 0; /* Start hidden for animation */
+}
+
+@keyframes popupFadeIn {
+  from {
+    transform: translate(-50%, -45%) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.popup-header {
+  position: relative;
+}
+
+.popup-header img.banner-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 30px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.popup-content {
+  padding: 1rem;
+  color: #fff;
+}
+
+.metadata span {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.description {
+  margin: 1rem 0;
+}
+
+.episodes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+}
+
+.season-selector {
+  background: #222;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.season-selector {
+  min-height: 40px;
+}
+
+
+.episodes-header h2 {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
+
+.episodes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.episode {
+  display: flex;
+  gap: 1rem;
+}
+
+.episode-thumb img {
+  width: 160px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.episode-details {
+  flex: 1;
+}
+
+.episode-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.episode-duration {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.episode-desc {
+  font-size: 14px;
+  color: #ccc;
+}
+.fade-out {
+  animation: popupFadeOut 0.3s ease forwards;
+}
+
+@keyframes popupFadeOut {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -45%) scale(0.95);
+    opacity: 0;
+  }
+}
+
+/*─── on small and touch devices ───*/
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  /* never show the hover overlay on mobile */
+  .netflix-hover-card {
+    display: none !important;
+  }
+
+  /* no zoom on tap */
+  .thumbnail-col:hover {
+    transform: none !important;
+  }
+
+  /* hint that it's tappable */
+  .thumbnail-col {
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 480px) {
+  .episodes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .episode-thumb img {
+    width: 120px;
+    height: 68px;
+  }
+
+  .episode {
+    gap: 0.5rem;
+  }
+}
+
+.thumbnail-image-container-book {
+  position: relative;
+  padding-top: 150%; /* This creates a tall aspect ratio for book covers */
+  width: 100%; /* Ensure it takes full width of its container */
+  overflow: hidden; /* Hide any overflow */
+}
+
+.thumbnail-image-container-book img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+}
+
+.netflix-thumbnail-book {
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%; 
+  background: #333; 
+}
+
+.book-quality {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 5px;
+  font-size: 0.7rem;
+  border-radius: 3px;
+  z-index: 2; 
+}
+
+.netflix-hover-card-book {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  width: 150%;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  animation: netflixHover 0.9s ease forwards;
+}
+
+/* Language Tabs Styling */
+.language-tabs {
+  margin: 1.5rem 0;
+}
+
+.tab-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tab-btn.active {
+  background: #F1066C;
+  border-color: #F1066C;
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+  .tab-buttons {
+    gap: 6px;
+  }
+  .tab-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Tab Styling */
+.language-tabs {
+  margin: 1.5rem 0;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn.active {
+  background: #F1066C;
+  font-weight: bold;
+}
+
+/* Quiz and Assignment Styling */
+.quiz-content, .assignment-content {
+  margin-top: 1rem;
+}
+
+.quiz-list, .assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quiz-item, .assignment-item {
+  background: rgba(30, 30, 30, 0.7);
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.quiz-item h5, .assignment-item h5 {
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.quiz-meta, .assignment-meta {
+  display: flex;
+  gap: 1rem;
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.start-quiz-btn, .view-assignment-btn {
+  background: #F1066C;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.start-quiz-btn:hover, .view-assignment-btn:hover {
+  background: #F1066C;
+}
+
+
+/* Quiz start CSS */
+
+
+/* Quiz Completion Screen Styles */
+.quiz-completed-container {
+  max-width: 600px;
+}
+
+.checkmark-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkmark {
+  color: white;
+  font-size: 50px;
+  line-height: 100px;
+}
+
+.subscribe-form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Existing Quiz Styles */
+.quiz-container {
+  max-width: 800px;
+}
+
+.option-item {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.option-item:hover {
+  background-color: #f8f9fa;
+}
+
+.option-item.selected {
+  background-color: #e7f1ff;
+  border-color: #86b7fe;
+}
+
+.option-item.correct {
+  background-color: #d1e7dd;
+  border-color: #a3cfbb;
+}
+
+.option-item.incorrect {
+  background-color: #f8d7da;
+  border-color: #f1aeb5;
+}
+
+.option-letter {
+  font-weight: bold;
+  margin-right: 15px;
+  width: 24px;
+  text-align: center;
+}
+
+.option-check {
+  margin-left: auto;
+  color: #198754;
+  font-weight: bold;
+}
+
+.quiz-image {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.result-message {
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .quiz-image {
+    max-height: 200px;
+    margin-top: 20px;
+  }
+}

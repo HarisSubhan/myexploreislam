@@ -1,20 +1,23 @@
 import React from "react";
-import Header from "../components/Header";
-import HeroSection from "../components/HeroSection";
-import InteractiveLearning from "../components/InteractiveLearning";
-import ExploreIslam from "../components/ExploreIslam";
-import WhyChoose from "../components/WhyChoose";
-import SubscriptionModel from "../components/SubscriptionModel";
+import HeroSection from "../../../components/common/HeroSection";
+import InteractiveLearning from "../../../components/common/InteractiveLearning";
+import WhyChoose from "../../../components/common/WhyChoose";
+import SubscriptionModel from "../../../components/common/SubscriptionModel";
+import ExploreIslam from "../../../components/common/ExploreIslam";
+import HowItWorks from "../../../components/common/HowItWorks";
+import Blog from "../../../components/common/Blog";
+
 
 const HomePage = () => {
   return (
     <>
-      <Header />
       <HeroSection />
       <InteractiveLearning />
       <ExploreIslam />
       <WhyChoose />
       <SubscriptionModel />
+      <HowItWorks/>
+      <Blog/>
     </>
   );
 };
