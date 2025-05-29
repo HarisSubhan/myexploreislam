@@ -597,3 +597,100 @@
 .start-quiz-btn:hover, .view-assignment-btn:hover {
   background: #F1066C;
 }
+
+
+/* Quiz start CSS */
+
+
+/* Quiz Completion Screen Styles */
+.quiz-completed-container {
+  max-width: 600px;
+}
+
+.checkmark-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkmark {
+  color: white;
+  font-size: 50px;
+  line-height: 100px;
+}
+
+.subscribe-form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Existing Quiz Styles */
+.quiz-container {
+  max-width: 800px;
+}
+
+.option-item {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.option-item:hover {
+  background-color: #f8f9fa;
+}
+
+.option-item.selected {
+  background-color: #e7f1ff;
+  border-color: #86b7fe;
+}
+
+.option-item.correct {
+  background-color: #d1e7dd;
+  border-color: #a3cfbb;
+}
+
+.option-item.incorrect {
+  background-color: #f8d7da;
+  border-color: #f1aeb5;
+}
+
+.option-letter {
+  font-weight: bold;
+  margin-right: 15px;
+  width: 24px;
+  text-align: center;
+}
+
+.option-check {
+  margin-left: auto;
+  color: #198754;
+  font-weight: bold;
+}
+
+.quiz-image {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.result-message {
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .quiz-image {
+    max-height: 200px;
+    margin-top: 20px;
+  }
+}

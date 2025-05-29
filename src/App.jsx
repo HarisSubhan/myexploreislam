@@ -65,7 +65,13 @@
 
 // tempory unprotect
 // src/App.js
-import { BrowserRouter, Routes, Route, Navigate, StaticRouter } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  StaticRouter,
+} from "react-router-dom";
 import AuthRoutes from "./routes/AuthRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
 import ParentRoutes from "./routes/ParentRoutes";
@@ -74,6 +80,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import StaticApp from "./pages/SharedPortal/StaticApp";
 import HomePage from "./pages/SharedPortal/pages/HomePage";
 import BlogPage from "./pages/SharedPortal/pages/BlogPage";
+import BlogDetail from "./components/common/BlogDetail";
 
 function App() {
   // Temporarily disable authentication checks
@@ -125,11 +132,11 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <Routes>
-
           {/* Static Routes */}
           <Route path="/" element={<StaticApp />}>
             <Route index element={<HomePage />} />
             <Route path="blog" element={<BlogPage />} />
+            <Route path="/blog/:titleSlug" element={<BlogDetail />} />
           </Route>
 
           {/* Auth Routes */}
@@ -144,7 +151,6 @@ function App() {
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
-
         </Routes>
       </ThemeProvider>
     </BrowserRouter>

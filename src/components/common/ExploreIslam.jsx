@@ -52,7 +52,7 @@ const ExploreIslam = () => {
           xs={12}
           md={6}
           lg={5}
-          className="order-2 order-md-1 position-relative"
+          className="text-center order-2 order-md-1 position-relative"
         >
           <div className="pe-lg-4">
             <p className="fs-5 fs-md-6 mb-4" style={{ lineHeight: "1.8" }}>
@@ -89,7 +89,7 @@ const ExploreIslam = () => {
           className="order-1 order-md-2 text-center text-md-start"
         >
           <h1
-            className="display-3 display-lg-1 fw-bold mb-4"
+            className="display-3 display-lg-1 text-center fw-bold mb-4"
             style={{ color: "#f1066c" }}
           >
             About <span className="d-block d-md-inline">Explore Islam</span>
