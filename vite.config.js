@@ -12,7 +12,7 @@ export default defineConfig({
       "@images": path.resolve(__dirname, "./src/assets/images"),
       "@auth": path.resolve(__dirname, "./src/components/auth"),
       "@shared-auth": path.resolve(__dirname, "./src/pages/SharedPortal/auth"),
-    },
+    },   
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   server: {

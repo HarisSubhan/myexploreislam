@@ -65,12 +65,22 @@
 
 // tempory unprotect
 // src/App.js
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  StaticRouter,
+} from "react-router-dom";
 import AuthRoutes from "./routes/AuthRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
 import ParentRoutes from "./routes/ParentRoutes";
 import ChildRoutes from "./routes/ChildRoutes";
+import { ThemeProvider } from "./context/ThemeContext";
+import StaticApp from "./pages/SharedPortal/StaticApp";
 import HomePage from "./pages/SharedPortal/pages/HomePage";
+import BlogPage from "./pages/SharedPortal/pages/BlogPage";
+import BlogDetail from "./components/common/BlogDetail";
 
 function App() {
   // Temporarily disable authentication checks
@@ -120,19 +130,29 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
+      <ThemeProvider>
+        <Routes>
+          {/* Static Routes */}
+          <Route path="/" element={<StaticApp />}>
+            <Route index element={<HomePage />} />
+            <Route path="blog" element={<BlogPage />} />
+            <Route path="/blog/:titleSlug" element={<BlogDetail />} />
+          </Route>
 
-        {AuthRoutes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} />
-        ))}
-        {/* Protected Routes */}
-        <Route path="/parent/*" element={<ParentRoutes />} />
-        <Route path="/child/*" element={<ChildRoutes />} />
-        <Route path="/admin/*" element={<AdminRoutes />} />
-        {/* Fallback Route */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          {/* Auth Routes */}
+          {AuthRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+
+          {/* Protected Routes */}
+          <Route path="/parent/*" element={<ParentRoutes />} />
+          <Route path="/child/*" element={<ChildRoutes />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

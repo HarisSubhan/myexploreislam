@@ -1,6 +1,7 @@
 import React from "react";
-import VideoSlider from "./components/VideoSlider";
-import Book from "./components/Book";
+import VideoSlider from "../../../components/child/VideoSlider";
+import Book from "../../../components/child/Book";
+
 
 const ChildDashboard = () => {
   return (
