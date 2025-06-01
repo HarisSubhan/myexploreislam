@@ -1,6 +1,6 @@
 import React from "react";
 import { Table, Button } from "react-bootstrap";
-import AdminLayout from "../AdminApp";
+import AdminLayout from "../../AdminApp";
 
 const dummyChildren = [
   { id: 1, name: "Ahmed", age: 8, email: "ahmed@example.com", parent: "Ali" },
