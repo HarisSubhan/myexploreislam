@@ -19,7 +19,7 @@ import AddAssignment from "../pages/AdminPortal/pages/ManageAssignments/AddAssig
 import EditAssignment from "../pages/AdminPortal/pages/ManageAssignments/EditAssignment";
 import ViewAssignment from "../pages/AdminPortal/pages/ManageAssignments/ViewAssignment";
 
-import ManageBooks from "../pages/AdminPortal/pages/ManageBooks";
+import ManageBooks from "../pages/AdminPortal/pages/ManageBooks.jsx";
 import AddBook from "../pages/AdminPortal/pages/ManageBooks/AddBook";
 import EditBook from "../pages/AdminPortal/pages/ManageBooks/EditBook";
 import ViewBook from "../pages/AdminPortal/pages/ManageBooks/ViewBook";
