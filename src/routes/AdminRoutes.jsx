@@ -54,7 +54,7 @@ const AdminRoutes = () => {
       <Route path="/manage-assignments/edit/:id" element={<EditAssignment />} />
       <Route path="/manage-assignments/view/:id" element={<ViewAssignment />} />
 
-      <Route path="managebooks" element={<ManageBooks />} />
+      <Route path="manage-books" element={<ManageBooks />} />
       <Route path="/manage-books/add" element={<AddBook />} />
       <Route path="/manage-books/edit/:id" element={<EditBook />} />
       <Route path="/manage-books/view/:id" element={<ViewBook />} />
