@@ -431,7 +431,7 @@
 
 .thumbnail-image-container-book {
   position: relative;
-  padding-top: 150%; /* This creates a tall aspect ratio for book covers */
+  padding-top: 140%; /* This creates a tall aspect ratio for book covers */
   width: 100%; /* Ensure it takes full width of its container */
   overflow: hidden; /* Hide any overflow */
 }
@@ -693,4 +693,16 @@
     max-height: 200px;
     margin-top: 20px;
   }
+}
+
+/* .assignment-content */
+.child-tabs .nav-link {
+  border-radius: 25px !important;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.child-tabs .nav-link.active {
+  background-color: #ffb703 !important;
+  color: white !important;
 }

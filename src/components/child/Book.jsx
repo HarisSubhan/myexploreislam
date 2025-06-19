@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Card, Container, Row, Col, Button } from "react-bootstrap";
 import { FaPlay, FaPlus, FaThumbsUp, FaChevronDown } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
-import "./VideoThumbnails.css";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import "./VideoThumbnails.css";
 
 const Book = () => {
   const [hoveredBook, setHoveredBook] = useState(null);
@@ -106,6 +106,7 @@ const Book = () => {
       description:
         "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
     },
+    
   ];
 
   const selectedBook = BookData.find((v) => v.id === expandedBook);
