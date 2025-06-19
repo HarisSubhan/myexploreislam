@@ -3,12 +3,19 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const db = require('./config/db');
+const initDB = require('./config/initDB');
+const authRoutes = require('./routes/authRoutes');
+const parentRoutes = require('./routes/parentRoutes');
 
+initDB();
 dotenv.config();
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/parent', parentRoutes);
 
 // Test route
 app.get('/', (req, res) => {
