@@ -19,10 +19,10 @@ import AddAssignment from "../pages/AdminPortal/pages/ManageAssignments/AddAssig
 import EditAssignment from "../pages/AdminPortal/pages/ManageAssignments/EditAssignment";
 import ViewAssignment from "../pages/AdminPortal/pages/ManageAssignments/ViewAssignment";
 
-import ManageBooks from "../pages/AdminPortal/pages/ManageBooks";
-import AddBook from "../pages/AdminPortal/pages/ManageBooks/AddBook";
-import EditBook from "../pages/AdminPortal/pages/ManageBooks/EditBook";
-import ViewBook from "../pages/AdminPortal/pages/ManageBooks/ViewBook";
+import ManageBooks from "../pages/AdminPortal/pages/ManageBooks"; 
+import AddBook from "../pages/AdminPortal/pages/ManageBooks/AddBook";  
+import EditBook from "../pages/AdminPortal/pages/ManageBooks/EditBook"; 
+import ViewBook from "../pages/AdminPortal/pages/ManageBooks/ViewBook"; 
 
 
 import ManageBlogs from "../pages/AdminPortal/pages/ManageBlogs";
@@ -54,7 +54,7 @@ const AdminRoutes = () => {
       <Route path="/manage-assignments/edit/:id" element={<EditAssignment />} />
       <Route path="/manage-assignments/view/:id" element={<ViewAssignment />} />
 
-      <Route path="/manage-books" element={<ManageBooks />} />
+      <Route path="manage-books" element={<ManageBooks />} />
       <Route path="/manage-books/add" element={<AddBook />} />
       <Route path="/manage-books/edit/:id" element={<EditBook />} />
       <Route path="/manage-books/view/:id" element={<ViewBook />} />
