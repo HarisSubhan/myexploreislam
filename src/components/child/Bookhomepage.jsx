@@ -60,8 +60,6 @@ const BookHomepage = () => {
         "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
     },
   ];
-
-  // Custom arrow components
   const NextArrow = (props) => {
     const { onClick } = props;
     return (
@@ -102,7 +100,7 @@ const BookHomepage = () => {
     );
   };
 
-  // Slider settings
+
   const settings = {
     dots: false,
     infinite: true,
