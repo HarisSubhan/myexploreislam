@@ -23,6 +23,8 @@ const HeaderChild = () => {
   const { color: themeColor, textColor } = useTheme(); 
   const handleCloseOffcanvas = () => setShowOffcanvas(false);
   const handleShowOffcanvas = () => setShowOffcanvas(true);
+  
+  
 
   const logoHeightMobile = 40; 
   const logoHeightDesktop = 50; 

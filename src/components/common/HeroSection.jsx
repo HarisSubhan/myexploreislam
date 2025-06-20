@@ -26,7 +26,7 @@ const HeroSection = () => {
       >
         {/* Main Content */}
         <Row className="align-items-center h-100 g-0">
-          <Col lg={6} className="order-lg-1 order-2 position-relative">
+          <Col lg={6} className="order-lg-1 order-2 position-relative ">
             <Image
               src={MaryamMuazImage}
               alt="Maryam & Muaz"
@@ -38,7 +38,8 @@ const HeroSection = () => {
                 marginBottom: "0.5rem",
                 position: "relative",
                 zIndex: 2,
-                width: "auto", 
+                width: "auto",
+              
               }}
             />
             <div
@@ -56,9 +57,7 @@ const HeroSection = () => {
                   position: "absolute",
                   bottom: 0,
                   right: 0,
-                  maxHeight: "80vh",
-                  maxWidth: "150px",
-                  height: "auto",
+                  maxWidth: "950px", 
                   width: "auto", 
                   marginTop: "-1rem",
                 }}
