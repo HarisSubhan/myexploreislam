@@ -6,6 +6,7 @@ const db = require('./config/db');
 const initDB = require('./config/initDB');
 const authRoutes = require('./routes/authRoutes');
 const parentRoutes = require('./routes/parentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 initDB();
 dotenv.config();
@@ -16,6 +17,8 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/parent', parentRoutes);
+
+app.use('/api/admin', adminRoutes);
 
 // Test route
 app.get('/', (req, res) => {
