@@ -7,6 +7,9 @@ const initDB = require('./config/initDB');
 const authRoutes = require('./routes/authRoutes');
 const parentRoutes = require('./routes/parentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const path = require('path');
+const videoRoutes = require('./routes/videoRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 
 initDB();
 dotenv.config();
@@ -19,6 +22,15 @@ app.use('/api/auth', authRoutes);
 app.use('/api/parent', parentRoutes);
 
 app.use('/api/admin', adminRoutes);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/api/videos', videoRoutes);
+
+app.use('/uploads', express.static('uploads'));
+
+app.use('/api/quizzes', quizRoutes);
+
 
 // Test route
 app.get('/', (req, res) => {

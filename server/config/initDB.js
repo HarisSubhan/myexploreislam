@@ -27,27 +27,36 @@ const initDB = () => {
     )
   `;
 
-  // db.query(userTable, (err) => {
-  //   if (err) {
-  //     console.log('❌ Error creating users table:', err.code, err.message);
-  //   } else {
-  //     console.log('✅ Users table ready.');
+  const videoTable = `
+  CREATE TABLE IF NOT EXISTS videos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    thumbnail_url VARCHAR(255),
+    video_url VARCHAR(255),
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
 
-  //     db.query("SELECT * FROM users WHERE role = 'admin'", (err, results) => {
-  //     if (err) return console.log('❌ Admin check error:', err.message);
+  const quizTable = `CREATE TABLE IF NOT EXISTS quizzes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
 
-  //     if (results.length === 0) {
-  //       // No admin exists – create one without password
-  //       const sql = `INSERT INTO users (name, email, role) VALUES (?, ?, 'admin')`;
-  //       db.query(sql, ['Super Admin', 'admin@exploreislam.com'], (err) => {
-  //         if (err) return console.log('❌ Failed to create admin:', err.message);
-  //         console.log('✅ Default admin created (no password)');
-  //       });
-  //     }
-
-  //   }
-
-  // });
+  const quizQuestionsTable = `CREATE TABLE IF NOT EXISTS quiz_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT,
+    question TEXT,
+    option_a TEXT,
+    option_b TEXT,
+    option_c TEXT,
+    option_d TEXT,
+    correct_option CHAR(1),
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+  )`;
 
   db.query(userTable, (err) => {
     if (err) {
@@ -78,6 +87,30 @@ const initDB = () => {
       console.log('✅ Users table ready.');
     }
 
+  });
+
+  db.query(videoTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating videos table:", err.message);
+    } else {
+      console.log("✅ Videos table ready.");
+    }
+  });
+
+  db.query(quizTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Quiz table:", err.message);
+    } else {
+      console.log("✅ Quiz table ready.");
+    }
+  });
+
+  db.query(quizQuestionsTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Quiz Questions table:", err.message);
+    } else {
+      console.log("✅ Quiz Questions table ready.");
+    }
   });
 };
 
