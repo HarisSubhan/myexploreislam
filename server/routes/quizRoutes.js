@@ -10,16 +10,16 @@ const quizController = require('../controllers/quizController');
 // Create a new quiz with questions
 router.post('/', verifyToken, isAdmin, quizController.createQuiz);
 
-// Get all quizzes
-router.get('/', quizController.getAllQuizzes);
+// // Get all quizzes
+// router.get('/', quizController.getAllQuizzes);
 
-// Get single quiz with questions
-router.get('/:id', quizController.getQuizById);
+// // Get single quiz with questions
+// router.get('/:id', quizController.getQuizById);
 
-// Update quiz + questions
-router.put('/:id', verifyToken, isAdmin, quizController.updateQuiz);
+// // Update quiz + questions
+// router.put('/:id', verifyToken, isAdmin, quizController.updateQuiz);
 
-// Delete quiz
-router.delete('/:id', verifyToken, isAdmin, quizController.deleteQuiz);
+// // Delete quiz
+// router.delete('/:id', verifyToken, isAdmin, quizController.deleteQuiz);
 
 module.exports = router;
