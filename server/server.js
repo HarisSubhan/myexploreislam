@@ -29,7 +29,7 @@ app.use('/api/videos', videoRoutes);
 
 app.use('/uploads', express.static('uploads'));
 
-app.use('/api/quizzes', quizRoutes);
+// app.use('/api/quizzes', quizRoutes);
 
 
 // Test route

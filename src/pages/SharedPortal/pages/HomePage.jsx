@@ -11,6 +11,7 @@ import Blog from "../../../components/common/Blog";
 const HomePage = () => {
   return (
     <>
+  
       <HeroSection />
       <InteractiveLearning />
       <ExploreIslam />
