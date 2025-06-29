@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Row, Col, Form, Button, Alert, Image, InputGroup } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Alert,
+  Image,
+  InputGroup,
+} from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "@images/logo.png";
-import { LoginApi } from "../../../services/api"; 
+import { LoginApi } from "../../../services/api";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,12 +29,13 @@ function LoginPage() {
       const res = await LoginApi({ email, password });
       const { token, user } = res.data;
 
-      localStorage.setItem("token", user.token);
+      localStorage.setItem("token", token);
       localStorage.setItem("userRole", user.role);
 
-      if (user.role.toLowerCase() === "admin") navigate("/admin/dashboard");
-      else if (user.role.toLowerCase() === "parent") navigate("/parent");
-      else if (user.role.toLowerCase() === "child") navigate("/child");
+      const role = user.role.toLowerCase();
+      if (role === "admin") navigate("/admin/dashboard");
+      else if (role === "parent") navigate("/parent");
+      else if (role === "child") navigate("/child");
       else navigate("/");
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");
@@ -35,22 +45,28 @@ function LoginPage() {
   return (
     <Container fluid className="vh-100">
       <Row className="h-100">
-        <Col md={6} className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white position-relative p-0">
+        <Col
+          md={6}
+          className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white p-0 position-relative"
+        >
           <Image
             src={logo}
-            alt="Islamic Book"
+            alt="Explore Islam"
             fluid
             className="position-absolute w-100 h-100"
             style={{ objectFit: "cover", opacity: 0.75 }}
           />
           <div className="position-relative text-center px-4">
-            <h1 className="display-5 mb-3" style={{ fontFamily: 'serif' }}>
+            <h1 className="display-5 mb-3" style={{ fontFamily: "serif" }}>
               فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
             </h1>
           </div>
         </Col>
 
-        <Col md={6} className="d-flex align-items-center justify-content-center">
+        <Col
+          md={6}
+          className="d-flex align-items-center justify-content-center"
+        >
           <div style={{ maxWidth: "400px", width: "100%" }}>
             <div className="text-center mb-4">
               <img src={logo} alt="Explore Islam Logo" style={{ width: 150 }} />
@@ -64,7 +80,7 @@ function LoginPage() {
               <Form.Group className="mb-3">
                 <Form.Control
                   type="email"
-                  placeholder="Please Enter Email"
+                  placeholder="Enter Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -75,7 +91,7 @@ function LoginPage() {
                 <InputGroup>
                   <Form.Control
                     type={showPassword ? "text" : "password"}
-                    placeholder="Please Enter Password"
+                    placeholder="Enter Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -89,22 +105,17 @@ function LoginPage() {
                 </InputGroup>
               </Form.Group>
 
-              <Button style={{ backgroundColor: "#f1066c" }} type="submit" className="w-100 mb-3">
+              <Button
+                style={{ backgroundColor: "#f1066c" }}
+                type="submit"
+                className="w-100 mb-3"
+              >
                 Login
               </Button>
             </Form>
 
-            <div className="text-center mb-3">OR</div>
-
-            <Button variant="outline-danger" className="w-100 mb-2">
-              Login with Google
-            </Button>
-            <Button variant="outline-primary" className="w-100 mb-2">
-              Login with Facebook
-            </Button>
-
-            <div className="text-center mt-4">
-              <a href="/register">Create an account</a>
+            <div className="text-center mt-3">
+              <a href="/register">Create a parent account</a>
             </div>
           </div>
         </Col>
