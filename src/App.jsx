@@ -28,7 +28,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 👇 Public routes wrapped with StaticApp (has Header/Footer) */}
+        
         <Route element={<StaticApp />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
@@ -36,7 +36,7 @@ function App() {
           <Route path="/blog/:titleSlug" element={<BlogDetail />} />
         </Route>
 
-        {/* 👇 Protected routes (NO StaticApp wrapper) */}
+        {/* 👇 Protected routes */}
         <Route
           path="/admin/*"
           element={
