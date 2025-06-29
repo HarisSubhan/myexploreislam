@@ -28,45 +28,44 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-      
+        {/* 👇 Public routes wrapped with StaticApp (has Header/Footer) */}
         <Route element={<StaticApp />}>
-          {/* Public routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:titleSlug" element={<BlogDetail />} />
-
-          {/* Protected routes */}
-          <Route
-            path="/admin/*"
-            element={
-              <RequireAuth allowedRoles={["admin"]}>
-                <AdminRoutes />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/parent/*"
-            element={
-              <RequireAuth allowedRoles={["parent"]}>
-                <ParentRoutes />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/child/*"
-            element={
-              <RequireAuth allowedRoles={["child"]}>
-                <ChildRoutes />
-              </RequireAuth>
-            }
-          />
         </Route>
 
-        {/* 👇 Login is separate — no header/footer */}
+        {/* 👇 Protected routes (NO StaticApp wrapper) */}
+        <Route
+          path="/admin/*"
+          element={
+            <RequireAuth allowedRoles={["admin"]}>
+              <AdminRoutes />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/parent/*"
+          element={
+            <RequireAuth allowedRoles={["parent"]}>
+              <ParentRoutes />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/child/*"
+          element={
+            <RequireAuth allowedRoles={["child"]}>
+              <ChildRoutes />
+            </RequireAuth>
+          }
+        />
+
+        {/* 👇 Login is separate — no layout */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Catch-all redirect */}
+        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
