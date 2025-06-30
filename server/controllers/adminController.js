@@ -1,4 +1,7 @@
+const bcrypt = require('bcryptjs');
 const db = require('../config/db');
+
+const User = require('../models/userModel');
 
 const getStats = (req, res) => {
   const stats = {};
@@ -102,6 +105,39 @@ const deleteChild = (req, res) => {
   });
 };
 
+const getAdminProfile = (req, res) =>{
+  const adminId = req.user.id;
+
+  User.getById(adminId, (err, results)=>{
+    if(err) return res.status(500).json({ error: 'Database error' });
+    
+    if (!results || results.length === 0) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    const { id, name, email, role } = results[0];
+    if (role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    res.json({ id, name, email });
+  })
+}
+
+const updateAdminProfile = (req, res) => {
+  const { name, email, password } = req.body;
+  const adminId = req.user.id;
+
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and Email required' });
+  }
+
+  User.updateByID(adminId, name, email, password, (err) => {
+    if (err) return res.status(500).json({ error: 'Failed to update admin' });
+    res.json({ message: 'Profile updated successfully' });
+  });
+}
+
 
 module.exports = {
   getStats,
@@ -112,5 +148,7 @@ module.exports = {
   deleteParent,
   getSingleChild,
   updateChild,
-  deleteChild
+  deleteChild,
+  getAdminProfile,
+  updateAdminProfile
 };
