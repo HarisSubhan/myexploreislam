@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import AdminLayout from "../AdminApp";
+import axios from "axios";
 
 const Settings = () => {
   const [formData, setFormData] = useState({

@@ -58,6 +58,40 @@ const initDB = () => {
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
   )`;
 
+
+  const booksTable = `CREATE TABLE IF NOT EXISTS books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255),
+    category VARCHAR(100),
+    pages INT,
+    file_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+  const blogsTable = `CREATE TABLE IF NOT EXISTS blogs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    banner_image VARCHAR(255),
+    publish_date DATE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+  const subscriptionTable = `CREATE TABLE IF NOT EXISTS subscriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    parent_id INT,
+    plan_name VARCHAR(100),         -- e.g., "Basic", "Premium", etc.
+    price DECIMAL(10, 2),
+    max_children INT DEFAULT 2,     -- default 2 allowed
+    is_active BOOLEAN DEFAULT TRUE,
+    start_date DATE,
+    end_date DATE, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES users(id)
+  )`;
+
   const AssignmentsTable =`CREATE TABLE IF NOT EXISTS assignments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -73,6 +107,7 @@ const initDB = () => {
     name VARCHAR(255) NOT NULL
   )
 `;
+
 
   db.query(userTable, (err) => {
     if (err) {
@@ -128,6 +163,32 @@ const initDB = () => {
       console.log("✅ Quiz Questions table ready.");
     }
   });
+
+
+  db.query(booksTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Books table:", err.message);
+    } else {
+      console.log("✅ Books table ready.");
+    }
+  });
+
+  db.query(blogsTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Blogs table:", err.message);
+    } else {
+      console.log("✅ Blogs table ready.");
+    }
+  });
+
+  db.query(subscriptionTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Subscription table:", err.message);
+    } else {
+      console.log("✅ Subscription table ready.");
+    }
+  });
+
   db.query(AssignmentsTable, (err) => {
     if (err) {
       console.log("❌ Error creating Assignment  table:", err.message);
