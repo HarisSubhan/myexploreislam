@@ -1,25 +1,3 @@
-// import React from 'react';
-// import { Nav } from 'react-bootstrap';
-// import { FaTachometerAlt, FaUsers, FaChild, FaVideo, FaListAlt, FaBook, FaBlog, FaTags, FaCog } from 'react-icons/fa';
-
-// const Sidebar = () => {
-//   return (
-//     <div className="bg-danger text-white vh-100 p-3" style={{ width: '240px' }}>
-//       <h4 className="mb-4">📘 Explore Islam</h4>
-//       <Nav className="flex-column">
-//         <Nav.Link href="#" className="text-white"><FaTachometerAlt /> Dashboard</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaUsers /> Manage Parents</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaChild /> Manage Children</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaVideo /> Manage Videos</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaListAlt /> Manage Quizzes</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaBook /> Manage Assignm.</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaBlog /> Manage Blogs</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaTags /> Categories</Nav.Link>
-//         <Nav.Link href="#" className="text-white"><FaCog /> Settings</Nav.Link>
-//       </Nav>
-//     </div>
-//   )
-
 
 import React from 'react';
 import { Nav } from 'react-bootstrap';

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const addChild = (req, res) => {
   const parentId = req.user.id;
-  const { name, email, password } = req.body;
+  const { name, email, password, phoneNumber} = req.body;
 
   // Step 1: Check current child count
   db.query("SELECT COUNT(*) as child_count FROM children WHERE parent_id = ?", [parentId], (err, results) => {
@@ -26,10 +26,11 @@ const addChild = (req, res) => {
         if (err) return res.status(500).json({ error: 'Hash error' });
 
         const sql = `INSERT INTO children (name, email, password, parent_id) VALUES (?, ?, ?, ?)`;
-        db.query(sql, [name, email, hash, parentId], (err) => {
-          if (err) return res.status(500).json({ error: 'Failed to add child' });
+        db.query(sql, [name, email, hash, parentId, phoneNumber], (err) => {
+          if (err)
+            return res.status(500).json({ error: "Failed to add child" });
 
-          res.status(201).json({ message: 'Child added successfully' });
+          res.status(201).json({ message: "Child added successfully" });
         });
       });
     });
