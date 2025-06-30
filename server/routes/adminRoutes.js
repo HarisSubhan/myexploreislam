@@ -21,4 +21,8 @@ router.get('/child/:id', adminController.getSingleChild);
 router.put('/child/:id', adminController.updateChild);
 router.delete('/child/:id', adminController.deleteChild);
 
+// Admin
+router.get('/profile', adminController.getAdminProfile);
+router.put('/profile', adminController.updateAdminProfile);
+
 module.exports = router;
