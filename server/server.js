@@ -10,6 +10,8 @@ const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
 const videoRoutes = require('./routes/videoRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const assignmentsRoutes = require('./routes/assignmentsRoutes');
 
 initDB();
 dotenv.config();
@@ -29,7 +31,12 @@ app.use('/api/videos', videoRoutes);
 
 app.use('/uploads', express.static('uploads'));
 
-// app.use('/api/quizzes', quizRoutes);
+app.use('/api/quizzes', quizRoutes);
+
+app.use('/api/assignments', assignmentsRoutes);
+
+app.use("/api/Category", categoryRoutes);
+
 
 
 // Test route

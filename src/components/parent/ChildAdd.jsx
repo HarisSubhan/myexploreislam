@@ -7,7 +7,9 @@ import {
   Alert,
   Row,
   Col,
+  InputGroup,
 } from "react-bootstrap";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { addChild } from "../../services/api";
 
@@ -22,6 +24,7 @@ const ChildAdd = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { color: themeColor, textColor } = useTheme();
 
   const handleChange = (e) => {
@@ -122,7 +125,6 @@ const ChildAdd = () => {
               )}
 
               <Form onSubmit={handleSubmit}>
-                {/* ... form groups remain unchanged ... */}
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email Address</Form.Label>
                   <Form.Control
@@ -170,17 +172,26 @@ const ChildAdd = () => {
 
                 <Form.Group className="mb-3" controlId="password">
                   <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    isInvalid={!!errors.password}
-                    placeholder="Create a password"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.password}
-                  </Form.Control.Feedback>
+                  <InputGroup>
+                    <Form.Control
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      isInvalid={!!errors.password}
+                      placeholder="Create a password"
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </Button>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </InputGroup>
                   <Form.Text className="text-muted">
                     At least 8 characters
                   </Form.Text>
