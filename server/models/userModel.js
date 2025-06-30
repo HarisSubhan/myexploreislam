@@ -10,4 +10,11 @@ const findUserByEmail = (email, callback) => {
   db.query(sql, [email], callback);
 };
 
-module.exports = { createUser, findUserByEmail };
+
+const findChildByEmail = (email, callback) => {
+  const query = 'SELECT * FROM children WHERE email = ?';
+  db.query(query, [email], callback);
+};
+
+
+module.exports = { createUser, findUserByEmail, findChildByEmail };

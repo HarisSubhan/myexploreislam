@@ -1,35 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import AdminLayout from "../AdminApp";
+import {
+  getCategoriesApi,
+  addCategoryApi,
+  updateCategoryApi,
+  deleteCategoryApi,
+} from "../../../services/api";
 
 const ManageCategories = () => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Qur'an" },
-    { id: 2, name: "Prophet Stories" },
-    { id: 3, name: "Salah Lessons" },
-  ]);
-
+  const [categories, setCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
 
-  const handleAdd = () => {
-    if (newCategory.trim() === "") return;
-    if (editingCategory) {
-      setCategories((prev) =>
-        prev.map((cat) =>
-          cat.id === editingCategory.id ? { ...cat, name: newCategory } : cat
-        )
-      );
-      setEditingCategory(null);
-    } else {
-      setCategories((prev) => [
-        ...prev,
-        { id: Date.now(), name: newCategory },
-      ]);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await getCategoriesApi();
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
     }
-    setNewCategory("");
-    setShowModal(false);
+  };
+
+  const handleAdd = async () => {
+    if (newCategory.trim() === "") return;
+
+    try {
+      if (editingCategory) {
+        await updateCategoryApi(editingCategory.id, newCategory);
+      } else {
+        await addCategoryApi(newCategory);
+      }
+      setNewCategory("");
+      setEditingCategory(null);
+      setShowModal(false);
+      fetchCategories();
+    } catch (err) {
+      console.error("Error saving category:", err);
+    }
   };
 
   const handleEdit = (cat) => {
@@ -38,8 +51,13 @@ const ManageCategories = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
-    setCategories((prev) => prev.filter((cat) => cat.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteCategoryApi(id);
+      fetchCategories();
+    } catch (err) {
+      console.error("Error deleting category:", err);
+    }
   };
 
   return (

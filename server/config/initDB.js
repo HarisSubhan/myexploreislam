@@ -58,6 +58,22 @@ const initDB = () => {
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
   )`;
 
+  const AssignmentsTable =`CREATE TABLE IF NOT EXISTS assignments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    file_url VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+  const categoriesTable = `
+  CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+  )
+`;
+
   db.query(userTable, (err) => {
     if (err) {
       console.log('❌ Error creating users table:', err.code, err.message);
@@ -112,6 +128,22 @@ const initDB = () => {
       console.log("✅ Quiz Questions table ready.");
     }
   });
+  db.query(AssignmentsTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Assignment  table:", err.message);
+    } else {
+      console.log("✅ Assignment table ready.");
+    }
+  });
+
+  db.query(categoriesTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Categories table:", err.message);
+    } else {
+      console.log("✅ Categories table ready.");
+    }
+  });
+  
 };
 
 module.exports = initDB;
