@@ -68,6 +68,16 @@ const initDB = () => {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
+  const blogsTable = `CREATE TABLE IF NOT EXISTS blogs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    banner_image VARCHAR(255),
+    publish_date DATE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+
 
   db.query(userTable, (err) => {
     if (err) {
@@ -129,6 +139,14 @@ const initDB = () => {
       console.log("❌ Error creating Books table:", err.message);
     } else {
       console.log("✅ Books table ready.");
+    }
+  });
+
+  db.query(blogsTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Blogs table:", err.message);
+    } else {
+      console.log("✅ Blogs table ready.");
     }
   });
 };
