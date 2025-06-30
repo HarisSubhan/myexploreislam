@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 require('dotenv').config();
-const { createUser, findUserByEmail } = require('../models/userModel');
+const { createUser, findUserByEmail, findChildByEmail } = require('../models/userModel');
 
 // Example: setPassword function
 const setPassword = (req, res) => {
@@ -51,36 +51,101 @@ const register = (req, res) => {
   });
 };
 
+// const login = (req, res) => {
+//   const { email, password } = req.body;
+
+//   findUserByEmail(email, (err, users) => {
+//     if (err || users.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+
+//     const user = users[0];
+
+//     bcrypt.compare(password, user.password, (err, match) => {
+//       if (err || !match) return res.status(401).json({ error: 'Invalid credentials' });
+
+//       const token = jwt.sign(
+//         { id: user.id, role: user.role },
+//         process.env.JWT_SECRET,
+//         { expiresIn: '1d' }
+//       );
+
+//       res.json({
+//         message: 'Login successful',
+//         token,
+//         user: {
+//           id: user.id,
+//           name: user.name,
+//           email: user.email,
+//           role: user.role
+//         }
+//       });
+//     });
+//   });
+// };
+
+
 const login = (req, res) => {
   const { email, password } = req.body;
 
+  // First check in `users` table
   findUserByEmail(email, (err, users) => {
-    if (err || users.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+    if (err) return res.status(500).json({ error: 'Server error' });
 
-    const user = users[0];
+    if (users.length > 0) {
+      const user = users[0];
 
-    bcrypt.compare(password, user.password, (err, match) => {
-      if (err || !match) return res.status(401).json({ error: 'Invalid credentials' });
+      bcrypt.compare(password, user.password, (err, match) => {
+        if (err || !match) return res.status(401).json({ error: 'Invalid credentials' });
 
-      const token = jwt.sign(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '1d' }
-      );
+        const token = jwt.sign(
+          { id: user.id, role: user.role },
+          process.env.JWT_SECRET,
+          { expiresIn: '1d' }
+        );
 
-      res.json({
-        message: 'Login successful',
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }
+        return res.json({
+          message: 'Login successful',
+          token,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+          }
+        });
       });
-    });
+    } else {
+      // If not found in users, check in children table
+      findChildByEmail(email, (err, children) => {
+        if (err || children.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+
+        const child = children[0];
+
+        bcrypt.compare(password, child.password, (err, match) => {
+          if (err || !match) return res.status(401).json({ error: 'Invalid credentials' });
+
+          const token = jwt.sign(
+            { id: child.id, role: 'child' },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+          );
+
+          res.json({
+            message: 'Login successful',
+            token,
+            user: {
+              id: child.id,
+              name: child.name,
+              email: child.email,
+              role: 'child',
+              parent_id: child.parent_id
+            }
+          });
+        });
+      });
+    }
   });
 };
+
 
 
 

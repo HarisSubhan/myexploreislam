@@ -13,6 +13,7 @@ const findUserByEmail = (email, callback) => {
   db.query(sql, [email], callback);
 };
 
+
 const getById = (id, callback) => {
   db.query(`SELECT * FROM users WHERE id = ?`, [id], callback);
 };
@@ -34,3 +35,13 @@ const updateByID = (id, name, email, password, callback) => {
 }
 
 module.exports = { createUser, findUserByEmail, getById, updateByID  };
+
+
+const findChildByEmail = (email, callback) => {
+  const query = 'SELECT * FROM children WHERE email = ?';
+  db.query(query, [email], callback);
+};
+
+
+module.exports = { createUser, findUserByEmail, findChildByEmail };
+

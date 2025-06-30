@@ -58,6 +58,7 @@ const initDB = () => {
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
   )`;
 
+
   const booksTable = `CREATE TABLE IF NOT EXISTS books (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -85,11 +86,28 @@ const initDB = () => {
     max_children INT DEFAULT 2,     -- default 2 allowed
     is_active BOOLEAN DEFAULT TRUE,
     start_date DATE,
-    end_date DATE,
+    end_date DATE, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES users(id)
   )`;
+
+  const AssignmentsTable =`CREATE TABLE IF NOT EXISTS assignments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    file_url VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+  const categoriesTable = `
+  CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+  )
+`;
+
 
   db.query(userTable, (err) => {
     if (err) {
@@ -146,6 +164,7 @@ const initDB = () => {
     }
   });
 
+
   db.query(booksTable, (err) => {
     if (err) {
       console.log("❌ Error creating Books table:", err.message);
@@ -169,6 +188,23 @@ const initDB = () => {
       console.log("✅ Subscription table ready.");
     }
   });
+
+  db.query(AssignmentsTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Assignment  table:", err.message);
+    } else {
+      console.log("✅ Assignment table ready.");
+    }
+  });
+
+  db.query(categoriesTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Categories table:", err.message);
+    } else {
+      console.log("✅ Categories table ready.");
+    }
+  });
+  
 };
 
 module.exports = initDB;
