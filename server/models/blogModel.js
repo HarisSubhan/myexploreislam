@@ -44,7 +44,7 @@ const remove = (id, callback) => {
 
 // Get latest 3 blogs (public)
 const getLatest = (callback) => {
-  const sql = `SELECT id, title, banner, publish_date FROM blogs ORDER BY created_at DESC LIMIT 3`;
+  const sql = `SELECT id, title, banner_image, publish_date FROM blogs ORDER BY created_at DESC LIMIT 3`;
   db.query(sql, callback);
 };
 
