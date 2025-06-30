@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
-    <div style={{ width: '250px', backgroundColor: 'hsl(232deg 17.24% 17.06%)', color: '#fff' }} className="p-3">
+    <div style={{ width: '250px', backgroundColor: 'hsl(232deg 17.24% 17.06%)', color: '#fff', height: '100vh' }} className="p-3">
       <h4 className="mb-4"> Explore Islam</h4>
       <Nav className="flex-column">
         <Nav.Link as={Link} to="/admin/dashboard" className="text-white">📊 Dashboard</Nav.Link>
