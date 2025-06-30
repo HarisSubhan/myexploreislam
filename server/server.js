@@ -33,7 +33,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/books', bookRoutes);
 
-app.use('/api/blogs', require('./routes/blogRoutes'));
+app.use('/api/blogs', blogRoutes);
 
 
 // app.use('/api/quizzes', quizRoutes);
