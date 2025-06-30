@@ -48,6 +48,30 @@ export const deleteCategoryApi = (id) =>
   axios.delete(`${baseUrl}/api/Category/${id}`);
 
 
+export const uploadAssignment = async (formData, token) => {
+  try {
+    const response = await fetch("http://localhost:5000/api/assignments/", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Upload failed");
+    }
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 
 
 

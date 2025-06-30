@@ -6,7 +6,7 @@ const createAssignment = (req, res) => {
   const { title, description, category } = req.body;
 
   if (!req.file) {
-    return res.status(400).json({ error: 'Assignment file is required' });
+    return res.status(400).json({ error: "Assignment file is required" });
   }
 
   const filePath = `/uploads/assignments/${req.file.filename}`;
@@ -16,11 +16,13 @@ const createAssignment = (req, res) => {
     VALUES (?, ?, ?, ?)
   `;
   db.query(sql, [title, description, filePath, category], (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to upload assignment' });
+    if (err)
+      return res.status(500).json({ error: "Failed to upload assignment" });
 
-    res.status(201).json({ message: 'Assignment uploaded successfully' });
+    res.status(201).json({ message: "Assignment uploaded successfully" });
   });
 };
+
 
 // Get all
 const getAllAssignments = (req, res) => {

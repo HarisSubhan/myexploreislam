@@ -9,16 +9,16 @@ const { uploadAssignment } = require('../middleware/assignmentsUpload');
 // Create a new quiz with questions
 router.post('/', uploadAssignment.single('file'), verifyToken, isAdmin, createAssignment);
 
-// Get all quizzes
+// Get all Assignment
 router.get('/', getAllAssignments);
 
-// Get single quiz with its questions
+// Get single Assignment with its questions
 router.get('/:id', getAssignmentById);
 
-// Update quiz and its questions
+// Update Assignment and its questions
 router.put('/:id',uploadAssignment.single('file'), verifyToken, isAdmin, updateAssignment);
 
-// Delete quiz
+// Delete Assignment
 router.delete('/:id', verifyToken, isAdmin, deleteAssignment);
 
 module.exports = router;

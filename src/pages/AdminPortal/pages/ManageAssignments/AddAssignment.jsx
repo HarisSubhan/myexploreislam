@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
+import { uploadAssignment } from "../../../../services/assignmentApi"; // ⬅️ Import the API
 
 const AddAssignment = () => {
   const [title, setTitle] = useState("");
@@ -10,18 +11,39 @@ const AddAssignment = () => {
   const [video, setVideo] = useState("");
   const [dueDate, setDueDate] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Backend call yahan lagega
-    console.log({
-      title,
-      description,
-      file,
-      category,
-      video,
-      dueDate,
-    });
-    alert("Assignment added successfully!");
+
+    if (!file) {
+      alert("Please upload a file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("file", file);
+    formData.append("category", category);
+    formData.append("video", video);
+    formData.append("dueDate", dueDate);
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const result = await uploadAssignment(formData, token);
+      alert(result.message || "Assignment uploaded successfully!");
+
+      // Reset fields
+      setTitle("");
+      setDescription("");
+      setFile(null);
+      setCategory("");
+      setVideo("");
+      setDueDate("");
+    } catch (error) {
+      console.error("Upload error:", error.message);
+      alert("Upload failed: " + error.message);
+    }
   };
 
   return (
@@ -33,7 +55,6 @@ const AddAssignment = () => {
             <Form.Label>Title</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter assignment title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -45,7 +66,6 @@ const AddAssignment = () => {
             <Form.Control
               as="textarea"
               rows={3}
-              placeholder="Enter description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -53,19 +73,19 @@ const AddAssignment = () => {
           </Form.Group>
 
           <Form.Group controlId="file" className="mb-3">
-            <Form.Label>Upload File (PDF/DOC)</Form.Label>
+            <Form.Label>Upload File</Form.Label>
             <Form.Control
               type="file"
               accept=".pdf,.doc,.docx"
               onChange={(e) => setFile(e.target.files[0])}
+              required
             />
           </Form.Group>
 
           <Form.Group controlId="category" className="mb-3">
-            <Form.Label>Related Category</Form.Label>
+            <Form.Label>Category</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter category name"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
@@ -75,7 +95,6 @@ const AddAssignment = () => {
             <Form.Label>Related Video (Optional)</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter video title"
               value={video}
               onChange={(e) => setVideo(e.target.value)}
             />
