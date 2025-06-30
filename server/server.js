@@ -10,6 +10,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
 const videoRoutes = require('./routes/videoRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const bookRoutes = require('./routes/bookRoutes');
 
 initDB();
 dotenv.config();
@@ -28,6 +29,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/videos', videoRoutes);
 
 app.use('/uploads', express.static('uploads'));
+
+app.use('/api/books', bookRoutes);
 
 // app.use('/api/quizzes', quizRoutes);
 

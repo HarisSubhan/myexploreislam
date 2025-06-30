@@ -58,6 +58,17 @@ const initDB = () => {
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
   )`;
 
+  const booksTable = `CREATE TABLE IF NOT EXISTS books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255),
+    category VARCHAR(100),
+    pages INT,
+    file_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+
   db.query(userTable, (err) => {
     if (err) {
       console.log('❌ Error creating users table:', err.code, err.message);
@@ -110,6 +121,14 @@ const initDB = () => {
       console.log("❌ Error creating Quiz Questions table:", err.message);
     } else {
       console.log("✅ Quiz Questions table ready.");
+    }
+  });
+
+  db.query(booksTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Books table:", err.message);
+    } else {
+      console.log("✅ Books table ready.");
     }
   });
 };
