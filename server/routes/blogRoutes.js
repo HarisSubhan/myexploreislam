@@ -14,4 +14,17 @@ router.post(
   blogController.createBlog
 );
 
+// GET /api/blogs
+router.get('/', verifyToken, isAdmin, blogController.getAllBlogs);
+
+
+router.get('/', verifyToken, isAdmin, blogController.getAllBlogs);
+router.get('/:id', verifyToken, isAdmin, blogController.getBlogById);
+router.put('/:id', verifyToken, isAdmin, uploadBlogBanner.single('banner'), blogController.updateBlog);
+router.delete('/:id', verifyToken, isAdmin, blogController.deleteBlog);
+
+// Public Routes
+router.get('/public/latest', blogController.getLatestBlogs);
+router.get('/public/:id', blogController.getPublicBlogById);
+
 module.exports = router;
