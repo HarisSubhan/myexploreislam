@@ -14,6 +14,8 @@ const getStats = (req, res) => {
       if (err) return res.status(500).json({ error: 'DB error' });
       stats.children = childResult[0].childCount;
 
+      stats.totalUsers = stats.parents + stats.children;
+
       // Count videos
       db.query("SELECT COUNT(*) AS videoCount FROM videos", (err, videoResult) => {
         if (err) return res.status(500).json({ error: 'DB error (videos)' });
