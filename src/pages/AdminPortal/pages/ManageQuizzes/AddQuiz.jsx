@@ -1,81 +1,7 @@
-// import React, { useState } from 'react';
-// import { Form, Button } from 'react-bootstrap';
-// import AdminLayout from '../../AdminApp';
-
-// const AddQuiz = () => {
-//   const [quiz, setQuiz] = useState({
-//     title: '',
-//     category: '',
-//     totalQuestions: '',
-//   });
-
-//   const handleChange = (e) => {
-//     setQuiz({ ...quiz, [e.target.name]: e.target.value });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log('Quiz Data:', quiz);
-//     // Yahan API call karni hogi baad mein
-//     alert('Quiz added successfully!');
-//   };
-
-//   return (
-//     <AdminLayout>
-//       <div className="p-4">
-//         <h2 className="mb-4">➕ Add New Quiz</h2>
-//         <Form onSubmit={handleSubmit}>
-//           <Form.Group className="mb-3">
-//             <Form.Label>Quiz Title</Form.Label>
-//             <Form.Control
-//               type="text"
-//               name="title"
-//               value={quiz.title}
-//               onChange={handleChange}
-//               required
-//               placeholder="Enter quiz title"
-//             />
-//           </Form.Group>
-
-//           <Form.Group className="mb-3">
-//             <Form.Label>Category</Form.Label>
-//             <Form.Control
-//               type="text"
-//               name="category"
-//               value={quiz.category}
-//               onChange={handleChange}
-//               required
-//               placeholder="Enter category"
-//             />
-//           </Form.Group>
-
-//           <Form.Group className="mb-3">
-//             <Form.Label>Total Questions</Form.Label>
-//             <Form.Control
-//               type="number"
-//               name="totalQuestions"
-//               value={quiz.totalQuestions}
-//               onChange={handleChange}
-//               required
-//               placeholder="Enter number of questions"
-//             />
-//           </Form.Group>
-
-//           <Button variant="success" type="submit">
-//             Add Quiz
-//           </Button>
-//         </Form>
-//       </div>
-//     </AdminLayout>
-//   );
-// };
-
-// export default AddQuiz;
-
-
 import React, { useState, useEffect } from "react";
 import { Form, Button, Card, Row, Col } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
+import { createQuizApi } from "../../../../services/quizApi";
 
 const AddQuiz = () => {
   const [quizTitle, setQuizTitle] = useState("");
@@ -122,10 +48,34 @@ const AddQuiz = () => {
     ]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ quizTitle, linkType, selectedLink, questions });
-    // Submit logic here (API call)
+  
+    const formattedQuestions = questions.map((q) => ({
+      question: q.question,
+      option_a: q.options[0],
+      option_b: q.options[1],
+      option_c: q.options[2],
+      option_d: q.options[3],
+      correct_option: q.correct,
+    }));
+  
+    const quizData = {
+      title: quizTitle,
+      description: selectedLink,
+      category: linkType,
+      questions: formattedQuestions,
+    };
+  
+    try {
+      const token = localStorage.getItem("token");
+      await createQuizApi(quizData, token);
+      alert("✅ Quiz created successfully!");
+      // Optionally reset form or redirect
+    } catch (error) {
+      console.error("Quiz creation error:", error.response?.data || error.message);
+      alert("❌ Failed to create quiz.");
+    }
   };
 
   return (

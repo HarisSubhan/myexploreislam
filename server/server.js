@@ -45,8 +45,6 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 
 
-// app.use('/api/quizzes', quizRoutes);
-
 app.use('/api/quizzes', quizRoutes);
 
 app.use('/api/assignments', assignmentsRoutes);

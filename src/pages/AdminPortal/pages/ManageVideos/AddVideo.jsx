@@ -1,73 +1,11 @@
-// import React, { useState } from 'react';
-// import { Form, Button, Card } from 'react-bootstrap';
-
-// const AddVideo = () => {
-//   const [title, setTitle] = useState('');
-//   const [url, setUrl] = useState('');
-//   const [category, setCategory] = useState('');
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log({ title, url, category });
-//     // Later: send this data to backend
-//     alert('Video added successfully!');
-//     setTitle('');
-//     setUrl('');
-//     setCategory('');
-//   };
-
-//   return (
-//     <Card className="p-4">
-//       <h3 className="mb-4">🎬 Add New Video</h3>
-//       <Form onSubmit={handleSubmit}>
-//         <Form.Group className="mb-3">
-//           <Form.Label>Video Title</Form.Label>
-//           <Form.Control
-//             type="text"
-//             placeholder="Enter title"
-//             value={title}
-//             onChange={(e) => setTitle(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
-
-//         <Form.Group className="mb-3">
-//           <Form.Label>Video URL</Form.Label>
-//           <Form.Control
-//             type="text"
-//             placeholder="Enter URL"
-//             value={url}
-//             onChange={(e) => setUrl(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
-
-//         <Form.Group className="mb-3">
-//           <Form.Label>Category</Form.Label>
-//           <Form.Control
-//             type="text"
-//             placeholder="Enter category"
-//             value={category}
-//             onChange={(e) => setCategory(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
-
-//         <Button variant="danger" type="submit">
-//           ➕ Add Video
-//         </Button>
-//       </Form>
-//     </Card>
-//   );
-// };
-
-// export default AddVideo;
-
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
+import { uploadVideoApi } from "../../../../services/videoApi";
+import { useNavigate } from "react-router-dom";
 
 const AddVideo = () => {
+  const navigate = useNavigate();
   const [videoType, setVideoType] = useState("single");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -76,26 +14,34 @@ const AddVideo = () => {
   const [singleVideo, setSingleVideo] = useState(null);
   const [seriesVideos, setSeriesVideos] = useState([]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Yahan API call karni hogi to actually save video data
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
     formData.append("category", category);
     formData.append("thumbnail", thumbnail);
-    formData.append("videoType", videoType);
 
     if (videoType === "single") {
       formData.append("video", singleVideo);
     } else {
-      for (let i = 0; i < seriesVideos.length; i++) {
-        formData.append("seriesVideos", seriesVideos[i]);
-      }
+      alert("🚧 Series upload is not yet supported.");
+      return;
+      // Later: loop through seriesVideos and append each video
+      // for (let i = 0; i < seriesVideos.length; i++) {
+      //   formData.append("videos", seriesVideos[i]);
+      // }
     }
 
-    console.log("Video submitted!");
-    // axios.post("/api/videos", formData)
+    try {
+      await uploadVideoApi(formData);
+      alert("✅ Video uploaded successfully!");
+      navigate("/admin/videos");
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("❌ Failed to upload video.");
+    }
   };
 
   return (
@@ -112,7 +58,6 @@ const AddVideo = () => {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter video title"
                 />
               </Form.Group>
 
@@ -133,7 +78,6 @@ const AddVideo = () => {
                   type="text"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  placeholder="Enter category"
                 />
               </Form.Group>
 
@@ -143,6 +87,7 @@ const AddVideo = () => {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setThumbnail(e.target.files[0])}
+                  required
                 />
               </Form.Group>
 
@@ -166,6 +111,7 @@ const AddVideo = () => {
                     type="file"
                     accept="video/*"
                     onChange={(e) => setSingleVideo(e.target.files[0])}
+                    required
                   />
                 </Form.Group>
               ) : (
@@ -176,6 +122,7 @@ const AddVideo = () => {
                     accept="video/*"
                     multiple
                     onChange={(e) => setSeriesVideos(e.target.files)}
+                    required
                   />
                 </Form.Group>
               )}

@@ -13,7 +13,6 @@ const Book = () => {
   const { color: themeColor, textColor } = useTheme();
   const navigate = useNavigate();
 
-
   const [activeTab, setActiveTab] = useState("pdf");
 
   const handleStartQuiz = (quizId) => {
@@ -54,59 +53,7 @@ const Book = () => {
       description:
         "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
     },
-    {
-      id: 2,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/M/MV5BODIyNzk5NDg5M15BMl5BanBnXkFtZTgwMTE5NjA5MjI@._V1_.jpg",
-      title: "STRANGER THINGS",
-      match: "98% Match",
-      rating: "TV-14",
-      seasons: "4 Seasons",
-      quality: "4K",
-      genres: ["pdf", "quiz", "assignment"],
-      description:
-        "When a boy vanishes, a small town uncovers a mystery involving secret experiments and terrifying supernatural forces.",
-    },
-    {
-      id: 3,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
-      title: "THE RECRUIT",
-      match: "95% Match",
-      rating: "TV-MA",
-      seasons: "2 Seasons",
-      quality: "HD",
-      genres: ["pdf", "quiz", "assignment"],
-      description:
-        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
-    },
-    {
-      id: 4,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
-      title: "THE RECRUIT",
-      match: "95% Match",
-      rating: "TV-MA",
-      seasons: "2 Seasons",
-      quality: "HD",
-      genres: ["pdf", "quiz", "assignment"],
-      description:
-        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
-    },
-    {
-      id: 5,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
-      title: "THE RECRUIT",
-      match: "95% Match",
-      rating: "TV-MA",
-      seasons: "2 Seasons",
-      quality: "HD",
-      genres: ["pdf", "quiz", "assignment"],
-      description:
-        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
-    },
-    
+    // ... other book data
   ];
 
   const selectedBook = BookData.find((v) => v.id === expandedBook);
@@ -118,24 +65,21 @@ const Book = () => {
   const renderTabContent = () => {
     if (!selectedBook) return null;
 
-    switch (activeTab.toLowerCase) {
+    switch (activeTab.toLowerCase()) {
       case "pdf":
         return (
           <div className="quiz-content">
             <h4>PDF</h4>
             <div className="quiz-list">
-              {(selectedBook.quizzes || []).map((quiz) => (
-                <div className="quiz-item" key={quiz.id}>
-                  <h5>{quiz.title}</h5>
+              {(selectedBook.pdf || []).map((pdf) => (
+                <div className="quiz-item" key={pdf.id}>
+                  <h5>{pdf.title}</h5>
                   <div className="quiz-meta">
-                    <span>{quiz.questions} questions</span>
-                    <span>{quiz.duration}</span>
+                    <span>{pdf.questions} questions</span>
+                    <span>{pdf.duration}</span>
                   </div>
-                  <button
-                    className="start-quiz-btn"
-                    onClick={() => handleStartQuiz(quiz.id)}
-                  >
-                    Start Quiz
+                  <button className="start-quiz-btn">
+                    View PDF
                   </button>
                 </div>
               ))}
@@ -154,7 +98,12 @@ const Book = () => {
                     <span>{quiz.questions} questions</span>
                     <span>{quiz.duration}</span>
                   </div>
-                  <button className="start-quiz-btn">Start Quiz</button>
+                  <button 
+                    className="start-quiz-btn"
+                    onClick={() => handleStartQuiz(quiz.id)}
+                  >
+                    Start Quiz
+                  </button>
                 </div>
               ))}
             </div>
@@ -188,34 +137,37 @@ const Book = () => {
   return (
     <Container className="netflix-container">
       <Row className="thumbnails-row">
-        {BookData.map((video) => (
+        {BookData.map((book) => (
           <Col
-            key={video.id}
-            xs={12}
-            sm={6}
-            md={4}
-            lg={3}
-            xl={2}
+            key={book.id}
+            xs={6}
+            sm={4}
+            md={3}
+            lg={2}
             className="thumbnail-col"
-            onMouseEnter={() => setHoveredBook(video.id)}
+            onMouseEnter={() => setHoveredBook(book.id)}
             onMouseLeave={() => setHoveredBook(null)}
-            onClick={() => setExpandedBook(video.id)}
+            onClick={() => setExpandedBook(book.id)}
           >
             <div className="netflix-card-wrapper-book">
               <Card className="netflix-thumbnail-book">
                 <div className="thumbnail-image-container-book">
-                  <img src={video.thumbnailUrl} alt={video.title} />
-                  <span className="Book-quality">{video.quality}</span>
+                  <img 
+                    src={book.thumbnailUrl} 
+                    alt={book.title} 
+                    loading="lazy" // Add lazy loading
+                  />
+                  <span className="book-quality">{book.quality}</span>
                 </div>
               </Card>
 
-              {hoveredBook === video.id && (
+              {hoveredBook === book.id && (
                 <div
                   style={{ backgroundColor: themeColor, color: textColor }}
                   className="netflix-hover-card-book"
                 >
                   <div className="hover-thumbnail">
-                    <img src={video.thumbnailUrl} alt={video.title} />
+                    <img src={book.thumbnailUrl} alt={book.title} />
                   </div>
                   <div className="hover-details">
                     <div className="action-buttons d-flex justify-content-between align-items-center">
@@ -229,17 +181,20 @@ const Book = () => {
                       </div>
                       <button
                         className="action-btn more-btn"
-                        onClick={() => setExpandedBook(video.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedBook(book.id);
+                        }}
                       >
                         <FaChevronDown />
                       </button>
                     </div>
                     <div className="match-rating">
-                      <span className="match">{video.match}</span>
-                      <span className="age-rating">{video.rating}</span>
+                      <span className="match">{book.match}</span>
+                      <span className="age-rating">{book.rating}</span>
                     </div>
                     <div className="genre-tags">
-                      {video.genres.map((genre, index) => (
+                      {book.genres.map((genre, index) => (
                         <span key={index}>{genre}</span>
                       ))}
                     </div>
@@ -282,14 +237,13 @@ const Book = () => {
 
             <p className="description">{selectedBook.description}</p>
 
-            {/* Tab Navigation */}
             <div className="language-tabs">
               <div className="tab-buttons">
                 {["PDF", "Quiz", "Assignment"].map((tab) => (
                   <button
                     key={tab}
-                    className={`tab-btn ${activeTab === tab ? "active" : ""}`}
-                    onClick={() => setActiveTab(tab)}
+                    className={`tab-btn ${activeTab === tab.toLowerCase() ? "active" : ""}`}
+                    onClick={() => setActiveTab(tab.toLowerCase())}
                   >
                     {tab}
                   </button>
