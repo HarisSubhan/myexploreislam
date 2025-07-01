@@ -1,3 +1,5 @@
+// /src/pages/admin/AddBook.jsx
+
 import React, { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
@@ -22,22 +24,38 @@ const AddBook = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const data = new FormData();
         data.append("title", formData.title);
         data.append("author", formData.author);
         data.append("category", formData.category);
         data.append("pages", formData.pages);
-        data.append("file", formData.file); // 👈 attach file
+        data.append("pdf", formData.file);
 
-        // 🔁 Send this FormData to your backend
-        console.log("Sending form with file:", data);
+        try {
+            const response = await fetch("http://localhost:5000/api/books", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, 
+                },
+                body: data,
+            });
 
-        // After API call
-        navigate("/admin/manage-books");
+            const resData = await response.json();
+
+            if (!response.ok) {
+                alert("Upload failed: " + resData.error);
+                return;
+            }
+
+            alert("✅ Book added successfully!");
+            navigate("/admin/manage-books");
+        } catch (error) {
+            console.error("Error uploading book:", error);
+            alert("Something went wrong");
+        }
     };
-
 
     return (
         <AdminLayout>
@@ -46,62 +64,30 @@ const AddBook = () => {
                 <Form onSubmit={handleSubmit} encType="multipart/form-data">
                     <Form.Group className="mb-3">
                         <Form.Label>Book Title</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Form.Control type="text" name="title" value={formData.title} onChange={handleChange} required />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Author</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="author"
-                            value={formData.author}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Form.Control type="text" name="author" value={formData.author} onChange={handleChange} required />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Category</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Form.Control type="text" name="category" value={formData.category} onChange={handleChange} required />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Number of Pages</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="pages"
-                            value={formData.pages}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Form.Control type="number" name="pages" value={formData.pages} onChange={handleChange} required />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Upload Book File (PDF)</Form.Label>
-                        <Form.Control
-                            type="file"
-                            name="file"
-                            accept=".pdf,.doc,.docx,.epub"
-                            onChange={handleChange}
-                            required
-                        />
+                        <Form.Control type="file" name="file" accept=".pdf,.doc,.docx,.epub" onChange={handleChange} required />
                     </Form.Group>
 
-                    <Button type="submit" variant="success">
-                        Add Book
-                    </Button>
+                    <Button type="submit" variant="success">Add Book</Button>
                 </Form>
             </Card>
         </AdminLayout>
