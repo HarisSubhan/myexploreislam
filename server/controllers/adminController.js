@@ -5,7 +5,7 @@ const User = require('../models/userModel');
 
 const getStats = (req, res) => {
   const stats = {};
-  
+
   db.query("SELECT COUNT(*) AS parentCount FROM users WHERE role = 'parent'", (err, parentResult) => {
     if (err) return res.status(500).json({ error: 'DB error' });
     stats.parents = parentResult[0].parentCount;
@@ -14,7 +14,23 @@ const getStats = (req, res) => {
       if (err) return res.status(500).json({ error: 'DB error' });
       stats.children = childResult[0].childCount;
 
-      res.json(stats);
+      // Count videos
+      db.query("SELECT COUNT(*) AS videoCount FROM videos", (err, videoResult) => {
+        if (err) return res.status(500).json({ error: 'DB error (videos)' });
+        stats.videos = videoResult[0].videoCount;
+
+        db.query("SELECT COUNT(*) AS assignmentCount FROM assignments", (err, assignmentResult) => {
+          if (err) return res.status(500).json({ error: 'DB error' });
+          stats.assignments = assignmentResult[0].assignmentCount;
+
+          db.query("SELECT COUNT(*) AS quizCount FROM quizzes", (err, quizResult) => {
+            if (err) return res.status(500).json({ error: 'DB error' });
+            stats.quizzes = quizResult[0].quizCount;
+
+            res.json(stats);
+          });
+        });
+      });
     });
   });
 };
@@ -105,12 +121,12 @@ const deleteChild = (req, res) => {
   });
 };
 
-const getAdminProfile = (req, res) =>{
+const getAdminProfile = (req, res) => {
   const adminId = req.user.id;
 
-  User.getById(adminId, (err, results)=>{
-    if(err) return res.status(500).json({ error: 'Database error' });
-    
+  User.getById(adminId, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+
     if (!results || results.length === 0) {
       return res.status(404).json({ error: 'Admin not found' });
     }

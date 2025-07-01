@@ -51,9 +51,6 @@ app.use('/api/assignments', assignmentsRoutes);
 
 app.use("/api/Category", categoryRoutes);
 
-
-
-
 // Test route
 app.get('/', (req, res) => {
   res.send('Explore Islam API is running...');
