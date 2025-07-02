@@ -1,14 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
-
-const dummyChildren = [
-  { id: 1, name: "Ahmed", age: 8, email: "ahmed@example.com", parent: "Ali" },
-  { id: 2, name: "Ayesha", age: 10, email: "ayesha@example.com", parent: "Fatima" },
-  { id: 3, name: "Zain", age: 9, email: "zain@example.com", parent: "Usman" },
-];
+import axios from "axios";
 
 const ManageChildren = () => {
+
+  const [children, setChildren] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get("/api/admin/children", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // use your token logic
+        },
+      })
+      .then((res) => {
+        setChildren(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching children:", err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <AdminLayout>
       <div className="p-4">
@@ -25,7 +41,7 @@ const ManageChildren = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyChildren.map((child, index) => (
+            {children.map((child, index) => (
               <tr key={child.id}>
                 <td>{index + 1}</td>
                 <td>{child.name}</td>
