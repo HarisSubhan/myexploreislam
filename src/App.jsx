@@ -9,6 +9,8 @@ import Unauthorized from "./pages/SharedPortal/Unauthorized";
 import BlogPage from "./pages/SharedPortal/pages/BlogPage";
 import BlogDetail from  "./components/common/BlogDetail";
 import RegisterPage from "./pages/SharedPortal/pages/RegisterPage";
+import Subscription from "./pages/SharedPortal/pages/Subscription";
+
 
 function RequireAuth({ children, allowedRoles }) {
   const token = localStorage.getItem("token");
@@ -29,7 +31,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        
         <Route element={<StaticApp />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
@@ -66,7 +67,7 @@ function App() {
         {/* 👇 Login is separate — no layout */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
+        <Route path="/subscription" element={<Subscription />} />
 
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
