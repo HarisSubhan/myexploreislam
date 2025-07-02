@@ -20,10 +20,14 @@ export const uploadBook = async (formData, token) => {
 // Get all books (Public)
 export const getAllBooks = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/api/books`);
-    return response.data;
+    const response = await fetch(`${baseUrl}/api/books`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch books');
+    }
+    return await response.json();
   } catch (error) {
-    throw new Error("Failed to fetch books");
+    console.error('Error fetching books:', error);
+    throw error;
   }
 };
 

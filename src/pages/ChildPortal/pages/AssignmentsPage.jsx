@@ -13,9 +13,9 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import {
-  FiBook,
+  
   FiCalendar,
-  FiCheckCircle,
+  
   FiAward,
   FiSearch,
 } from "react-icons/fi";

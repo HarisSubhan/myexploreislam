@@ -1,20 +1,48 @@
 const bookModel = require('../models/bookModel');
 
 const addBook = (req, res) => {
-  const { title, author, category, pages } = req.body;
+  try {
+    const { title, author, category, pages } = req.body;
 
-  if (!req.file) {
-    return res.status(400).json({ error: 'PDF file is required' });
+    if (!req.files?.pdf) {
+      return res.status(400).json({ error: 'PDF file is required' });
+    }
+
+    if (!req.files?.thumbnail) {
+      return res.status(400).json({ error: 'Thumbnail image is required' });
+    }
+
+    const file_url = `/uploads/books/${req.files.pdf[0].filename}`;
+    const thumbnail_url = `/uploads/books/${req.files.thumbnail[0].filename}`;
+
+    const newBook = { 
+      title, 
+      author, 
+      category, 
+      pages: parseInt(pages), 
+      file_url, 
+      thumbnail_url 
+    };
+
+
+    bookModel.addBook(newBook, (err) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ 
+          error: 'DB error while adding book',
+          details: err.message 
+        });
+      }
+      res.status(201).json({ message: 'Book added successfully' });
+    });
+
+  } catch (error) {
+    console.error('Error in addBook:', error);
+    res.status(500).json({ 
+      error: 'Server error',
+      details: error.message 
+    });
   }
-
-  const file_url = `/uploads/books/${req.file.filename}`;
-
-  const newBook = { title, author, category, pages, file_url };
-
-  bookModel.addBook(newBook, (err) => {
-    if (err) return res.status(500).json({ error: 'DB error while adding book' });
-    res.status(201).json({ message: 'Book added successfully' });
-  });
 };
 
 const getAllBooks = (req, res) => {

@@ -23,14 +23,14 @@ export const uploadVideoApi = async (formData) => {
 
 export const getAllVideosApi = async () => {
   const token = getToken();
-
   const response = await axios.get(`${baseUrl}/api/videos`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
-
-  return response.data;
+  return response.data.map(video => ({
+    ...video,
+    thumbnail_url: `${baseUrl}${video.thumbnail_url}`,
+    video_url: `${baseUrl}${video.video_url}`
+  }));
 };
 
 export const getVideoByIdApi = async (id) => {

@@ -1,19 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { Card, Container, Row, Col, Button } from "react-bootstrap";
+import { Card, Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { FaPlay, FaPlus, FaThumbsUp, FaChevronDown } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { getAllBooks } from "../../services/bookApi";
 import "./VideoThumbnails.css";
+import { baseUrl } from "../../services/config";
 
 const Book = () => {
   const [hoveredBook, setHoveredBook] = useState(null);
   const [expandedBook, setExpandedBook] = useState(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { color: themeColor, textColor } = useTheme();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("pdf");
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const data = await getAllBooks();
+        setBooks(data.map(book => ({
+          ...book,
+         
+          thumbnailUrl: `${baseUrl}${book.thumbnail_url}`,
+          match: "95% Match", 
+          rating: "Book", 
+          seasons: `${book.pages} Pages`,
+          quality: "HD",
+          pdf: [
+            { id: 1, title: "Full Book PDF", questions: 0, duration: "N/A" }
+          ],
+          quizzes: [], 
+          assignments: [], 
+          genres: [book.category || "General"],
+          description: book.description || "No description available"
+        })));
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
 
   const handleStartQuiz = (quizId) => {
     navigate(`/quiz/${quizId}`);
@@ -27,36 +62,7 @@ const Book = () => {
     }, 300);
   };
 
-  const BookData = [
-    {
-      id: 1,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
-      title: "THE RECRUIT",
-      match: "95% Match",
-      rating: "TV-MA",
-      seasons: "2 Seasons",
-      quality: "HD",
-      pdf: [
-        { id: 1, title: "Chapter 1 pdf", questions: 10, duration: "15 min" },
-        { id: 2, title: "Midterm pdf", questions: 20, duration: "30 min" },
-      ],
-      quizzes: [
-        { id: 1, title: "Chapter 1 Quiz", questions: 10, duration: "15 min" },
-        { id: 2, title: "Midterm Quiz", questions: 20, duration: "30 min" },
-      ],
-      assignments: [
-        { id: 1, title: "Essay Assignment", due: "May 30", points: 100 },
-        { id: 2, title: "Group Project", due: "June 15", points: 200 },
-      ],
-      genres: ["pdf", "quiz", "assignment"],
-      description:
-        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
-    },
-    // ... other book data
-  ];
-
-  const selectedBook = BookData.find((v) => v.id === expandedBook);
+  const selectedBook = books.find((v) => v.id === expandedBook);
 
   useEffect(() => {
     document.body.style.overflow = expandedBook ? "hidden" : "auto";
@@ -78,9 +84,14 @@ const Book = () => {
                     <span>{pdf.questions} questions</span>
                     <span>{pdf.duration}</span>
                   </div>
-                  <button className="start-quiz-btn">
+                  <a 
+                    href={`${baseUrl}${selectedBook.file_url}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="start-quiz-btn"
+                  >
                     View PDF
-                  </button>
+                  </a>
                 </div>
               ))}
             </div>
@@ -106,6 +117,9 @@ const Book = () => {
                   </button>
                 </div>
               ))}
+              {selectedBook.quizzes?.length === 0 && (
+                <p>No quizzes available for this book</p>
+              )}
             </div>
           </div>
         );
@@ -126,6 +140,9 @@ const Book = () => {
                   </button>
                 </div>
               ))}
+              {selectedBook.assignments?.length === 0 && (
+                <p>No assignments available for this book</p>
+              )}
             </div>
           </div>
         );
@@ -134,10 +151,28 @@ const Book = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Container className="text-center mt-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="text-center mt-5">
+        <div className="alert alert-danger">Error: {error}</div>
+      </Container>
+    );
+  }
+
   return (
-    <Container className="netflix-container">
+    <Container fluid className="netflix-container">
       <Row className="thumbnails-row">
-        {BookData.map((book) => (
+        {books.slice(0, 5).map((book) => (
           <Col
             key={book.id}
             xs={6}
@@ -155,7 +190,7 @@ const Book = () => {
                   <img 
                     src={book.thumbnailUrl} 
                     alt={book.title} 
-                    loading="lazy" // Add lazy loading
+                    loading="lazy"
                   />
                   <span className="book-quality">{book.quality}</span>
                 </div>
