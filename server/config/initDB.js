@@ -8,6 +8,9 @@ const initDB = () => {
       name VARCHAR(100),
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
+      phone_number VARCHAR(20) DEFAULT NULL,
+      is_active BOOLEAN DEFAULT NULL,
+      is_deleted BOOLEAN DEFAULT NULL,
       role ENUM('admin', 'parent', 'child') DEFAULT 'parent',
       max_children INT DEFAULT 2,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -93,7 +96,7 @@ const initDB = () => {
     FOREIGN KEY (parent_id) REFERENCES users(id)
   )`;
 
-  const AssignmentsTable =`CREATE TABLE IF NOT EXISTS assignments (
+  const AssignmentsTable = `CREATE TABLE IF NOT EXISTS assignments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -205,7 +208,7 @@ const initDB = () => {
       console.log("✅ Categories table ready.");
     }
   });
-  
+
 };
 
 module.exports = initDB;

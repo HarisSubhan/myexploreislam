@@ -1,25 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
+import axios from 'axios';
 
 const ManageParents = () => {
   const [parents, setParents] = useState([
-    {
-      id: 1,
-      name: "Ahmed Khan",
-      email: "ahmed@example.com",
-      phone: "03001234567",
-    },
-    {
-      id: 2,
-      name: "Ayesha Fatima",
-      email: "ayesha@example.com",
-      phone: "03111234567",
-    },
+    // {
+    //   id: 1,
+    //   name: "Ahmed Khan",
+    //   email: "ahmed@example.com",
+    //   phone: "03001234567",
+    // },
+    // {
+    //   id: 2,
+    //   name: "Ayesha Fatima",
+    //   email: "ayesha@example.com",
+    //   phone: "03111234567",
+    // },
   ]);
 
   const [selectedParent, setSelectedParent] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const fetchParents = async () => {
+      try {
+        const token = localStorage.getItem('token'); // 🔐 Adjust based on your auth method
+        const res = await axios.get('/api/admin/parents', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setParents(res.data);
+      } catch (error) {
+        console.error("Error fetching parents:", error);
+      }
+    };
+
+    fetchParents();
+  }, []);
 
   const handleView = (parent) => {
     setSelectedParent(parent);
