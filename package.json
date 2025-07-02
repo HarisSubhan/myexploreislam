@@ -23,6 +23,7 @@
     "axios": "^1.9.0",
     "bootstrap": "^5.3.6",
     "cors": "^2.8.5",
+    "framer-motion": "^12.23.0",
     "i": "^0.3.7",
     "lucide-react": "^0.510.0",
     "my-explore-islam": "file:",

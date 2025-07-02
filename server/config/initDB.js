@@ -66,6 +66,7 @@ const initDB = () => {
     category VARCHAR(100),
     pages INT,
     file_url VARCHAR(255),
+    thumbnail_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 

@@ -1,9 +1,19 @@
 const db = require('../config/db');
 
 const addBook = (book, callback) => {
-  const { title, author, category, pages, file_url } = book;
-  const sql = `INSERT INTO books (title, author, category, pages, file_url) VALUES (?, ?, ?, ?, ?)`;
-  db.query(sql, [title, author, category, pages, file_url], callback);
+  const { title, author, category, pages, file_url, thumbnail_url } = book;
+  const sql = `INSERT INTO books (title, author, category, pages, file_url, thumbnail_url) VALUES (?, ?, ?, ?, ?, ?)`;
+  
+  db.query(sql, 
+    [title, author, category, pages, file_url, thumbnail_url], 
+    (err, result) => {
+      if (err) {
+        console.error('Database error:', err); // Add this for debugging
+        return callback(err);
+      }
+      callback(null, result);
+    }
+  );
 };
 
 const getAllBooks = (callback) => {

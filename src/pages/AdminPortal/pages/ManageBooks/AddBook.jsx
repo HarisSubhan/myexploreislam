@@ -1,5 +1,3 @@
-// /src/pages/admin/AddBook.jsx
-
 import React, { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
@@ -12,13 +10,14 @@ const AddBook = () => {
         author: "",
         category: "",
         pages: "",
+        thumbnail: null,
         file: null
     });
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        if (name === "file") {
-            setFormData({ ...formData, file: files[0] });
+        if (name === "thumbnail" || name === "file") {
+            setFormData({ ...formData, [name]: files[0] });
         } else {
             setFormData({ ...formData, [name]: value });
         }
@@ -31,7 +30,8 @@ const AddBook = () => {
         data.append("author", formData.author);
         data.append("category", formData.category);
         data.append("pages", formData.pages);
-        data.append("pdf", formData.file);
+        data.append("thumbnail", formData.thumbnail); 
+        data.append("pdf", formData.file); 
 
         try {
             const response = await fetch("http://localhost:5000/api/books", {
@@ -83,8 +83,31 @@ const AddBook = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Upload Book File (PDF)</Form.Label>
-                        <Form.Control type="file" name="file" accept=".pdf,.doc,.docx,.epub" onChange={handleChange} required />
+                        <Form.Label>Upload Book Thumbnail</Form.Label>
+                        <Form.Control 
+                            type="file" 
+                            name="thumbnail" 
+                            accept="image/*" 
+                            onChange={handleChange} 
+                            required 
+                        />
+                        <Form.Text className="text-muted">
+                            This will be the cover image for your book
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Upload Book File</Form.Label>
+                        <Form.Control 
+                            type="file" 
+                            name="file" 
+                            accept=".pdf,.doc,.docx,.epub" 
+                            onChange={handleChange} 
+                            required 
+                        />
+                        <Form.Text className="text-muted">
+                            Accepted formats: PDF, DOC, DOCX, EPUB
+                        </Form.Text>
                     </Form.Group>
 
                     <Button type="submit" variant="success">Add Book</Button>
