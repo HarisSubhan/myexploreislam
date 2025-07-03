@@ -5,6 +5,7 @@ import Book from "../../../components/child/Book";
 import { FaBookOpen, FaVideo, FaStar, FaTrophy } from "react-icons/fa";
 import { useTheme } from "../../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import Banner from "../../../components/child/Banner";
 
 
 const styles = {
@@ -147,6 +148,8 @@ const ChildDashboard = () => {
   const navigateToVideos = () => navigate("/child/video");
 
   return (
+    <div>
+      <Banner />
     <div className="child-dashboard" style={styles.dashboard}>
       <Container fluid className="px-2 px-sm-3 px-md-4">
         {/* Welcome & Progress */}
@@ -343,6 +346,8 @@ const ChildDashboard = () => {
         </Row>
       </Container>
     </div>
+    </div>
+    
   );
 };
 

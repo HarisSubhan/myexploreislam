@@ -1231,3 +1231,30 @@ Netflix-like styling
     gap: 6px;
   }
 }
+
+ /* Add these to your CSS file */
+.option-button.selected {
+  background-color: #e3f2fd;
+  border-color: #4a6baf;
+  transform: scale(1.02);
+}
+
+.correct-answer {
+  background-color: #d4edda !important;
+  border-color: #28a745 !important;
+  color: #28a745 !important;
+}
+
+.incorrect-answer {
+  background-color: #f8d7da !important;
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.bg-success-light {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.bg-danger-light {
+  background-color: rgba(220, 53, 69, 0.1);
+}

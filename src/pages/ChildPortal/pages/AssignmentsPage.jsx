@@ -23,9 +23,11 @@ import { BsEmojiSmile, BsClipboardCheck } from "react-icons/bs";
 import "../../../components/child/VideoThumbnails.css";
 import { useTheme } from "../../../context/ThemeContext";
 import { getAllAssignments } from "../../../../src/services/assignmentApi"; 
+import { useNavigate } from "react-router-dom";
 
 const AssignmentsPage = () => {
   const [activeTab, setActiveTab] = useState("current");
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [assignments, setAssignments] = useState({
     current: [],
@@ -115,58 +117,61 @@ const AssignmentsPage = () => {
         </div>
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4 mb-4">
-          {filteredAssignments.map((assignment) => (
-            <Col key={assignment.id}>
-              <Card
-                className="shadow-sm"
-                style={{
-                  borderLeft: `8px solid ${
-                    assignment.category === "Math"
-                      ? "#FF6B6B"
-                      : assignment.category === "Science"
-                        ? "#4ECDC4"
-                        : "#FFD166"
-                  }`,
-                  borderRadius: "20px",
-                }}
-              >
-                <Card.Body>
-                  <div className="d-flex justify-content-between mb-2">
-                    <Badge bg="light" text="dark" className="rounded-pill px-3">
-                      {assignment.category}
-                    </Badge>
-                    <Badge bg="danger">
-                      <FiCalendar className="me-1" />
-                      {assignment.due_date?.slice(0, 10)}
-                    </Badge>
-                  </div>
-                  <Card.Title style={{ fontSize: "1.1rem" }}>
-                    {assignment.title}
-                  </Card.Title>
-                  <Card.Text
-                    className="text-muted"
-                    style={{ fontSize: "0.9rem" }}
-                  >
-                    {assignment.description}
-                  </Card.Text>
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-                    <span className="text-primary fw-bold">
-                      <FiAward className="me-1" />
-                      {assignment.points || 10} pts
-                    </span>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="rounded-pill px-3"
-                    >
-                      Start Now
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        {filteredAssignments.map((assignment) => (
+          <Col key={assignment.id}>
+            <Card
+              className="shadow-sm"
+              style={{
+                borderLeft: `8px solid ${
+                  assignment.category === "Math"
+                    ? "#FF6B6B"
+                    : assignment.category === "Science"
+                    ? "#4ECDC4"
+                    : "#FFD166"
+                }`,
+                borderRadius: "20px",
+              }}
+            >
+              <Card.Body>
+                <div className="d-flex justify-content-between mb-2">
+                  <Badge bg="light" text="dark" className="rounded-pill px-3">
+                    {assignment.category}
+                  </Badge>
+                  <Badge bg="danger">
+                    <FiCalendar className="me-1" />
+                    {assignment.due_date?.slice(0, 10)}
+                  </Badge>
+                </div>
+                <Card.Title style={{ fontSize: "1.1rem" }}>
+                  {assignment.title}
+                </Card.Title>
+                <Card.Text className="text-muted" style={{ fontSize: "0.9rem" }}>
+                  {assignment.description}
+                </Card.Text>
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <span className="text-primary fw-bold">
+                    <FiAward className="me-1" />
+                    {assignment.points || 10} pts
+                  </span>
+                  <Button
+  variant="warning"
+  size="sm"
+  className="rounded-pill px-3"
+  onClick={() => {
+    navigate(`/child/assignments/${assignment.id}`);
+    console.log("Navigate to", `/child/assignments/${assignment.id}`);
+  }}
+  
+>
+  Start Now
+</Button>
+
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
       )}
 
       <Card className="bg-light mt-4 border-0 rounded-4 shadow-sm">

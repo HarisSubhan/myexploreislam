@@ -107,7 +107,7 @@ export const VideoHomepage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Extract unique categories from videos
+  
   const categories = ["All", ...new Set(videos.map(video => video.category))];
 
   const filteredVideos = activeCategory === "All" 

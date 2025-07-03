@@ -10,6 +10,9 @@ import {
   Alert,
   Badge,
 } from "react-bootstrap";
+import Header from "../../../components/common/Header";
+import MainFooter from './../../../components/MainFooter';
+
 
 const plans = [
   {
@@ -72,15 +75,17 @@ const Subscription = () => {
   };
 
   return (
+    
     <div>
-      {/* Hero Section */}
+      <Header/>
       <div className="bg-dark text-white py-5 text-center">
         <Container>
           <h1 className="display-4 fw-bold">Upgrade Your Learning Journey</h1>
           <p className="lead mt-3">
             Choose a plan that fits your goals and budget. Cancel anytime.
           </p>
-          <Button variant="primary" size="lg" className="mt-3">
+          <Button type="submit"  variant="primary" size="lg" className="mt-3">
+            
             Get Started
           </Button>
         </Container>
@@ -197,7 +202,7 @@ const Subscription = () => {
         </Container>
       </div>
 
-      {/* Modal */}
+      
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Subscribe to {selectedPlan} Plan</Modal.Title>
@@ -224,6 +229,7 @@ const Subscription = () => {
           )}
         </Modal.Body>
       </Modal>
+      <MainFooter/>
     </div>
   );
 };

@@ -7,16 +7,9 @@ import { ThemeProvider } from "../../context/ThemeContext";
 const ChildApp = () => {
   return (
     <ThemeProvider>
-      <div
-        style={{
-          backgroundColor: "var(--primary-color)",
-          minHeight: "100vh",
-          color: "var(--text-on-primary)",
-        }}
-      >
+      <div>
         <HeaderChild />
-        <Banner />
-        <main className="p-4">
+        <main >
           <Outlet />
         </main>
       </div>
