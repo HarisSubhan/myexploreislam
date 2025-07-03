@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { uploadVideoApi } from "../../../../services/videoApi";
 import { useNavigate } from "react-router-dom";
+import { getCategoriesApi } from "../../../../services/api";
+
 
 const AddVideo = () => {
   const navigate = useNavigate();
@@ -13,6 +15,21 @@ const AddVideo = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [singleVideo, setSingleVideo] = useState(null);
   const [seriesVideos, setSeriesVideos] = useState([]);
+  const [categories, setCategories] = useState([]); 
+
+  
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategoriesApi();
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,10 +45,6 @@ const AddVideo = () => {
     } else {
       alert("🚧 Series upload is not yet supported.");
       return;
-      // Later: loop through seriesVideos and append each video
-      // for (let i = 0; i < seriesVideos.length; i++) {
-      //   formData.append("videos", seriesVideos[i]);
-      // }
     }
 
     try {
@@ -74,11 +87,18 @@ const AddVideo = () => {
 
               <Form.Group className="mb-3">
                 <Form.Label>Category</Form.Label>
-                <Form.Control
-                  type="text"
+                <Form.Select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                />
+                  required
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </Form.Select>
               </Form.Group>
 
               <Form.Group className="mb-3">

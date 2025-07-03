@@ -8,8 +8,9 @@ const BookDetail = lazy(() => import("../components/child/BookDetail"));
 const ChildVideopage = lazy(() => import("../pages/ChildPortal/pages/ChildVideopage"));
 const VideoDetail = lazy(() => import("../components/child/VideoDetail"));
 const QuizPage = lazy(() => import("../pages/ChildPortal/pages/QuizPage"));
-const AssignmentsPage = lazy(() => import("../pages/ChildPortal/pages/AssignmentsPage"));
 const QuizStart = lazy(() => import("../components/child/QuizStart"));
+const AssignmentsPage = lazy(() => import("../pages/ChildPortal/pages/AssignmentsPage"));
+const AssignmentsStart = lazy(() =>import("../components/child/AssignmentsStart"));
 
 const ChildRoutes = () => {
   return (
@@ -24,6 +25,7 @@ const ChildRoutes = () => {
           <Route path="quiz" element={<QuizPage />} />
           <Route path="quiz/:quizid" element={<QuizStart />} />
           <Route path="assignments" element={<AssignmentsPage />} />
+          <Route path="assignments/:id" element={<AssignmentsStart />} />
         </Route>
       </Routes>
     </Suspense>

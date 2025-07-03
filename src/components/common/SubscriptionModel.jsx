@@ -1,8 +1,14 @@
 import React from 'react';
 import { Container, Row, Col, Button, ListGroup } from 'react-bootstrap';
 import sideimage from '@images/side.png'; // ✅ Ensure this path is valid
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionModel = () => {
+  const navigate = useNavigate();
+
+  const handleClickButton = () => {
+    navigate("/subscription"); 
+  };
   const features = [
     {
       id: 1,
@@ -58,6 +64,7 @@ const SubscriptionModel = () => {
                 $39 <span className="fs-5 fw-semibold text-muted">/month</span>
               </p>
               <Button
+              onClick={handleClickButton}
                 variant="light"
                 size="lg"
                 className="fw-semibold py-2 px-5 rounded shadow-sm  w-md-auto"

@@ -2,8 +2,14 @@ import React from "react";
 import { Button, Container, Row, Col, Image } from "react-bootstrap";
 import MaryamMuazImage from "@images/Maryam___Muaz.png";
 import DecorativeImage from "@images/c.png";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleClickButton = () => {
+    navigate("/subscription"); // Programmatic navigation
+  };
   return (
     <div
       className="hero-wrapper"
@@ -92,19 +98,20 @@ const HeroSection = () => {
                 style={{
                   backgroundColor: "#2a5f73",
                   border: "none",
-                  minWidth: "160px", // Ensures consistent button width
+                  minWidth: "160px", 
                 }}
               >
                 Learn More
               </Button>
               <Button
+              onClick={handleClickButton}
                 variant="outline-light"
                 size="lg"
                 className="px-4 py-3 fw-bold"
                 style={{
                   color: "#2a5f73",
                   borderColor: "#2a5f73",
-                  minWidth: "160px", // Ensures consistent button width
+                  minWidth: "160px", 
                 }}
               >
                 Subscribe
@@ -128,6 +135,7 @@ const HeroSection = () => {
           }}
         ></div>
       </Container>
+      
     </div>
   );
 };

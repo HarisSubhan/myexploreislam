@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
-import { uploadAssignment } from "../../../../services/assignmentApi"; // ⬅️ Import the API
+import { uploadAssignment } from "../../../../services/assignmentApi"; 
+import { getCategoriesApi } from "../../../../services/api";
+
 
 const AddAssignment = () => {
   const [title, setTitle] = useState("");
@@ -10,6 +12,15 @@ const AddAssignment = () => {
   const [category, setCategory] = useState("");
   const [video, setVideo] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const res = await getCategoriesApi();
+      setCategories(res.data);
+    };
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,13 +94,17 @@ const AddAssignment = () => {
           </Form.Group>
 
           <Form.Group controlId="category" className="mb-3">
-            <Form.Label>Category</Form.Label>
-            <Form.Control
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-          </Form.Group>
+      <Form.Label>Category</Form.Label>
+      <Form.Select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="">Select a category</option>
+        {categories.map((cat) => (
+          <option key={cat.id} value={cat.name}>{cat.name}</option>
+        ))}
+      </Form.Select>
+    </Form.Group>
 
           <Form.Group controlId="video" className="mb-3">
             <Form.Label>Related Video (Optional)</Form.Label>
