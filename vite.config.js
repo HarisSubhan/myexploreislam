@@ -6,6 +6,7 @@ import path from "path";
 export default defineConfig({
   base: "./",
   plugins: [react()],
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -16,6 +17,13 @@ export default defineConfig({
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   server: {
+    proxy:{
+      '/api':{
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      }
+    },
     fs: {
       strict: false, // Allows serving from outside root
     },

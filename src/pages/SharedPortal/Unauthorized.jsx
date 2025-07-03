@@ -1,4 +1,3 @@
-// src/pages/SharedPortal/Unauthorized.jsx
 const Unauthorized = () => (
   <div className="unauthorized-container">
     <h1>403 - Access Denied</h1>

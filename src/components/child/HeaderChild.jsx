@@ -1,196 +1,175 @@
 import React, { useState } from "react";
 import {
   Container,
-  Row,
-  Col,
-  Form,
   Navbar,
-  FormControl,
-  Dropdown,
   Image,
   Nav,
+  Offcanvas,
+  Button,
+  Dropdown
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Offcanvas } from "react-bootstrap";
 import logo from "@images/logo.png";
 import { CiBellOn, CiMenuBurger } from "react-icons/ci";
+import { FaBookOpen, FaVideo, FaGamepad, FaHome, FaTasks } from "react-icons/fa";
 import avatar from "@images/DES.png";
 import writtenlogo from "@images/WRITTEN.png";
 import { useTheme } from "../../context/ThemeContext";
 
+
 const HeaderChild = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-  const { color: themeColor, textColor } = useTheme(); 
+  const { color: themeColor, textColor } = useTheme();
+  
   const handleCloseOffcanvas = () => setShowOffcanvas(false);
   const handleShowOffcanvas = () => setShowOffcanvas(true);
 
-  const logoHeightMobile = 40; 
-  const logoHeightDesktop = 50; 
-  const writtenLogoHeightMobile = 40; 
+  const themeStyles = {
+    backgroundColor: themeColor,
+    color: textColor,
+  };
+
+  // Avatar dropdown menu items
+  const AvatarDropdown = () => (
+    <Dropdown.Menu >
+      <Dropdown.Header className="text-center" >
+        <Image
+          src={avatar}
+          alt="User Avatar"
+          roundedCircle
+          width={60}
+          height={60}
+          className="mb-2 border border-2 border-warning"
+        />
+        <div>Username</div>
+        <div className="small text-muted">user@example.com</div>
+      </Dropdown.Header>
+      <Dropdown.Divider />
+      <Dropdown.Item as={Link} to="/profile" >
+        <i className="bi bi-person me-2"></i> Profile
+      </Dropdown.Item>
+      <Dropdown.Item as={Link} to="/settings" >
+        <i className="bi bi-gear me-2"></i> Settings
+      </Dropdown.Item>
+      <Dropdown.Divider />
+      <Dropdown.Item as={Link} to="/logout" >
+        <i className="bi bi-box-arrow-right me-2"></i> Logout
+      </Dropdown.Item>
+    </Dropdown.Menu>
+  );
 
   return (
     <>
       <Navbar
-        style={{ backgroundColor: themeColor, color: textColor }}
+        style={{ 
+          ...themeStyles,
+          borderBottom: "3px solid #FFD700",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+        }}
         expand="lg"
-        className="py-2 py-md-3"
+        className="py-2 py-md-3 child-header"
       >
-        <Container className="px-3 px-md-4">
-          <div className="d-flex w-100 align-items-center justify-content-between">
-           
-            <div className="d-flex d-lg-none w-100 align-items-center">
-             
-              <CiMenuBurger
-                size={24}
-                className="cursor-pointer me-3"
-                onClick={handleShowOffcanvas}
-              />
+        <Container style={themeStyles}>
+          {/* Mobile View */}
+          <div className="d-flex d-lg-none w-100 align-items-center">
+            <Button 
+              variant="link"
+              onClick={handleShowOffcanvas}
+              className="p-0 border-0"
+              aria-label="Menu"
+              style={{ color: textColor }}
+            >
+              <CiMenuBurger size={28} className="menu-icon" />
+            </Button>
 
-             
-              <Navbar.Brand as={Link} to="/child" className="mx-auto">
-                <div className="d-flex align-items-center">
-                  <Image
-                    src={logo}
-                    alt="Company Logo"
-                    height={logoHeightMobile}
-                    className="me-2"
-                  />
-                  <Image
-                    src={writtenlogo}
-                    alt="Company Name"
-                    height={writtenLogoHeightMobile}
-                  />
-                </div>
-              </Navbar.Brand>
+            <Navbar.Brand as={Link} to="/child" className="mx-auto" style={themeStyles}>
+              <div className="d-flex align-items-center">
+                <Image
+                  src={logo}
+                  alt="Fun Learning Logo"
+                  height={40}
+                  className="me-2 bounce"
+                />
+              </div>
+            </Navbar.Brand>
 
-             
-              <Dropdown className="ms-auto">
+            <div className="d-flex align-items-center">
+              <CiBellOn size={24} className="me-3 notification-icon" style={{ color: textColor }} />
+              <Dropdown>
                 <Dropdown.Toggle
                   variant="link"
-                  id="mobile-dropdown-basic"
+                  id="dropdown-avatar-mobile"
                   className="p-0 border-0 bg-transparent shadow-none"
                 >
                   <Image
                     src={avatar}
-                    alt="User Avatar"
+                    alt="My Avatar"
                     roundedCircle
-                    width={32}
-                    height={32}
-                    className="border border-2 border-primary"
+                    width={36}
+                    height={36}
+                    className="border border-3 border-warning avatar"
                   />
                 </Dropdown.Toggle>
-                <Dropdown.Menu align="end">
-                  <Dropdown.Header className="text-center">
-                    <Image
-                      src={avatar}
-                      alt="User Avatar"
-                      roundedCircle
-                      width={60}
-                      height={60}
-                      className="mb-2 border border-2 border-primary"
-                    />
-                    <div>Username</div>
-                    <div className="small text-muted">user@example.com</div>
-                  </Dropdown.Header>
-                  <Dropdown.Divider />
-                  <Dropdown.Item as={Link} to="/profile">
-                    <i className="bi bi-person me-2"></i> Profile
-                  </Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/settings">
-                    <i className="bi bi-gear me-2"></i> Settings
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item as={Link} to="/logout">
-                    <i className="bi bi-box-arrow-right me-2"></i> Logout
-                  </Dropdown.Item>
-                </Dropdown.Menu>
+                <AvatarDropdown />
               </Dropdown>
             </div>
+          </div>
 
-           
-            <div className="d-none d-lg-flex w-100 align-items-center justify-content-between">
-            
-              <Navbar.Brand as={Link} to="/child">
-                <Image
-                  src={logo}
-                  alt="Company Logo"
-                  height={logoHeightDesktop}
-                />
-              </Navbar.Brand>
+          {/* Desktop View */}
+          <div className="d-none d-lg-flex w-100 align-items-center justify-content-between">
+            <Navbar.Brand as={Link} to="/child" className="d-flex align-items-center" style={themeStyles}>
+              <Image
+                src={logo}
+                alt="My explore Islam"
+                height={80}
+                className="me-2 bounce"
+              />
+            </Navbar.Brand>
 
-             
-              <Nav className="mx-auto">
-                <Nav.Item className="mx-3">
-                  <Link to="/child" className="nav-link fw-bold">
-                    Home
-                  </Link>
-                </Nav.Item>
-                <Nav.Item className="mx-3">
-                  <Link to="/child/book" className="nav-link fw-bold">
-                    Book
-                  </Link>
-                </Nav.Item>
-                <Nav.Item className="mx-3">
-                  <Link to="/child/video" className="nav-link fw-bold">
-                    Video
-                  </Link>
-                </Nav.Item>
-              </Nav>
-
-             
-              <div className="d-flex align-items-center gap-3">
-                <Form className="d-flex me-2">
-                  <FormControl
-                    type="search"
-                    placeholder="Search"
-                    className="me-2"
-                    aria-label="Search"
-                    style={{ minWidth: "200px" }}
-                  />
-                </Form>
-                <CiBellOn size={24} className="cursor-pointer" />
-                <Dropdown>
-                  <Dropdown.Toggle
-                    variant="link"
-                    id="desktop-dropdown-basic"
-                    className="p-0 border-0 bg-transparent shadow-none"
+            <Nav className="mx-auto nav-links" style={themeStyles}>
+              {[
+                { to: "/child", icon: <FaHome size={20} />, text: "Home" },
+                { to: "/child/book", icon: <FaBookOpen size={20} />, text: "Books" },
+                { to: "/child/video", icon: <FaVideo size={20} />, text: "Videos" },
+                { to: "/child/quiz", icon: <FaGamepad size={20} />, text: "Quiz" },
+                { to: "/child/assignments", icon: <FaTasks size={20} />, text: "Assignment" },
+              ].map((item, index) => (
+                <Nav.Item key={index} className="mx-2">
+                  <Link 
+                    to={item.to} 
+                    className="nav-link fw-bold d-flex flex-column align-items-center"
+                    style={{ color: textColor }}
                   >
-                    <Image
-                      src={avatar}
-                      alt="User Avatar"
-                      roundedCircle
-                      width={40}
-                      height={40}
-                      className="border border-2 border-primary"
-                    />
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu align="end">
-                    <Dropdown.Header className="text-center">
-                      <Image
-                        src={avatar}
-                        alt="User Avatar"
-                        roundedCircle
-                        width={60}
-                        height={60}
-                        className="mb-2 border border-2 border-primary"
-                      />
-                      <div>Username</div>
-                      <div className="small text-muted">user@example.com</div>
-                    </Dropdown.Header>
-                    <Dropdown.Divider />
-                    <Dropdown.Item as={Link} to="/profile">
-                      <i className="bi bi-person me-2"></i> Profile
-                    </Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/settings">
-                      <i className="bi bi-gear me-2"></i> Settings
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item as={Link} to="/logout">
-                      <i className="bi bi-box-arrow-right me-2"></i> Logout
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
+                    {React.cloneElement(item.icon, { className: "mb-1" })}
+                    <span>{item.text}</span>
+                  </Link>
+                </Nav.Item>
+              ))}
+            </Nav>
+
+            <div className="d-flex align-items-center">
+              <CiBellOn 
+                size={26} 
+                className="me-3 notification-icon" 
+                style={{ color: textColor }} 
+              />
+              <Dropdown>
+                <Dropdown.Toggle
+                  variant="link"
+                  id="dropdown-avatar-desktop"
+                  className="p-0 border-0 bg-transparent shadow-none"
+                >
+                  <Image
+                    src={avatar}
+                    alt="My Avatar"
+                    roundedCircle
+                    width={42}
+                    height={42}
+                    className="border border-3 border-warning avatar"
+                  />
+                </Dropdown.Toggle>
+                <AvatarDropdown />
+              </Dropdown>
             </div>
           </div>
         </Container>
@@ -201,80 +180,72 @@ const HeaderChild = () => {
         show={showOffcanvas}
         onHide={handleCloseOffcanvas}
         placement="start"
-        style={{ backgroundColor: themeColor, color: textColor }}
+        style={themeStyles}
+        className="child-offcanvas"
       >
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>
-            <div className="d-flex align-items-center">
+        <Offcanvas.Header closeButton closeVariant={textColor === '#000000' ? undefined : 'white'}>
+          <Offcanvas.Title className="w-100">
+            <div className="d-flex align-items-center justify-content-center w-100">
               <Image
                 src={logo}
-                alt="Company Logo"
-                height={logoHeightMobile}
+                alt="Fun Learning Logo"
+                height={40}
                 className="me-2"
               />
               <Image
                 src={writtenlogo}
-                alt="Company Name"
-                height={writtenLogoHeightMobile}
+                alt="Fun Learning"
+                height={40}
               />
             </div>
           </Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body className="d-flex flex-column justify-content-between h-100">
+        <Offcanvas.Body className="d-flex flex-column">
           <Nav className="flex-column">
-            <Nav.Item className="mb-2">
-              <Link
-                to="/child"
-                className="nav-link fw-bold text-dark"
-                onClick={handleCloseOffcanvas}
-              >
-                Home
-              </Link>
-            </Nav.Item>
-            <Nav.Item className="mb-2">
-              <Link
-                to="/child/book"
-                className="nav-link fw-bold text-dark"
-                onClick={handleCloseOffcanvas}
-              >
-                Book
-              </Link>
-            </Nav.Item>
-            <Nav.Item className="mb-2">
-              <Link
-                to="/child/video"
-                className="nav-link fw-bold text-dark"
-                onClick={handleCloseOffcanvas}
-              >
-                Video
-              </Link>
-            </Nav.Item>
+            {[
+              { to: "/child", icon: <FaHome size={20} />, text: "Home" },
+              { to: "/child/book", icon: <FaBookOpen size={20} />, text: "Books" },
+              { to: "/child/video", icon: <FaVideo size={20} />, text: "Videos" },
+              { to: "/child/quiz", icon: <FaGamepad size={20} />, text: "Games" },
+              { to: "/child/assignments", icon: <FaTasks size={20} />, text: "Tasks" },
+            ].map((item, index) => (
+              <Nav.Item key={index} className="mb-3">
+                <Link
+                  to={item.to}
+                  className="nav-link fw-bold d-flex align-items-center"
+                  onClick={handleCloseOffcanvas}
+                  style={{ color: textColor }}
+                >
+                  {React.cloneElement(item.icon, { className: "me-3" })}
+                  {item.text}
+                </Link>
+              </Nav.Item>
+            ))}
           </Nav>
-          <div>
-            <hr className="border-dark-subtle" />
-            <div className="d-flex flex-column align-items-start">
-              <Link
-                to="/profile"
-                className="nav-link small text-dark mb-2"
-                onClick={handleCloseOffcanvas}
-              >
-                <i className="bi bi-person me-2"></i> Profile
-              </Link>
-              <Link
-                to="/settings"
-                className="nav-link small text-dark mb-2"
-                onClick={handleCloseOffcanvas}
-              >
-                <i className="bi bi-gear me-2"></i> Settings
-              </Link>
-              <Link
-                to="/logout"
-                className="nav-link small text-dark mb-2"
-                onClick={handleCloseOffcanvas}
-              >
-                <i className="bi bi-box-arrow-right me-2"></i> Logout
-              </Link>
+          
+          <div className="mt-auto user-section">
+            <div className="d-flex align-items-center mb-3">
+              <Image
+                src={avatar}
+                alt="My Avatar"
+                roundedCircle
+                width={50}
+                height={50}
+                className="border border-3 border-warning me-3"
+              />
+              <div style={{ color: textColor }}>
+                <div className="fw-bold">My Profile</div>
+                <small>Student</small>
+              </div>
             </div>
+            <Button 
+              variant={textColor === '#000000' ? "outline-dark" : "outline-light"}
+              className="w-100"
+              as={Link}
+              to="/logout"
+            >
+              Sign Out
+            </Button>
           </div>
         </Offcanvas.Body>
       </Offcanvas>

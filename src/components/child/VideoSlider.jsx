@@ -1,72 +1,120 @@
 import React, { useState, useEffect } from "react";
-import { Card, Container, Row, Col } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Card, Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { FaPlay, FaPlus, FaThumbsUp, FaChevronDown } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import "./VideoThumbnails.css";
 import { useTheme } from "../../context/ThemeContext";
+import { getAllVideosApi } from "../../services/videoApi";
+import { getQuizApi } from "../../services/quizApi";
+import { getAllAssignments } from "../../services/assignmentApi";
 
 const VideoThumbnails = () => {
+  const navigate = useNavigate();
+  const [videoData, setVideoData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [hoveredVideo, setHoveredVideo] = useState(null);
   const [expandedVideo, setExpandedVideo] = useState(null);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("Episodes");
-  const { color: themeColor, textColor } = useTheme(); 
 
+  const { color: themeColor, textColor } = useTheme();
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch videos and assignments in parallel
+        const [videosResponse, assignmentsResponse] = await Promise.all([
+          getAllVideosApi(),
+          getAllAssignments().catch(err => {
+            console.warn("Assignments fetch error:", err);
+            return []; // Return empty array if assignments fail
+          })
+        ]);
+
+        // Log raw data for debugging
+        console.log("Videos response:", videosResponse);
+        console.log("Assignments response:", assignmentsResponse);
+
+        // Process videos and assignments
+        const enrichedVideos = await Promise.all(
+          videosResponse.map(async (video) => {
+            // Fetch quizzes for each video
+            let quizzes = [];
+            try {
+              quizzes = await getQuizApi(video.id) || [];
+            } catch (err) {
+              console.warn(`Quiz fetch failed for video ${video.id}:`, err);
+            }
+
+            // Filter assignments for this video (with type coercion)
+            const assignments = (assignmentsResponse || []).filter(a => 
+              String(a.video_id) === String(video.id)
+            );
+
+            console.log(`Video ${video.id} assignments:`, assignments);
+
+            return {
+              ...video,
+              quizzes: quizzes || [],
+              assignments: assignments || [],
+              genres: video.genres || [],
+              description: video.description || "No description available",
+              thumbnail_url: video.thumbnail_url || "/default-thumbnail.jpg"
+            };
+          })
+        );
+
+        setVideoData(enrichedVideos);
+      } catch (err) {
+        console.error("Data fetching failed:", err);
+        setError("Failed to load content. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = expandedVideo ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [expandedVideo]);
 
   const handleClose = () => {
     setIsFadingOut(true);
     setTimeout(() => {
       setExpandedVideo(null);
       setIsFadingOut(false);
-    }, 300); 
+    }, 300);
   };
 
-  const videoData = [
-    {
-      id: 1,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
-      title: "THE RECRUIT",
-      match: "95% Match",
-      rating: "TV-MA",
-      seasons: "2 Seasons",
-      quality: "HD",
-      quizzes: [
-        { id: 1, title: "Chapter 1 Quiz", questions: 10, duration: "15 min" },
-        { id: 2, title: "Midterm Quiz", questions: 20, duration: "30 min" }
-      ],
-      assignments: [
-        { id: 1, title: "Essay Assignment", due: "May 30", points: 100 },
-        { id: 2, title: "Group Project", due: "June 15", points: 200 }
-      ],
-      genres: ["Action", "Thriller", "Drama"],
-      description:
-        "A young CIA lawyer gets entangled in dangerous international conspiracies when a former asset threatens to expose agency secrets.",
-    },
-    {
-      id: 2,
-      thumbnailUrl:
-        "https://m.media-amazon.com/images/M/MV5BODIyNzk5NDg5M15BMl5BanBnXkFtZTgwMTE5NjA5MjI@._V1_.jpg",
-      title: "STRANGER THINGS",
-      match: "98% Match",
-      rating: "TV-14",
-      seasons: "4 Seasons",
-      quality: "4K",
-      genres: ["Sci-Fi", "Horror", "Drama"],
-      description:
-        "When a boy vanishes, a small town uncovers a mystery involving secret experiments and terrifying supernatural forces.",
-    },
-  ];
+  const handlePlayClick = (id, e) => {
+    e.stopPropagation();
+    navigate(`/child/video/${id}`);
+  };
+
+  const handlePlayQuiz = (quizId) => {
+    navigate(`/child/quiz/${quizId}`);
+  };
+
+  const handleViewAssignment = (assignmentId) => {
+    navigate(`/child/assignments/${assignmentId}`);
+  };
 
   const selectedVideo = videoData.find((v) => v.id === expandedVideo);
 
-  useEffect(() => {
-    document.body.style.overflow = expandedVideo ? "hidden" : "auto";
-  }, [expandedVideo]);
-
   const renderTabContent = () => {
-    if (!selectedVideo) return null; // Add this safety check
-    
+    if (!selectedVideo) return null;
+
     switch (activeTab) {
       case "Episodes":
         return (
@@ -81,13 +129,19 @@ const VideoThumbnails = () => {
               {[...Array(10)].map((_, i) => (
                 <div className="episode" key={i}>
                   <div className="episode-thumb">
-                    <img src={selectedVideo.thumbnailUrl} alt={`Episode ${i + 1}`} />
+                    <img 
+                      src={selectedVideo.thumbnail_url} 
+                      alt={`Episode ${i + 1}`} 
+                      onError={(e) => {
+                        e.target.src = "/default-thumbnail.jpg";
+                      }}
+                    />
                   </div>
                   <div className="episode-details">
                     <div className="episode-title">Episode {i + 1}</div>
                     <div className="episode-duration">44m</div>
                     <div className="episode-desc">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      {selectedVideo.description}
                     </div>
                   </div>
                 </div>
@@ -99,36 +153,65 @@ const VideoThumbnails = () => {
         return (
           <div className="quiz-content">
             <h4>Quizzes</h4>
-            <div className="quiz-list">
-              {(selectedVideo.quizzes || []).map((quiz) => ( // Added null check
-                <div className="quiz-item" key={quiz.id}>
-                  <h5>{quiz.title}</h5>
-                  <div className="quiz-meta">
-                    <span>{quiz.questions} questions</span>
-                    <span>{quiz.duration}</span>
+            {selectedVideo.quizzes.length > 0 ? (
+              <div className="quiz-list">
+                {selectedVideo.quizzes.map((quiz) => (
+                  <div className="quiz-item" key={quiz.id}>
+                    <h5>{quiz.title || "Untitled Quiz"}</h5>
+                    <div className="quiz-meta">
+                      <span>{quiz.questions?.length || "0"} questions</span>
+                      <span>{quiz.duration || "No time limit"}</span>
+                    </div>
+                    <button 
+                      onClick={() => handlePlayQuiz(quiz.id)} 
+                      className="start-quiz-btn"
+                    >
+                      Start Quiz
+                    </button>
                   </div>
-                  <button className="start-quiz-btn">Start Quiz</button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-content-message">
+                <p>No quizzes available for this video</p>
+              </div>
+            )}
           </div>
         );
       case "Assignment":
         return (
           <div className="assignment-content">
             <h4>Assignments</h4>
-            <div className="assignment-list">
-              {(selectedVideo.assignments || []).map((assignment) => ( // Added null check
-                <div className="assignment-item" key={assignment.id}>
-                  <h5>{assignment.title}</h5>
-                  <div className="assignment-meta">
-                    <span>Due: {assignment.due}</span>
-                    <span>Points: {assignment.points}</span>
+            {selectedVideo.assignments.length > 0 ? (
+              <div className="assignment-list">
+                {selectedVideo.assignments.map((assignment) => (
+                  <div className="assignment-item" key={assignment.id}>
+                    <h5>{assignment.title || "Untitled Assignment"}</h5>
+                    <div className="assignment-meta">
+                      <span>Description: {assignment.description || "None provided"}</span>
+                      <span>Category: {assignment.category || "General"}</span>
+                      <span>Due: {assignment.due_date || "No deadline"}</span>
+                    </div>
+                    <button 
+                      className="view-assignment-btn"
+                      onClick={() => handleViewAssignment(assignment.id)}
+                    >
+                      View Assignment
+                    </button>
                   </div>
-                  <button className="view-assignment-btn">View Assignment</button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-content-message">
+                <p>No assignments available for this video</p>
+                <button 
+                  className="refresh-btn"
+                  onClick={() => window.location.reload()}
+                >
+                  Refresh Data
+                </button>
+              </div>
+            )}
           </div>
         );
       default:
@@ -138,38 +221,74 @@ const VideoThumbnails = () => {
 
   return (
     <Container fluid className="netflix-container">
+      {loading && (
+        <div className="loading-overlay">
+          <Spinner animation="border" variant="primary" />
+          <p>Loading content...</p>
+        </div>
+      )}
+      
+      {error && (
+        <Alert variant="danger" className="error-alert">
+          {error}
+          <button 
+            className="retry-btn" 
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+        </Alert>
+      )}
+
       <Row className="thumbnails-row">
         {videoData.map((video) => (
-         <Col
-         key={video.id}
-         xs={12}
-         sm={6}
-         md={4}
-         lg={3}
-         xl={2}
-         className="thumbnail-col"
-         onMouseEnter={() => setHoveredVideo(video.id)}
-         onMouseLeave={() => setHoveredVideo(null)}
-         onClick={() => setExpandedVideo(video.id)}
-       >
-       
+          <Col
+            key={video.id}
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}
+            xl={2}
+            className="thumbnail-col"
+            onMouseEnter={() => setHoveredVideo(video.id)}
+            onMouseLeave={() => setHoveredVideo(null)}
+            onClick={() => setExpandedVideo(video.id)}
+          >
             <div className="netflix-card-wrapper">
               <Card className="netflix-thumbnail">
                 <div className="thumbnail-image-container">
-                  <img src={video.thumbnailUrl} alt={video.title} />
-                  <span className="video-quality">{video.quality}</span>
+                  <img 
+                    src={video.thumbnail_url} 
+                    alt={video.title}
+                    onError={(e) => {
+                      e.target.src = "/default-thumbnail.jpg";
+                    }}
+                  />
+                  <span className="video-quality">{video.quality || "HD"}</span>
                 </div>
               </Card>
 
               {hoveredVideo === video.id && (
                 <div className="netflix-hover-card">
                   <div className="hover-thumbnail">
-                    <img src={video.thumbnailUrl} alt={video.title} />
+                    <img 
+                      src={video.thumbnail_url} 
+                      alt={video.title}
+                      onError={(e) => {
+                        e.target.src = "/default-thumbnail.jpg";
+                      }}
+                    />
                   </div>
-                  <div style={{ backgroundColor: themeColor, color: textColor }} className="hover-details">
+                  <div 
+                    style={{ backgroundColor: themeColor, color: textColor }} 
+                    className="hover-details"
+                  >
                     <div className="action-buttons d-flex justify-content-between align-items-center">
                       <div className="d-flex gap-2">
-                        <button className="action-btn play-btn">
+                        <button
+                          className="action-btn"
+                          onClick={(e) => handlePlayClick(video.id, e)}
+                        >
                           <FaPlay />
                         </button>
                         <button className="action-btn">
@@ -179,19 +298,21 @@ const VideoThumbnails = () => {
                           <FaThumbsUp />
                         </button>
                       </div>
-                      <button
-                        className="action-btn more-btn"
-                        onClick={() => setExpandedVideo(video.id)}
-
+                      <button 
+                        className="action-btn more-btn" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedVideo(video.id);
+                        }}
                       >
                         <FaChevronDown />
                       </button>
                     </div>
                     <div className="match-rating">
-                      <span className="match">{video.match}</span>
-                      <span className="age-rating">{video.rating}</span>
-                      <span>{video.seasons}</span>
-                      <span className="hd-badge">{video.quality}</span>
+                      <span className="match">{video.match || "98% Match"}</span>
+                      <span className="age-rating">{video.rating || "PG-13"}</span>
+                      <span>{video.seasons || "1 Season"}</span>
+                      <span className="hd-badge">{video.quality || "HD"}</span>
                     </div>
                     <div className="genre-tags">
                       {video.genres.map((genre, index) => (
@@ -207,30 +328,44 @@ const VideoThumbnails = () => {
       </Row>
 
       {selectedVideo && (
-        <div style={{ backgroundColor: themeColor, color: textColor }} className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}>
+        <div
+          style={{ backgroundColor: themeColor, color: textColor }}
+          className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}
+        >
           <div className="popup-header">
-            <img src={selectedVideo.thumbnailUrl} alt={selectedVideo.title} className="banner-image" />
-            <IoMdCloseCircleOutline className="close-btn" onClick={handleClose} />
+            <img 
+              src={selectedVideo.thumbnail_url} 
+              alt={selectedVideo.title} 
+              className="banner-image"
+              onError={(e) => {
+                e.target.src = "/default-banner.jpg";
+              }}
+            />
+            <IoMdCloseCircleOutline 
+              className="close-btn" 
+              onClick={handleClose} 
+            />
           </div>
 
-          <div style={{ backgroundColor: themeColor, color: textColor }} className="popup-content mx-auto">
+          <div className="popup-content mx-auto">
             <div className="metadata">
-              <span className="match">{selectedVideo.match}</span>
-              <span className="year">2022</span>
-              <span className="rating">{selectedVideo.rating}</span>
-              <span className="seasons">{selectedVideo.seasons}</span>
-              <span className="genres">{selectedVideo.genres.join(", ")}</span>
+              <span className="match">{selectedVideo.match || "98% Match"}</span>
+              <span className="year">{selectedVideo.year || "2022"}</span>
+              <span className="rating">{selectedVideo.rating || "PG-13"}</span>
+              <span className="seasons">{selectedVideo.seasons || "1 Season"}</span>
+              <span className="genres">
+                {selectedVideo.genres.join(", ") || "General"}
+              </span>
             </div>
 
             <p className="description">{selectedVideo.description}</p>
-            
-            {/* Tab Navigation */}
+
             <div className="language-tabs">
               <div className="tab-buttons">
-                {['Episodes', 'Quiz', 'Assignment'].map((tab) => (
-                  <button 
-                    key={tab} 
-                    className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                {["Episodes", "Quiz", "Assignment"].map((tab) => (
+                  <button
+                    key={tab}
+                    className={`tab-btn ${activeTab === tab ? "active" : ""}`}
                     onClick={() => setActiveTab(tab)}
                   >
                     {tab}
@@ -239,7 +374,6 @@ const VideoThumbnails = () => {
               </div>
             </div>
 
-            {/* Tab Content */}
             {renderTabContent()}
           </div>
         </div>

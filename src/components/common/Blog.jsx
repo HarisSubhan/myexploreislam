@@ -36,9 +36,9 @@ const Blog = () => {
   const createSlug = (title) => {
     return title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, "") // Remove non-word characters
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/--+/g, "-"); // Replace multiple hyphens with single
+      .replace(/[^\w\s-]/g, "") 
+      .replace(/\s+/g, "-") 
+      .replace(/--+/g, "-"); 
   };
 
   return (
