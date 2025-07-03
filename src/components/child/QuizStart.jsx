@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Button,
   Card,
@@ -6,84 +7,60 @@ import {
   Row,
   Col,
   ProgressBar,
-  Image,
   Form,
-} from "react-bootstrap";
-import Banner from "./Banner";
+  Spinner,
+  Alert,
+  Image
+} from 'react-bootstrap';
+import { getQuizByIdApi } from '../../services/quizApi';
 import "./VideoThumbnails.css";
-import { useParams } from "react-router-dom";
 
 const QuizStart = () => {
+  const { quizid } = useParams();
+  const navigate = useNavigate();
+  const [quizData, setQuizData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [email, setEmail] = useState("");
+  const [score, setScore] = useState(0);
+  const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const { quizid } = useParams();
 
-  const questions = [
-    {
-      question: "The logo for luxury car maker Porsche features which animal?",
-      options: [
-        { id: "A", text: "Dog", correct: false },
-        { id: "B", text: "Tiger", correct: false },
-        { id: "C", text: "Cat", correct: false },
-        { id: "D", text: "Horse", correct: true },
-      ],
-      image:
-        "https://templates.seekviral.com/qzain/quiz/Quiz10/assets/images/Manthinking-bro.png",
-      fact: "The Porsche logo features a rearing black horse from the Stuttgart city coat of arms.",
-    },
-    {
-      question: "What year was the first Porsche 911 introduced?",
-      options: [
-        { id: "A", text: "1955", correct: false },
-        { id: "B", text: "1963", correct: true },
-        { id: "C", text: "1971", correct: false },
-        { id: "D", text: "1982", correct: false },
-      ],
-      image:
-        "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1697583910i/195096793.jpg",
-      fact: "The Porsche 911 debuted in 1963 at the Frankfurt Motor Show.",
-    },
-    {
-      question: "Which Porsche model is electric?",
-      options: [
-        { id: "A", text: "Cayenne", correct: false },
-        { id: "B", text: "Taycan", correct: true },
-        { id: "C", text: "Panamera", correct: false },
-        { id: "D", text: "Macan", correct: false },
-      ],
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_FSc_YmIngfoALB46aPE44bkkIifCObUwUQ&s",
-      fact: "The Taycan is Porsche's first all-electric sports car.",
-    },
-    {
-      question: "What does 'GT' stand for in Porsche models?",
-      options: [
-        { id: "A", text: "Grand Touring", correct: true },
-        { id: "B", text: "Gas Turbo", correct: false },
-        { id: "C", text: "German Technology", correct: false },
-        { id: "D", text: "Gear Transmission", correct: false },
-      ],
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_FSc_YmIngfoALB46aPE44bkkIifCObUwUQ&s",
-      fact: "GT stands for Gran Turismo or Grand Touring in Italian and English respectively.",
-    },
-    {
-      question: "Which color is most associated with Porsche?",
-      options: [
-        { id: "A", text: "Ferrari Red", correct: false },
-        { id: "B", text: "BMW Blue", correct: false },
-        { id: "C", text: "Porsche Green", correct: false },
-        { id: "D", text: "Porsche Guards Red", correct: true },
-      ],
-      image:
-        "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1697583910i/195096793.jpg",
-      fact: "Guards Red is one of Porsche's signature colors since the 1980s.",
-    },
-  ];
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const data = await getQuizByIdApi(quizid);
+        
+        const transformedData = {
+          ...data,
+          questions: data.questions.map((q) => ({
+            id: q.id,
+            question: q.question,
+            options: [
+              { id: 'A', text: q.option_a, correct: q.correct_option === 'A' },
+              { id: 'B', text: q.option_b, correct: q.correct_option === 'B' },
+              { id: 'C', text: q.option_c, correct: q.correct_option === 'C' },
+              { id: 'D', text: q.option_d, correct: q.correct_option === 'D' }
+            ],
+            image: q.image || null,
+            fact: q.fact || ''
+          }))
+        };
+
+        setQuizData(transformedData);
+      } catch (err) {
+        console.error("Error fetching quiz:", err);
+        setError("Failed to load quiz. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuiz();
+  }, [quizid]);
 
   const handleAnswerSelect = (answerId) => {
     if (!showResult && !quizCompleted) {
@@ -92,13 +69,15 @@ const QuizStart = () => {
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer !== null) {
-      setShowResult(true);
-    }
+    const current = quizData.questions[currentQuestionIndex];
+    const isCorrect = current.options.find(opt => opt.id === selectedAnswer)?.correct;
+
+    if (isCorrect) setScore(score + 1);
+    setShowResult(true);
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < quizData.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setShowResult(false);
@@ -115,162 +94,214 @@ const QuizStart = () => {
     }
   };
 
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically send the email to your backend
-    console.log("Subscribed with email:", email);
-    setIsSubscribed(true);
-    setEmail("");
+  const restartQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setQuizCompleted(false);
+    setScore(0);
+    setEmail('');
+    setIsSubscribed(false);
   };
 
-  useEffect(() => {
-    if (!quizid) {
-      // Handle missing quiz ID (redirect or show error)
-    }
-  }, [quizid]);
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    setIsSubscribed(true);
+    setEmail('');
+  };
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-  const isCorrect =
-    selectedAnswer &&
-    currentQuestion.options.find((opt) => opt.id === selectedAnswer)?.correct;
+  if (loading) {
+    return (
+      <Container className="text-center mt-5">
+        <Spinner animation="grow" variant="primary" />
+        <h3 className="mt-3" style={{ color: '#4a6baf' }}>Loading your quiz...</h3>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="text-center mt-5">
+        <Alert variant="danger" className="rounded-pill">
+          <Alert.Heading>Oops! Something went wrong</Alert.Heading>
+          <p>{error}</p>
+          <Button variant="warning" onClick={() => navigate('/quizzes')}>Back to Quizzes</Button>
+        </Alert>
+      </Container>
+    );
+  }
+
+  if (!quizData) return null;
 
   if (quizCompleted) {
     return (
-      <Container className="quiz-completed-container py-5 text-center">
-        <Card className="shadow-sm p-4">
-          <Card.Title>
-            <h2>Quiz ID: {quizid}</h2>
-          </Card.Title>
-          <div className="mb-4">
-            <div className="checkmark-circle mb-3">
-              <span className="checkmark">✓</span>
+      <Container className="mt-5 d-flex justify-content-center">
+        <Card className="text-center p-4 border-0 shadow" style={{ maxWidth: '500px', backgroundColor: '#f8f9fa', borderRadius: '20px' }}>
+          <Card.Body>
+            <div className="mb-4">
+              <h2 style={{ color: '#4a6baf' }}>🎉 Quiz Completed!</h2>
+              <div className="mt-3 mb-4">
+                <div className="display-4" style={{ color: '#4a6baf' }}>{score}</div>
+                <div className="text-muted">out of {quizData.questions.length}</div>
+              </div>
             </div>
-            <h2 className="text-success">Your answer has been submitted</h2>
-            <p className="lead">Thank you for taking the Quiz!</p>
-          </div>
-
-          {!isSubscribed ? (
-            <div className="subscribe-form mt-4">
-              <h5>Stay updated with more quizzes</h5>
-              <Form onSubmit={handleEmailSubmit} className="mt-3">
-                <Form.Group controlId="formEmail">
+            
+            {!isSubscribed ? (
+              <Form onSubmit={handleEmailSubmit} className="mb-4">
+                <h5 className="mb-3" style={{ color: '#4a6baf' }}>Want more fun quizzes?</h5>
+                <div className="d-flex">
                   <Form.Control
                     type="email"
-                    placeholder="Your Email"
+                    placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="mb-3"
+                    className="rounded-pill me-2"
+                    style={{ height: '50px' }}
                   />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                  Subscribe Now
-                </Button>
+                  <Button 
+                    type="submit" 
+                    variant="primary" 
+                    className="rounded-pill px-4"
+                    style={{ height: '50px', backgroundColor: '#4a6baf', borderColor: '#4a6baf' }}
+                  >
+                    Subscribe
+                  </Button>
+                </div>
               </Form>
+            ) : (
+              <Alert variant="success" className="rounded-pill">
+                <span className="h5">🎉 Thanks for subscribing!</span>
+              </Alert>
+            )}
+            
+            <div className="d-grid gap-3 mt-4">
+              <Button 
+                variant="primary" 
+                onClick={restartQuiz}
+                className="rounded-pill py-2"
+                style={{ backgroundColor: '#4a6baf', borderColor: '#4a6baf' }}
+              >
+                Play Again
+              </Button>
+              <Button 
+                variant="outline-primary" 
+                onClick={() => navigate('/child/quiz')}
+                className="rounded-pill py-2"
+                style={{ color: '#4a6baf', borderColor: '#4a6baf' }}
+              >
+                More Quizzes
+              </Button>
             </div>
-          ) : (
-            <div className="text-success mt-3">
-              <p>Thank you for subscribing!</p>
-            </div>
-          )}
-
-          <Button
-            variant="outline-secondary"
-            className="mt-4"
-            onClick={() => {
-              setCurrentQuestionIndex(0);
-              setSelectedAnswer(null);
-              setShowResult(false);
-              setQuizCompleted(false);
-              setIsSubscribed(false);
-            }}
-          >
-            Take Quiz Again
-          </Button>
+          </Card.Body>
         </Card>
       </Container>
     );
   }
 
+  const current = quizData.questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+  const isCorrect = selectedAnswer && current.options.find(opt => opt.id === selectedAnswer)?.correct;
+
   return (
-    <Container className="quiz-container py-4">
-     
-
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <small className="text-muted">
-          Question {currentQuestionIndex + 1} of {questions.length}
-        </small>
-        <ProgressBar now={progress} style={{ width: "70%", height: "8px" }} />
+    <Container className="mt-4" style={{ maxWidth: '800px' }}>
+      <div className="mb-4 text-center">
+        <h3 style={{ color: '#4a6baf' }}>{quizData.title}</h3>
+        <div className="d-flex align-items-center mt-3">
+          <ProgressBar 
+            now={progress} 
+            style={{ height: '15px', width: '100%', borderRadius: '10px' }} 
+            variant="info"
+          />
+          <span className="ms-3 fw-bold" style={{ color: '#4a6baf' }}>
+            Q{currentQuestionIndex + 1}/{quizData.questions.length}
+          </span>
+        </div>
       </div>
-
-      <Card className="shadow-sm">
-        <Card.Body>
-          <Card.Title className="mb-4">{currentQuestion.question}</Card.Title>
-
-          <Row>
-            <Col md={6} className="mb-3 mb-md-0">
-              <div className="options-container">
-                {currentQuestion.options.map((option) => (
-                  <div
+      
+      <Card className="border-0 shadow-sm" style={{ borderRadius: '15px' }}>
+        <Card.Body className="p-4">
+          <Card.Title className="mb-4 h4" style={{ color: '#4a6baf' }}>
+            {current.question}
+          </Card.Title>
+          
+          <Row className="g-4">
+            <Col md={6}>
+              <div className="d-grid gap-3">
+                {current.options.map(option => (
+                  <Button
                     key={option.id}
-                    className={`option-item ${selectedAnswer === option.id ? "selected" : ""} 
-                      ${showResult ? (option.correct ? "correct" : selectedAnswer === option.id ? "incorrect" : "") : ""}`}
+                    variant="outline-primary"
+                    className={`text-start py-3 rounded-pill option-button ${selectedAnswer === option.id ? 'selected' : ''} ${showResult ? (option.correct ? 'correct-answer' : (selectedAnswer === option.id ? 'incorrect-answer' : '')) : ''}`}
                     onClick={() => handleAnswerSelect(option.id)}
+                    style={{ 
+                      borderWidth: '2px',
+                      fontSize: '1.1rem',
+                      transition: 'all 0.3s'
+                    }}
                   >
-                    <span className="option-letter">{option.id}</span>
-                    <span className="option-text">{option.text}</span>
-                    {showResult && option.correct && (
-                      <span className="option-check">✓</span>
-                    )}
-                  </div>
+                    <span className="fw-bold me-2">{option.id}.</span> {option.text}
+                  </Button>
                 ))}
               </div>
             </Col>
-
-            <Col
-              md={6}
-              className="d-flex align-items-center justify-content-center"
-            >
-              <Image
-                src={currentQuestion.image}
-                alt="Quiz illustration"
-                fluid
-                className="quiz-image"
-              />
+            
+            <Col md={6} className="d-flex align-items-center justify-content-center">
+              {current.image && (
+                <Image 
+                  src={current.image} 
+                  alt="question" 
+                  fluid 
+                  className="rounded shadow-sm"
+                  style={{ maxHeight: '300px', objectFit: 'contain' }}
+                />
+              )}
             </Col>
           </Row>
-
+          
           {showResult && (
-            <div
-              className={`result-message mt-3 p-3 ${isCorrect ? "text-success" : "text-danger"}`}
-            >
-              {isCorrect ? "Correct!" : "Incorrect!"} {currentQuestion.fact}
+            <div className={`mt-4 p-3 rounded ${isCorrect ? 'bg-success-light' : 'bg-danger-light'}`}>
+              <div className="d-flex align-items-center">
+                <span className={`fs-1 me-3 ${isCorrect ? 'text-success' : 'text-danger'}`}>
+                  {isCorrect ? '✓' : '✗'}
+                </span>
+                <div>
+                  <h5 className={isCorrect ? 'text-success' : 'text-danger'}>
+                    {isCorrect ? 'Great Job!' : 'Oops!'}
+                  </h5>
+                  <p className="mb-0">{current.fact}</p>
+                </div>
+              </div>
             </div>
           )}
-
-          <div className="d-flex justify-content-between mt-4">
-            <Button
-              variant="outline-primary"
-              onClick={handlePreviousQuestion}
+          
+          <div className="d-flex justify-content-between mt-5">
+            <Button 
+              variant="outline-secondary" 
+              onClick={handlePreviousQuestion} 
               disabled={currentQuestionIndex === 0}
+              className="rounded-pill px-4 py-2"
             >
-              Previous Question
+              ← Previous
             </Button>
-
+            
             {!showResult ? (
-              <Button
-                variant="primary"
-                onClick={handleSubmit}
-                disabled={selectedAnswer === null}
+              <Button 
+                variant="primary" 
+                onClick={handleSubmit} 
+                disabled={!selectedAnswer}
+                className="rounded-pill px-4 py-2"
+                style={{ backgroundColor: '#4a6baf', borderColor: '#4a6baf' }}
               >
-                Submit Answer
+                Check Answer
               </Button>
             ) : (
-              <Button variant="primary" onClick={handleNextQuestion}>
-                {currentQuestionIndex === questions.length - 1
-                  ? "Finish Quiz"
-                  : "Next Question"}
+              <Button 
+                variant="success" 
+                onClick={handleNextQuestion}
+                className="rounded-pill px-4 py-2"
+              >
+                {currentQuestionIndex === quizData.questions.length - 1 ? 'See Results →' : 'Next Question →'}
               </Button>
             )}
           </div>
@@ -281,3 +312,4 @@ const QuizStart = () => {
 };
 
 export default QuizStart;
+

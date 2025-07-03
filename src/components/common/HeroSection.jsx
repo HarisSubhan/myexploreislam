@@ -2,8 +2,14 @@ import React from "react";
 import { Button, Container, Row, Col, Image } from "react-bootstrap";
 import MaryamMuazImage from "@images/Maryam___Muaz.png";
 import DecorativeImage from "@images/c.png";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleClickButton = () => {
+    navigate("/subscription"); // Programmatic navigation
+  };
   return (
     <div
       className="hero-wrapper"
@@ -26,7 +32,7 @@ const HeroSection = () => {
       >
         {/* Main Content */}
         <Row className="align-items-center h-100 g-0">
-          <Col lg={6} className="order-lg-1 order-2 position-relative">
+          <Col lg={6} className="order-lg-1 order-2 position-relative ">
             <Image
               src={MaryamMuazImage}
               alt="Maryam & Muaz"
@@ -38,7 +44,8 @@ const HeroSection = () => {
                 marginBottom: "0.5rem",
                 position: "relative",
                 zIndex: 2,
-                width: "auto", 
+                width: "auto",
+              
               }}
             />
             <div
@@ -56,9 +63,7 @@ const HeroSection = () => {
                   position: "absolute",
                   bottom: 0,
                   right: 0,
-                  maxHeight: "80vh",
-                  maxWidth: "150px",
-                  height: "auto",
+                  maxWidth: "950px", 
                   width: "auto", 
                   marginTop: "-1rem",
                 }}
@@ -93,19 +98,20 @@ const HeroSection = () => {
                 style={{
                   backgroundColor: "#2a5f73",
                   border: "none",
-                  minWidth: "160px", // Ensures consistent button width
+                  minWidth: "160px", 
                 }}
               >
                 Learn More
               </Button>
               <Button
+              onClick={handleClickButton}
                 variant="outline-light"
                 size="lg"
                 className="px-4 py-3 fw-bold"
                 style={{
                   color: "#2a5f73",
                   borderColor: "#2a5f73",
-                  minWidth: "160px", // Ensures consistent button width
+                  minWidth: "160px", 
                 }}
               >
                 Subscribe
@@ -129,6 +135,7 @@ const HeroSection = () => {
           }}
         ></div>
       </Container>
+      
     </div>
   );
 };

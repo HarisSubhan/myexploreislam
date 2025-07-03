@@ -1,104 +1,171 @@
-import React from "react";
-import { Container, Row, Col, Card, Badge } from "react-bootstrap";
-import { Navigate, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Card, Badge, Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
-
-const videos = [
-  {
-    id: 1,
-    title: "Kaho Na Kaho slowed reverb (lofi)",
-    channel: "Harshit Saxena",
-    views: "1.2M views",
-    time: "2 days ago",
-    duration: "3:20",
-    thumbnail: "https://picsum.photos/id/237/400/225",
-  },
-  {
-    id: 2,
-    title: "Main Nagin Dance Full Video",
-    channel: "Anmol Malik",
-    views: "42M views",
-    time: "Updated today",
-    duration: "4:05",
-    thumbnail: "https://picsum.photos/id/238/400/225",
-  },
-  {
-    id: 3,
-    title: "Sason ki Mala Pe (Remix)",
-    channel: "Nusrat Fateh Ali Khan",
-    views: "900K views",
-    time: "1 week ago",
-    duration: "4:42",
-    thumbnail: "https://picsum.photos/id/239/400/225",
-  },
-  {
-    id: 4,
-    title: "Nasha - Lofi Song",
-    channel: "Tamannaah B",
-    views: "3M views",
-    time: "1 month ago",
-    duration: "3:24",
-    thumbnail: "https://picsum.photos/id/240/400/225",
-  },
-  {
-    id: 5,
-    title: "Build Apps with GenAI",
-    channel: "OpenAI",
-    views: "2.3M views",
-    time: "3 days ago",
-    duration: "2:01",
-    thumbnail: "https://picsum.photos/id/241/400/225",
-  },
-];
+import { FaPlay, FaHeart, FaRegClock, FaEye } from "react-icons/fa";
+import { getAllVideosApi } from "../../services/videoApi"; 
+import "../../components/child/VideoThumbnails.css";
 
 const VideoCard = ({ video }) => {
   const navigate = useNavigate();
-      const { color: themeColor, textColor } = useTheme(); 
+  const { color: themeColor, textColor } = useTheme();
   
-  
-
   const handleClick = () => {
     navigate(`/child/video/${video.id}`);
   };
 
   return (
     <Card
-      className="border-0"
+      className="child-video-card border-0 shadow-sm"
       onClick={handleClick}
-      style={{ cursor: "pointer" }}
+      style={{ 
+        cursor: "pointer",
+        borderRadius: "16px",
+        overflow: "hidden",
+        transition: "transform 0.2s",
+        backgroundColor: "#f9f9f9"
+      }}
     >
       <div className="position-relative">
-        <Card.Img variant="top" src={video.thumbnail} />
-        <Badge
-          style={{ backgroundColor: themeColor, color: textColor, opacity: 0.85 }}
-          className="position-absolute bottom-0 end-0 m-2"
-          // style={{ opacity: 0.85 }}
-        >
-          {video.duration}
-        </Badge>
+        <div className="thumbnail-container">
+          <Card.Img 
+            variant="top" 
+            src={video.thumbnail_url} 
+            className="child-thumbnail"
+          />
+          <div className="play-icon-overlay">
+            <FaPlay size={24} />
+          </div>
+        </div>
+        <div className="video-badges">
+          <Badge pill className="age-badge">
+            {video.ageGroup || "3+"} 
+          </Badge>
+          <Badge 
+            pill 
+            className="duration-badge"
+            style={{ backgroundColor: themeColor, color: textColor }}
+          >
+            {video.duration || "3:00"}
+          </Badge>
+        </div>
       </div>
-      <Card.Body className="pt-2 px-1">
-        <Card.Title style={{ fontSize: "0.95rem" }}>{video.title}</Card.Title>
-        <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
-          {video.channel}
-          <br />
-          {video.views} • {video.time}
+      <Card.Body className="pt-2 px-2 pb-3">
+        <div className="d-flex justify-content-between align-items-start">
+          <Card.Title className="child-video-title">
+            {video.title}
+          </Card.Title>
+          <button 
+            className="favorite-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Handle favorite toggle
+            }}
+          >
+            <FaHeart color={video.favorite ? "#ff6b6b" : "#ccc"} />
+          </button>
+        </div>
+        <Card.Text className="video-description">
+          {video.description}
         </Card.Text>
+        <div className="video-meta d-flex align-items-center">
+          <span className="meta-item">
+            <FaEye className="meta-icon" /> {video.views || "1M views"}
+          </span>
+          <span className="meta-divider">•</span>
+          <span className="meta-item">
+            <FaRegClock className="meta-icon" /> {video.time || "1 day ago"}
+          </span>
+        </div>
+        <Badge pill className="category-badge">
+          {video.category}
+        </Badge>
       </Card.Body>
     </Card>
   );
 };
 
-export default VideoCard;
-
-export const VideoHomepage = () => (
-  <Container className="py-4">
-    <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-      {videos.map((vid) => (
-        <Col key={vid.id}>
-          <VideoCard video={vid} />
-        </Col>
+const CategoryFilter = ({ categories, activeCategory, onSelect }) => {
+  return (
+    <div className="category-filter mb-4">
+      {categories.map(category => (
+        <button
+          key={category}
+          className={`category-button ${activeCategory === category ? 'active' : ''}`}
+          onClick={() => onSelect(category)}
+        >
+          {category}
+        </button>
       ))}
-    </Row>
-  </Container>
-);
+    </div>
+  );
+};
+
+export const VideoHomepage = () => {
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  
+  const categories = ["All", ...new Set(videos.map(video => video.category))];
+
+  const filteredVideos = activeCategory === "All" 
+    ? videos 
+    : videos.filter(video => video.category === activeCategory);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const data = await getAllVideosApi();
+        setVideos(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
+  if (loading) {
+    return (
+      <Container className="text-center py-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="py-5">
+        <div className="alert alert-danger">Error loading videos: {error}</div>
+      </Container>
+    );
+  }
+
+  return (
+    <Container className="child-video-container py-4">
+      <h2 className="child-page-title mb-4">Kids Videos</h2>
+      
+      <CategoryFilter 
+        categories={categories}
+        activeCategory={activeCategory}
+        onSelect={setActiveCategory}
+      />
+      
+      <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+        {filteredVideos.map((video) => (
+          <Col key={video.id}>
+            <VideoCard video={video} />
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
+};
+
+export default VideoCard;

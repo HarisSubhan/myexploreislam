@@ -4,8 +4,14 @@ import parent from '@images/8.png';
 import kids from '@images/c.png';
 import track from '@images/10.png';
 import background from '@images/background.png';
+import { useNavigate } from 'react-router-dom';
 
 const HowItWorks = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/subscription"); 
+  };
   return (
     <section id="how-it-works">
 <Container
@@ -40,7 +46,7 @@ const HowItWorks = () => {
       </Row>
       <div className="d-flex flex-column flex-md-row justify-content-center gap-5 mt-4">
         <Button variant="primary">Learn More!</Button>
-        <Button style={{backgroundColor:"#ffc943"}} className='text-dark fw-bold'>Subscribe Now!</Button>
+        <Button onClick={handleClick} style={{backgroundColor:"#ffc943"}} className='text-dark fw-bold'>Subscribe Now!</Button>
       </div>
     </Container>
     </section>

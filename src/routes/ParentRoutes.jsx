@@ -1,17 +1,20 @@
-import React from "react";
-import ParentDashboard from "../pages/ParentPortal/pages/ParentDashboard";
+import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import ParentApp from "../pages/ParentPortal/ParentApp";
-import Subscription from "../pages/ParentPortal/pages/Subscription";
-import Payments from "../pages/ParentPortal/pages/Payments";
-import Profile from "../pages/ParentPortal/pages/Profile";
-import ChangePassword from "../pages/ParentPortal/pages/ChangePassword";
-import DefaultTheme from "../pages/ParentPortal/pages/DefaultTheme";
-import AddChild from './../pages/ParentPortal/pages/AddChild';
-import Account from './../pages/ParentPortal/pages/Account';
+
+// Lazy-loaded components
+const ParentApp = lazy(() => import("../pages/ParentPortal/ParentApp"));
+const ParentDashboard = lazy(() => import("../pages/ParentPortal/pages/ParentDashboard"));
+const Subscription = lazy(() => import("../pages/ParentPortal/pages/Subscription"));
+const Payments = lazy(() => import("../pages/ParentPortal/pages/Payments"));
+const Profile = lazy(() => import("../pages/ParentPortal/pages/Profile"));
+const ChangePassword = lazy(() => import("../pages/ParentPortal/pages/ChangePassword"));
+const DefaultTheme = lazy(() => import("../pages/ParentPortal/pages/DefaultTheme"));
+const AddChild = lazy(() => import("../pages/ParentPortal/pages/AddChild"));
+const Account = lazy(() => import("../pages/ParentPortal/pages/Account"));
 
 const ParentRoutes = () => {
   return (
+    <Suspense fallback={<div>Loading...</div>}>
       <Routes>
         <Route path="/" element={<ParentApp />}>
           <Route index element={<ParentDashboard />} />
@@ -24,6 +27,7 @@ const ParentRoutes = () => {
           <Route path="defaulttheme" element={<DefaultTheme />} />
         </Route>
       </Routes>
+    </Suspense>
   );
 };
 
