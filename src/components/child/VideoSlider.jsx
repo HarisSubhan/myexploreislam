@@ -20,7 +20,7 @@ const VideoThumbnails = () => {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("Episodes");
 
-  const { color: themeColor, textColor } = useTheme();
+  
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -28,23 +28,23 @@ const VideoThumbnails = () => {
         setLoading(true);
         setError(null);
         
-        // Fetch videos and assignments in parallel
+       
         const [videosResponse, assignmentsResponse] = await Promise.all([
           getAllVideosApi(),
           getAllAssignments().catch(err => {
             console.warn("Assignments fetch error:", err);
-            return []; // Return empty array if assignments fail
+            return []; 
           })
         ]);
 
-        // Log raw data for debugging
+        
         console.log("Videos response:", videosResponse);
         console.log("Assignments response:", assignmentsResponse);
 
-        // Process videos and assignments
+        
         const enrichedVideos = await Promise.all(
           videosResponse.map(async (video) => {
-            // Fetch quizzes for each video
+            
             let quizzes = [];
             try {
               quizzes = await getQuizApi(video.id) || [];
@@ -52,7 +52,7 @@ const VideoThumbnails = () => {
               console.warn(`Quiz fetch failed for video ${video.id}:`, err);
             }
 
-            // Filter assignments for this video (with type coercion)
+       
             const assignments = (assignmentsResponse || []).filter(a => 
               String(a.video_id) === String(video.id)
             );
@@ -280,7 +280,7 @@ const VideoThumbnails = () => {
                     />
                   </div>
                   <div 
-                    style={{ backgroundColor: themeColor, color: textColor }} 
+                  
                     className="hover-details"
                   >
                     <div className="action-buttons d-flex justify-content-between align-items-center">
@@ -329,7 +329,7 @@ const VideoThumbnails = () => {
 
       {selectedVideo && (
         <div
-          style={{ backgroundColor: themeColor, color: textColor }}
+          
           className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}
         >
           <div className="popup-header">

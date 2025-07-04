@@ -1,26 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Card } from "react-bootstrap";
+import { Form, Button, Card, Spinner, ListGroup } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
-import { uploadAssignment } from "../../../../services/assignmentApi"; 
-import { getCategoriesApi } from "../../../../services/api";
-
+import { uploadAssignment } from "../../../../services/assignmentApi";
+import { getCategoriesApi } from "../../../../services/categoryApi";
 
 const AddAssignment = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
-  const [category, setCategory] = useState("");
   const [video, setVideo] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await getCategoriesApi();
-      setCategories(res.data);
+      setLoading(true);
+      try {
+        const res = await getCategoriesApi();
+        setCategories(res.data);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+      setLoading(false);
     };
     fetchCategories();
   }, []);
+
+  const handleCategoryToggle = (categoryId) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,9 +48,9 @@ const AddAssignment = () => {
     formData.append("title", title);
     formData.append("description", description);
     formData.append("file", file);
-    formData.append("category", category);
     formData.append("video", video);
     formData.append("dueDate", dueDate);
+    formData.append("categories", JSON.stringify(selectedCategories));
 
     const token = localStorage.getItem("token");
 
@@ -48,9 +62,9 @@ const AddAssignment = () => {
       setTitle("");
       setDescription("");
       setFile(null);
-      setCategory("");
       setVideo("");
       setDueDate("");
+      setSelectedCategories([]);
     } catch (error) {
       console.error("Upload error:", error.message);
       alert("Upload failed: " + error.message);
@@ -93,18 +107,42 @@ const AddAssignment = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="category" className="mb-3">
-      <Form.Label>Category</Form.Label>
-      <Form.Select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      >
-        <option value="">Select a category</option>
-        {categories.map((cat) => (
-          <option key={cat.id} value={cat.name}>{cat.name}</option>
-        ))}
-      </Form.Select>
-    </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label>Select Categories</Form.Label>
+            <Card>
+              <Card.Body style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {loading ? (
+                  <div className="text-center py-3">
+                    <Spinner animation="border" variant="primary" />
+                  </div>
+                ) : categories.length > 0 ? (
+                  <ListGroup variant="flush">
+                    {categories.map((category) => (
+                      <ListGroup.Item
+                        key={category.id}
+                        className="px-0 py-2"
+                      >
+                        <Form.Check
+                          type="checkbox"
+                          id={`category-${category.id}`}
+                          label={category.name}
+                          checked={selectedCategories.includes(category.id)}
+                          onChange={() => handleCategoryToggle(category.id)}
+                        />
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <div className="text-muted">No categories available</div>
+                )}
+              </Card.Body>
+            </Card>
+            <Form.Text className="text-muted">
+              {selectedCategories.length > 0
+                ? `${selectedCategories.length} categories selected`
+                : "Select at least one category"}
+            </Form.Text>
+          </Form.Group>
 
           <Form.Group controlId="video" className="mb-3">
             <Form.Label>Related Video (Optional)</Form.Label>

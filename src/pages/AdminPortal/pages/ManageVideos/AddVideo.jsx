@@ -3,7 +3,7 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { uploadVideoApi } from "../../../../services/videoApi";
 import { useNavigate } from "react-router-dom";
-import { getCategoriesApi } from "../../../../services/api";
+import { getCategoriesApi } from "../../../../services/categoryApi";
 
 
 const AddVideo = () => {

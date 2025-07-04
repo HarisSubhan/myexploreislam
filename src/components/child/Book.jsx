@@ -17,7 +17,7 @@ const Book = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { color: themeColor, textColor } = useTheme();
+  // const { color: themeColor, textColor } = useTheme();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("pdf");
@@ -200,7 +200,7 @@ const Book = () => {
 
               {hoveredBook === book.id && (
                 <div
-                  style={{ backgroundColor: themeColor, color: textColor }}
+                  // style={{ backgroundColor: themeColor, color: textColor }}
                   className="netflix-hover-card-book"
                 >
                   <div className="hover-thumbnail">
@@ -245,7 +245,7 @@ const Book = () => {
 
       {selectedBook && (
         <div
-          style={{ backgroundColor: themeColor, color: textColor }}
+          // style={{ backgroundColor: themeColor, color: textColor }}
           className={`expanded-video-popup ${isFadingOut ? "fade-out" : ""}`}
         >
           <div className="popup-header">
@@ -261,7 +261,7 @@ const Book = () => {
           </div>
 
           <div
-            style={{ backgroundColor: themeColor, color: textColor }}
+            // style={{ backgroundColor: themeColor, color: textColor }}
             className="popup-content mx-auto"
           >
             <div className="metadata">

@@ -10,6 +10,7 @@ import BlogPage from "./pages/SharedPortal/pages/BlogPage";
 import BlogDetail from  "./components/common/BlogDetail";
 import RegisterPage from "./pages/SharedPortal/pages/RegisterPage";
 import Subscription from "./pages/SharedPortal/pages/Subscription";
+import AdminPasswordSetup from "./pages/SharedPortal/pages/AdminPasswordSetup";
 
 
 function RequireAuth({ children, allowedRoles }) {
@@ -67,6 +68,7 @@ function App() {
         {/* 👇 Login is separate — no layout */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/set-password" element={<AdminPasswordSetup />} />
         <Route path="/subscription" element={<Subscription />} />
 
         {/* Catch-all route */}

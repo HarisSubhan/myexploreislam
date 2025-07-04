@@ -1,13 +1,13 @@
 const db = require('../config/db');
 
 
-// GET all categories
 exports.getCategories = (req, res) => {
   db.query("SELECT * FROM categories", (err, results) => {
     if (err) return res.status(500).json({ error: err });
-    res.json(results);
+    res.json({ data: results }); // ✅ return categories in an object with 'data'
   });
 };
+
 
 // ADD new category
 exports.addCategory = (req, res) => {
