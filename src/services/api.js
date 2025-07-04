@@ -40,12 +40,12 @@ export const addChild = async (childData) => {
 
 
 
-export const getCategoriesApi = () => axios.get(`${baseUrl}/api/Category`);
-export const addCategoryApi = (name) => axios.post(`${baseUrl}/api/Category`, { name });
-export const updateCategoryApi = (id, name) =>
-  axios.put(`${baseUrl}/api/Category/${id}`, { name });
-export const deleteCategoryApi = (id) =>
-  axios.delete(`${baseUrl}/api/Category/${id}`);
+// export const getCategoriesApi = () => axios.get(`${baseUrl}/api/Category`);
+// export const addCategoryApi = (name) => axios.post(`${baseUrl}/api/Category`, { name });
+// export const updateCategoryApi = (id, name) =>
+//   axios.put(`${baseUrl}/api/Category/${id}`, { name });
+// export const deleteCategoryApi = (id) =>
+//   axios.delete(`${baseUrl}/api/Category/${id}`);
 
 
 // export const uploadAssignment = async (formData, token) => {

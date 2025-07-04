@@ -6,6 +6,7 @@ import { FaBookOpen, FaVideo, FaStar, FaTrophy } from "react-icons/fa";
 import { useTheme } from "../../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import Banner from "../../../components/child/Banner";
+import FallingElements from "./FallingElements";
 
 
 const styles = {
@@ -149,6 +150,7 @@ const ChildDashboard = () => {
 
   return (
     <div>
+      {/* <FallingElements /> */}
       <Banner />
     <div className="child-dashboard" style={styles.dashboard}>
       <Container fluid className="px-2 px-sm-3 px-md-4">

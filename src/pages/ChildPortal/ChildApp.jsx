@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Banner from "../../components/child/Banner";
 import HeaderChild from "../../components/child/HeaderChild";
 import { ThemeProvider } from "../../context/ThemeContext"; 
+import FallingElements from "./pages/FallingElements";
 
 const ChildApp = () => {
   return (

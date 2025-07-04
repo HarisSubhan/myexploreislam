@@ -1,10 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { useNavigate } from "react-router-dom";
+import { getCategoriesApi } from "../../../../services/categoryApi";
 
 const AddBook = () => {
     const navigate = useNavigate();
+    const [categories, setCategories] = useState([]);
+const [loadingCategories, setLoadingCategories] = useState(false);
+const [category, setCategory] = useState("");  
+
+useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const res = await getCategoriesApi();  
+        setCategories(res.data);
+      } catch (error) {
+        console.error("Failed to load categories", error);
+      }
+      setLoadingCategories(false);
+    };
+    fetchCategories();
+  }, []);
+  
+
     const [formData, setFormData] = useState({
         title: "",
         author: "",
@@ -32,6 +52,7 @@ const AddBook = () => {
         data.append("pages", formData.pages);
         data.append("thumbnail", formData.thumbnail); 
         data.append("pdf", formData.file); 
+        
 
         try {
             const response = await fetch("http://localhost:5000/api/books", {
@@ -73,9 +94,26 @@ const AddBook = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Category</Form.Label>
-                        <Form.Control type="text" name="category" value={formData.category} onChange={handleChange} required />
-                    </Form.Group>
+  <Form.Label>Category</Form.Label>
+  {loadingCategories ? (
+    <div>Loading categories...</div>
+  ) : (
+    <Form.Select
+      name="category"
+      value={category}
+      onChange={(e) => setCategory(e.target.value)}
+      required
+    >
+      <option value="">Select a category</option>
+      {categories.map((cat) => (
+        <option key={cat.id} value={cat.name}>
+          {cat.name}
+        </option>
+      ))}
+    </Form.Select>
+  )}
+</Form.Group>
+
 
                     <Form.Group className="mb-3">
                         <Form.Label>Number of Pages</Form.Label>

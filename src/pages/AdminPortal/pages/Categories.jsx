@@ -3,10 +3,10 @@ import { Table, Button, Modal, Form } from "react-bootstrap";
 import AdminLayout from "../AdminApp";
 import {
   getCategoriesApi,
-  addCategoryApi,
   updateCategoryApi,
   deleteCategoryApi,
-} from "../../../services/api";
+  createCategoryApi,
+} from "../../../services/categoryApi";
 
 const ManageCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -21,7 +21,12 @@ const ManageCategories = () => {
   const fetchCategories = async () => {
     try {
       const res = await getCategoriesApi();
-      setCategories(res.data);
+      if (Array.isArray(res.data)) {
+        setCategories(res.data);
+      } else {
+        console.error("Invalid response:", res);
+        setCategories([]);
+      }
     } catch (err) {
       console.error("Error fetching categories:", err);
     }
@@ -32,10 +37,11 @@ const ManageCategories = () => {
 
     try {
       if (editingCategory) {
-        await updateCategoryApi(editingCategory.id, newCategory);
+        await updateCategoryApi(editingCategory.id, { name: newCategory });
       } else {
-        await addCategoryApi(newCategory);
+        await createCategoryApi({ name: newCategory });
       }
+
       setNewCategory("");
       setEditingCategory(null);
       setShowModal(false);
@@ -64,7 +70,16 @@ const ManageCategories = () => {
     <AdminLayout>
       <div className="p-4">
         <h2 className="mb-4">📂 Manage Categories</h2>
-        <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
+
+        <Button
+          variant="primary"
+          className="mb-3"
+          onClick={() => {
+            setNewCategory("");
+            setEditingCategory(null);
+            setShowModal(true);
+          }}
+        >
           ➕ Add Category
         </Button>
 
@@ -77,32 +92,41 @@ const ManageCategories = () => {
             </tr>
           </thead>
           <tbody>
-            {categories.map((cat, index) => (
-              <tr key={cat.id}>
-                <td>{index + 1}</td>
-                <td>{cat.name}</td>
-                <td>
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => handleEdit(cat)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(cat.id)}
-                  >
-                    Delete
-                  </Button>
+            {Array.isArray(categories) && categories.length > 0 ? (
+              categories.map((cat, index) => (
+                <tr key={cat.id}>
+                  <td>{index + 1}</td>
+                  <td>{cat.name}</td>
+                  <td>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => handleEdit(cat)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDelete(cat.id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="text-center text-muted">
+                  No categories found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </Table>
 
+        {/* Modal for Add/Edit */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>
