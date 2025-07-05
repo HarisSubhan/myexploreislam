@@ -10,7 +10,7 @@ router.post(
   '/',
   verifyToken,
   isAdmin,
-  uploadBlogBanner.single('banner'), // 👈 updated usage
+  uploadBlogBanner.single('banner_image'), // 👈 updated usage
   blogController.createBlog
 );
 
@@ -20,7 +20,7 @@ router.get('/', verifyToken, isAdmin, blogController.getAllBlogs);
 
 router.get('/', verifyToken, isAdmin, blogController.getAllBlogs);
 router.get('/:id', verifyToken, isAdmin, blogController.getBlogById);
-router.put('/:id', verifyToken, isAdmin, uploadBlogBanner.single('banner'), blogController.updateBlog);
+router.put('/:id', verifyToken, isAdmin, uploadBlogBanner.single('banner_image'), blogController.updateBlog);
 router.delete('/:id', verifyToken, isAdmin, blogController.deleteBlog);
 
 // Public Routes

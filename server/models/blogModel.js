@@ -3,7 +3,7 @@ const db = require('../config/db');
 // Create blog
 const create = (blogData, callback) => {
   const { title, description, publish_date, banner } = blogData;
-  const sql = `INSERT INTO blogs (title, description, publish_date, banner) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO blogs (title, description, publish_date, banner_image) VALUES (?, ?, ?, ?)`;
   db.query(sql, [title, description, publish_date, banner], callback);
 };
 
