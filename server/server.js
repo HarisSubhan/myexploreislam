@@ -18,6 +18,8 @@ const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const assignmentsRoutes = require('./routes/assignmentsRoutes');
 
+const userRoutes = require('./routes/userRoutes');
+
 
 initDB();
 dotenv.config();
@@ -50,6 +52,8 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/assignments', assignmentsRoutes);
 
 app.use("/api/Category", categoryRoutes);
+
+app.use('/api', userRoutes);
 
 // Test route
 app.get('/', (req, res) => {
