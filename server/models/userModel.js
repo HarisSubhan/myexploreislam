@@ -34,16 +34,10 @@ const updateByID = (id, name, email, password, callback) => {
   db.query(sql, params, callback);
 }
 
-// module.exports = { createUser, findUserByEmail, getById, updateByID  };
-
-
 const findChildByEmail = (email, callback) => {
   const query = 'SELECT * FROM children WHERE email = ?';
   db.query(query, [email], callback);
 };
-
-
-// module.exports = { createUser, findUserByEmail, findChildByEmail };
 
 module.exports = {
   createUser,
