@@ -150,7 +150,7 @@ const ChildDashboard = () => {
 
   return (
     <div>
-      {/* <FallingElements /> */}
+      <FallingElements />
       <Banner />
     <div className="child-dashboard" style={styles.dashboard}>
       <Container fluid className="px-2 px-sm-3 px-md-4">
