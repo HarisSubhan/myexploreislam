@@ -105,12 +105,19 @@ const initDB = () => {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
-  const categoriesTable = `
-  CREATE TABLE IF NOT EXISTS categories (
+  const categoriesTable = `CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
-  )
-`;
+  )`;
+
+  const childRequestTable = `CREATE TABLE IF NOT EXISTS child_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    parent_id INT NOT NULL,
+    requested_children INT DEFAULT 1,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
+  )`;
 
 
   db.query(userTable, (err) => {
@@ -206,6 +213,14 @@ const initDB = () => {
       console.log("❌ Error creating Categories table:", err.message);
     } else {
       console.log("✅ Categories table ready.");
+    }
+  });
+
+  db.query(childRequestTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Child Requests table:", err.message);
+    } else {
+      console.log("✅ Child Requests table ready.");
     }
   });
 
