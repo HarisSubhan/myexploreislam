@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Container,
   Row,
@@ -12,83 +12,76 @@ import {
 } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "@images/logo.png";
-import { RegisterApi } from "../../../services/api"; // ✅ Import separated API
+import { RegisterApi } from "../../../services/api";
+import axios from "axios";
+import { baseUrl } from "../../../services/config";
 
 const RegisterPage = () => {
+  const location = useLocation();
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Get subscription ID from navigation state
+  const subscriptionId = location.state?.subscriptionId;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
-    setSuccess("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
+    setLoading(true);
 
     try {
-      const res = await RegisterApi(form); // ✅ Call your custom API
+      // Register user with subscription ID
+      const res = await RegisterApi({
+        ...form,
+        subscriptionId // Pass subscription ID with registration data
+      });
 
-      // Save token and role
-      if (res.token) {
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("userRole", res.user?.role || "parent");
+      if (!res.token) {
+        throw new Error("Registration failed");
       }
 
-      setSuccess(res.message || "Registration successful!");
-      setForm({ name: "", email: "", password: "" });
+      // Save token and redirect
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("userRole", "parent");
+      
+      navigate("/parent"); // Immediate redirect on success
 
-      setTimeout(() => navigate("/login"), 1500); // Redirect
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed");
+      setError(err.response?.data?.message || err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Container fluid className="vh-100">
       <Row className="h-100">
-        <Col
-          md={6}
-          className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white position-relative p-0"
-        >
-          <Image
-            src={logo}
-            alt="Islamic Book"
-            fluid
-            className="position-absolute w-100 h-100"
-            style={{ objectFit: "cover", opacity: 0.75 }}
-          />
-          <div className="position-relative text-center px-4">
-            <h1 className="display-5 mb-3" style={{ fontFamily: "serif" }}>
-              فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
-            </h1>
-          </div>
+        <Col md={6} className="d-none d-md-flex bg-dark text-white p-0">
+          {/* Left side with image */}
+          <Image src={logo} fluid className="w-100 h-100 opacity-75" />
         </Col>
 
-        <Col
-          md={6}
-          className="d-flex align-items-center justify-content-center"
-        >
+        <Col md={6} className="d-flex align-items-center justify-content-center">
           <div style={{ maxWidth: "400px", width: "100%" }}>
             <div className="text-center mb-4">
-              <img src={logo} alt="Explore Islam Logo" style={{ width: 150 }} />
+              <img src={logo} alt="Logo" style={{ width: 150 }} />
               <h2 className="mt-2">Explore Islam</h2>
-              <p className="text-muted">Parent Registration</p>
+              <p>Platform for Young Minds</p>
             </div>
 
             {error && <Alert variant="danger">{error}</Alert>}
-            {success && <Alert variant="success">{success}</Alert>}
 
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
@@ -102,6 +95,16 @@ const RegisterPage = () => {
                 />
               </Form.Group>
 
+              <Form.Group className="mb-3">
+                <Form.Control
+                  type="phone"
+                  placeholder="Phone Number"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Control
                   type="email"
@@ -136,8 +139,9 @@ const RegisterPage = () => {
                 style={{ backgroundColor: "#f1066c" }}
                 type="submit"
                 className="w-100 mb-3"
+                disabled={loading}
               >
-                Register
+                {loading ? "Processing..." : "Register"}
               </Button>
             </Form>
 
