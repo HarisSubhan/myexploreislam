@@ -4,6 +4,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { FaUsers, FaVideo, FaBook, FaQuestionCircle } from 'react-icons/fa';
 import AdminLayout from "../AdminApp";
 import axios from 'axios';
+import IncomeChart from "../../../components/admin/IncomeChart";
 
 const Dashboard = () => {
 
@@ -61,6 +62,10 @@ const Dashboard = () => {
           </Col>
         </Row>
       </Container>
+
+      <h3 className="mt-5 mb-3">💰 Income Chart</h3>
+      <IncomeChart />
+
     </AdminLayout>
   );
 };
