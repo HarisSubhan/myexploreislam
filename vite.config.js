@@ -32,11 +32,13 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
+    exclude: ['chunk-EWTE5DHJ', 'chunk-HUL2CLQT'],
     include: [
       "react",
       "react-dom",
       "@/components/auth/RequireAuth",
       "@/pages/SharedPortal/auth/RoleRedirector",
+      
     ],
   },
 });
