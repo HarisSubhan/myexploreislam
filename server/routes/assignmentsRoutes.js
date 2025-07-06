@@ -3,7 +3,7 @@ const router = express.Router();
 const verifyToken = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 const { createAssignment, getAllAssignments, getAssignmentById, updateAssignment, deleteAssignment} = require('../controllers/AssigmentController');
-const { uploadAssignment } = require('../middleware/assignmentsUpload');
+const uploadAssignment = require('../middleware/assignmentsUpload');
 
 
 // Create a new quiz with questions

@@ -120,6 +120,27 @@ const initDB = () => {
     FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
   )`;
 
+  const quizSubmissionTable = `CREATE TABLE IF NOT EXISTS quiz_submissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT,
+    child_id INT,
+    score INT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+  )`;
+
+  const assignmentSubmissionTable = `CREATE TABLE IF NOT EXISTS assignment_submissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    assignment_id INT,
+    child_id INT,
+    file_url VARCHAR(255),
+    marks INT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+  )`;
+
 
   db.query(userTable, (err) => {
     if (err) {
@@ -222,6 +243,22 @@ const initDB = () => {
       console.log("❌ Error creating Child Requests table:", err.message);
     } else {
       console.log("✅ Child Requests table ready.");
+    }
+  });
+
+  db.query(quizSubmissionTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Quiz Submission table:", err.message);
+    } else {
+      console.log("✅ Quiz Submission table ready.");
+    }
+  });
+
+  db.query(assignmentSubmissionTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Assignment Submission table:", err.message);
+    } else {
+      console.log("✅ Assignment Submission table ready.");
     }
   });
 

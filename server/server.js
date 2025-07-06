@@ -22,6 +22,9 @@ const userRoutes = require('./routes/userRoutes');
 const childRequestsRoutes = require('./routes/childRequestRoutes');
 const childRoutes = require('./routes/childRoutes');
 
+const quizSubmissionRoutes = require('./routes/quizSubmissionRoutes');
+const assignmentSubmissionRoutes = require('./routes/assignmentSubmissionRoutes');
+
 
 initDB();
 dotenv.config();
@@ -60,6 +63,8 @@ app.use('/api/child-requests', childRequestsRoutes);
 
 app.use('/api/child', childRoutes);
 
+app.use('/api/quiz-submissions', quizSubmissionRoutes);
+app.use('/api/assignment-submissions', assignmentSubmissionRoutes);
 
 // Test route
 app.get('/', (req, res) => {
