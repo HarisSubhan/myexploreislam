@@ -5,5 +5,6 @@ const verifyToken = require('../middleware/auth');
 const childController = require('../controllers/childrenControler');
 
 router.get('/me/name', verifyToken, childController.getCurrentChildName);
+router.put('/color', verifyToken, childController.updateChildColor);
 
 module.exports = router;

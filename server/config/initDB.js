@@ -24,6 +24,7 @@ const initDB = () => {
       name VARCHAR(100),
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
+      color VARCHAR(20),
       parent_id INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
