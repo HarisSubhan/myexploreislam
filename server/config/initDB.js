@@ -10,7 +10,7 @@ const initDB = () => {
       password VARCHAR(255),
       phone_number VARCHAR(20) DEFAULT NULL,
       subscription_id INT,
-      is_active BOOLEAN DEFAULT NULL,
+      is_active BOOLEAN DEFAULT 1,
       is_deleted BOOLEAN DEFAULT NULL,
       role ENUM('admin', 'parent', 'child') DEFAULT 'parent',
       max_children INT DEFAULT 2,
