@@ -6,6 +6,13 @@ const getChildById = (id, callback) => {
   db.query(sql, [id], callback);
 };
 
+const updateColor = (childId, parentId, color, callback) => {
+  const sql = `UPDATE children SET color = ? WHERE id = ? AND parent_id = ?`;
+  db.query(sql, [color, childId, parentId], callback);
+};
+
+
 module.exports = {
-  getChildById
+  getChildById,
+  updateColor
 };
