@@ -25,6 +25,4 @@ const assignmentStorage = multer.diskStorage({
 
 const uploadAssignment = multer({ storage: assignmentStorage });
 
-module.exports = {
-  uploadAssignment,
-};
+module.exports = uploadAssignment;
