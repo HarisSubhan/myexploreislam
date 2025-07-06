@@ -3,9 +3,9 @@ const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 
-const createUser = (name, email, password, role, callback) => {
-  const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
-  db.query(sql, [name, email, password, role], callback);
+const createUser = (name, email, password, role, phone_number, subscriptionId, callback) => {
+  const sql = 'INSERT INTO users (name, email, password, role, phone_number, subscription_id) VALUES (?, ?, ?, ?, ?, ?)';
+  db.query(sql, [name, email, password, role, phone_number, subscriptionId], callback);
 };
 
 const findUserByEmail = (email, callback) => {
