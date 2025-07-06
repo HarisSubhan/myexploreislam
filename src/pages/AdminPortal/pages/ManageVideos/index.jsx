@@ -74,7 +74,7 @@ const ManageVideos = () => {
                   <td>{video.title}</td>
                   <td>{video.category}</td>
                   <td>
-                    <a href={video.video_url} target="_blank" rel="noreferrer">Watch</a>
+                    <a href={`http://localhost:5000${video.video_url}`} target="_blank" rel="noreferrer">Watch</a>
                   </td>
                   <td>
                     <img
