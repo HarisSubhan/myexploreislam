@@ -78,7 +78,7 @@ const ManageVideos = () => {
                   </td>
                   <td>
                     <img
-                      src={video.thumbnail_url}
+                      src={`http://localhost:5000${video.thumbnail_url}`}
                       alt="Thumbnail"
                       width="80"
                       height="50"
