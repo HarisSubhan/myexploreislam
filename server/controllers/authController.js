@@ -31,7 +31,7 @@ const setPassword = (req, res) => {
 };
 
 const register = (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, phone_number, subscription_id } = req.body;
   const role = 'parent'; // 👈 only parent can register from frontend
 
   // Check if user already exists
@@ -42,7 +42,7 @@ const register = (req, res) => {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) return res.status(500).json({ error: 'Hashing error' });
 
-      createUser(name, email, hash, role, (err, result) => {
+      createUser(name, email, hash, role, phone_number, subscription_id, (err, result) => {
         if (err) return res.status(500).json({ error: 'Insert failed' });
 
         res.status(201).json({ message: 'Parent registered successfully' });
