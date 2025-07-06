@@ -20,6 +20,7 @@ const assignmentsRoutes = require('./routes/assignmentsRoutes');
 
 const userRoutes = require('./routes/userRoutes');
 const childRequestsRoutes = require('./routes/childRequestRoutes');
+const childRoutes = require('./routes/childRoutes');
 
 
 initDB();
@@ -56,6 +57,9 @@ app.use("/api/Category", categoryRoutes);
 app.use('/api', userRoutes);
 
 app.use('/api/child-requests', childRequestsRoutes);
+
+app.use('/api/child', childRoutes);
+
 
 // Test route
 app.get('/', (req, res) => {
