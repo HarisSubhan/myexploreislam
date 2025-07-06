@@ -44,5 +44,5 @@ module.exports = {
   findUserByEmail,
   getById,
   updateByID,
-  findChildByEmail,
+  findChildByEmail
 };
