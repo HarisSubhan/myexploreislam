@@ -38,7 +38,7 @@ const AddBlog = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then(() => navigate("/admin/manage-blogs"))
+      .then(() => navigate("/admin/blogs"))
       .catch((err) => {
         console.error(err);
         setError("Failed to create blog");

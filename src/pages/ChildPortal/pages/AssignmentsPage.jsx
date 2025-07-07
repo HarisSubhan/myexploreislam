@@ -106,12 +106,7 @@ const AssignmentsPage = () => {
 
       {filteredAssignments.length === 0 ? (
         <div className="text-center my-5">
-          <img
-            src="/images/no-assignments.png"
-            alt="No assignments"
-            width="120"
-            className="mb-3"
-          />
+          
           <h4 className="text-warning">No {activeTab} assignments!</h4>
           {activeTab === "current" && <p>Yay! 🎉 You’re free to play!</p>}
         </div>

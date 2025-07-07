@@ -11,6 +11,7 @@ const QuizPage = lazy(() => import("../pages/ChildPortal/pages/QuizPage"));
 const QuizStart = lazy(() => import("../components/child/QuizStart"));
 const AssignmentsPage = lazy(() => import("../pages/ChildPortal/pages/AssignmentsPage"));
 const AssignmentsStart = lazy(() =>import("../components/child/AssignmentsStart"));
+const ChildProfilePage = lazy(() =>import("../pages/ChildPortal/pages/ChildProfilePage"));
 
 const ChildRoutes = () => {
   return (
@@ -26,6 +27,8 @@ const ChildRoutes = () => {
           <Route path="quiz/:quizid" element={<QuizStart />} />
           <Route path="assignments" element={<AssignmentsPage />} />
           <Route path="assignments/:id" element={<AssignmentsStart />} />
+          <Route path="profile" element={<ChildProfilePage />} />
+
         </Route>
       </Routes>
     </Suspense>
