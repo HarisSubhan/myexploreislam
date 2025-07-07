@@ -9,7 +9,8 @@ const submitQuiz = (req, res) => {
   }
 
   QuizSubmission.submit(quiz_id, childId, score, (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to submit quiz' });
+    if (err) return res.status(500).json({ error: 'Failed to submit quiz',note: err });
+  
     res.json({ message: 'Quiz submitted successfully' });
   });
 };

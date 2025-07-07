@@ -63,3 +63,15 @@ export const deleteQuizApi = async (id) => {
   return response.data;
 };
 
+// Submit a completed quiz (quiz result)
+export const submitQuizApi = async (submissionData) => {
+  const token = getToken();
+
+  const response = await axios.post(`${baseUrl}/api/quiz-submissions/submit`, submissionData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};

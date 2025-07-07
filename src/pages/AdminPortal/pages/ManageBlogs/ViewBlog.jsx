@@ -1,4 +1,3 @@
-// ✅ File: ViewBlog.js
 import React, { useEffect, useState } from "react";
 import { Card, Spinner } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
