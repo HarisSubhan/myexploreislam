@@ -1,4 +1,3 @@
-import axios from "axios";
 import { baseUrl } from "../services/config";
 
 export const createCategoryApi = async (categoryData) => {

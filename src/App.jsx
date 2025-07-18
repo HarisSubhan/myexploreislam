@@ -11,6 +11,9 @@ import BlogDetail from  "./components/common/BlogDetail";
 import RegisterPage from "./pages/SharedPortal/pages/RegisterPage";
 import Subscription from "./pages/SharedPortal/pages/Subscription";
 import AdminPasswordSetup from "./pages/SharedPortal/pages/AdminPasswordSetup";
+import ContactUs from "./pages/SharedPortal/pages/ContactUs";
+import FaqsPage from "./pages/SharedPortal/pages/FaqsPage";
+import AboutIslam from "./pages/SharedPortal/pages/AboutIslam";
 
 
 function RequireAuth({ children, allowedRoles }) {
@@ -37,6 +40,10 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:titleSlug" element={<BlogDetail />} />
+          <Route path="/Subscriptions" element={<Subscription/>} />
+          <Route path="/Contact" element={<ContactUs />} />
+          <Route path="/faqs" element={<FaqsPage />} />
+          <Route path="/about-islam" element={<AboutIslam />} />
         </Route>
 
         {/* 👇 Protected routes */}
