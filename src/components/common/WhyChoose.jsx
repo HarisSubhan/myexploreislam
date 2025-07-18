@@ -23,14 +23,14 @@ const WhyChoose = () => {
   ];
 
   return (
-    <Container fluid className="p-0" style={{ backgroundColor: "#e7fcff", minHeight: "100vh" }}>
-      <Row className="g-0" style={{ minHeight: "100vh" }}>
+    <Container fluid className="p-0" style={{ backgroundColor: "#e7fcff",  }}>
+      <Row className="g-0">
         
         <Col
           xs={12}
           md={6}
           className="d-flex flex-column align-items-center justify-content-center"
-          style={{ minHeight: "100vh", padding: 0 }}
+          style={{  padding: 0 }}
         >
           <img
             src={star}
@@ -60,7 +60,7 @@ const WhyChoose = () => {
           xs={12}
           md={6}
           className="d-flex flex-column justify-content-center p-4"
-          style={{ minHeight: "100vh" }}
+          style={{  }}
         >
           {features.map((feature, index) => (
             <div key={index} className="mb-4 text-center text-md-start">
