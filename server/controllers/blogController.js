@@ -16,8 +16,8 @@ const createBlog = (req, res) => {
     description,
   };
 
-  blogModel.createBlog(blogData, (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to create blog' });
+  blogModel.create(blogData, (err) => {
+    if (err) return res.status(500).json({ error: 'Failed to create blog', err });
     res.status(201).json({ message: 'Blog created successfully' });
   });
 };
