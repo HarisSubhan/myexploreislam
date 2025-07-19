@@ -26,8 +26,6 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "../../context/ThemeContext";
 
-const drawerWidth = 240;
-
 const NAVIGATION = [
   { kind: "header", title: "Main Menu" },
   { path: "/parent", title: "Home", icon: <HomeIcon /> },
@@ -158,10 +156,10 @@ const ParentApp = () => {
           open={isSidebarOpen}
           onClose={toggleSidebar}
           sx={{
-            width: drawerWidth,
+            
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              width: drawerWidth,
+              
               boxSizing: "border-box",
               marginTop: "64px",
               height: "calc(100vh - 64px)",
