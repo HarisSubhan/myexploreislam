@@ -44,8 +44,6 @@ function App() {
           <Route path="/Contact" element={<ContactUs />} />
           <Route path="/faqs" element={<FaqsPage />} />
           <Route path="/about-islam" element={<AboutIslam />} />
-          <Route path="/about-islams" element={<AboutIslam />} />
-
         </Route>
 
         {/* 👇 Protected routes */}
