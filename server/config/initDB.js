@@ -9,7 +9,8 @@ const initDB = () => {
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
       phone_number VARCHAR(20) DEFAULT NULL,
-      is_active BOOLEAN DEFAULT NULL,
+      subscription_id INT,
+      is_active BOOLEAN DEFAULT 1,
       is_deleted BOOLEAN DEFAULT NULL,
       role ENUM('admin', 'parent', 'child') DEFAULT 'parent',
       max_children INT DEFAULT 2,
@@ -24,6 +25,7 @@ const initDB = () => {
       name VARCHAR(100),
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
+      color VARCHAR(20),
       parent_id INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
@@ -105,12 +107,40 @@ const initDB = () => {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
-  const categoriesTable = `
-  CREATE TABLE IF NOT EXISTS categories (
+  const categoriesTable = `CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
-  )
-`;
+  )`;
+
+  const childRequestTable = `CREATE TABLE IF NOT EXISTS child_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    parent_id INT NOT NULL,
+    requested_children INT DEFAULT 1,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
+  )`;
+
+  const quizSubmissionTable = `CREATE TABLE IF NOT EXISTS quiz_submissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT,
+    child_id INT,
+    score INT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+  )`;
+
+  const assignmentSubmissionTable = `CREATE TABLE IF NOT EXISTS assignment_submissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    assignment_id INT,
+    child_id INT,
+    file_url VARCHAR(255),
+    marks INT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+  )`;
 
 
   db.query(userTable, (err) => {
@@ -206,6 +236,30 @@ const initDB = () => {
       console.log("❌ Error creating Categories table:", err.message);
     } else {
       console.log("✅ Categories table ready.");
+    }
+  });
+
+  db.query(childRequestTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Child Requests table:", err.message);
+    } else {
+      console.log("✅ Child Requests table ready.");
+    }
+  });
+
+  db.query(quizSubmissionTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Quiz Submission table:", err.message);
+    } else {
+      console.log("✅ Quiz Submission table ready.");
+    }
+  });
+
+  db.query(assignmentSubmissionTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Assignment Submission table:", err.message);
+    } else {
+      console.log("✅ Assignment Submission table ready.");
     }
   });
 

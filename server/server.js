@@ -18,6 +18,13 @@ const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const assignmentsRoutes = require('./routes/assignmentsRoutes');
 
+const userRoutes = require('./routes/userRoutes');
+const childRequestsRoutes = require('./routes/childRequestRoutes');
+const childRoutes = require('./routes/childRoutes');
+
+const quizSubmissionRoutes = require('./routes/quizSubmissionRoutes');
+const assignmentSubmissionRoutes = require('./routes/assignmentSubmissionRoutes');
+
 
 initDB();
 dotenv.config();
@@ -35,7 +42,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/videos', videoRoutes);
 
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
 
 
 app.use('/api/books', bookRoutes);
@@ -44,12 +51,20 @@ app.use('/api/blogs', blogRoutes);
 
 app.use('/api/subscriptions', subscriptionRoutes);
 
-
 app.use('/api/quizzes', quizRoutes);
 
 app.use('/api/assignments', assignmentsRoutes);
 
 app.use("/api/Category", categoryRoutes);
+
+app.use('/api', userRoutes);
+
+app.use('/api/child-requests', childRequestsRoutes);
+
+app.use('/api/child', childRoutes);
+
+app.use('/api/quiz-submissions', quizSubmissionRoutes);
+app.use('/api/assignment-submissions', assignmentSubmissionRoutes);
 
 // Test route
 app.get('/', (req, res) => {
