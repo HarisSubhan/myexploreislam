@@ -158,10 +158,10 @@ const ParentApp = () => {
           open={isSidebarOpen}
           onClose={toggleSidebar}
           sx={{
-            width: drawerWidth,
+            
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              width: drawerWidth,
+              
               boxSizing: "border-box",
               marginTop: "64px",
               height: "calc(100vh - 64px)",
@@ -211,7 +211,7 @@ const ParentApp = () => {
             p: 3,
             marginTop: "64px",
             marginLeft: { md: isSidebarOpen ? `${drawerWidth}px` : 0 },
-            width: { md: `calc(100% - ${isSidebarOpen ? drawerWidth : 0}px)` },
+          
             transition: theme.transitions.create(["margin", "width"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
