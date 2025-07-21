@@ -26,9 +26,9 @@ const Header = () => {
             className="shadow-sm px-3"
         >
             <Container fluid>
-                <Navbar.Brand href="/admin/dashboard" className="fw-bold">
+                {/* <Navbar.Brand href="/admin/dashboard" className="fw-bold">
                     Explore Islam
-                </Navbar.Brand>
+                </Navbar.Brand> */}
 
                 <Nav className="ms-auto align-items-center gap-3">
                     {/* Theme Toggle Button */}
