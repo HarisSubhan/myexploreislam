@@ -6,6 +6,7 @@ import {
 import AdminLayout from '../AdminApp';
 import axios from 'axios';
 import IncomeChart from '../../../components/admin/IncomeChart';
+// import RecentActivity from "../../../components/admin/RecentActivity";
 import RecentActivity from "../../../components/admin/RecentActivity";
 import UsersTable from "../../../components/admin/UsersTable";
 import TopPerformingStudents from "../../../components/admin/TopPerformingStudents";
@@ -99,11 +100,11 @@ const Dashboard = () => {
         <RecentActivity />
       </Container>
 
-      <Row className="mt-4">
-        <Col md={6}>
+      <Container className="mt-4">
+        {/* <Col md={6}> */}
           <TopPerformingStudents />
-        </Col>
-      </Row>
+        {/* </Col> */}
+      </Container>
 
 
       <Container className="mt-5">
