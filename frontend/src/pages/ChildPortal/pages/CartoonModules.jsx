@@ -1,27 +1,38 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaTv, FaPalette } from 'react-icons/fa';
+import { FaPlay, FaBookOpen, FaGamepad, FaMusic } from 'react-icons/fa';
 import cartoonImage from '@images/c.png';
-import "../../../components/child/ChildProfilePage.css";
 
-const modules = [
-  { 
-    title: "Modules", 
-    icon: <FaTv size={28} className="text-white" />, 
-    path: "/child/videos",
-    bgColor: "#FF6B6B" // Vibrant red
-  },
-  { 
-    title: "Cartoons", 
-    icon: <FaPalette size={28} className="text-white" />, 
-    path: "/child/cartoons",
-    bgColor: "#4ECDC4" // Teal
-  },
-];
-
-const ChildDashboard = () => {
+const CartoonModules = () => {
   const navigate = useNavigate();
+
+  const modules = [
+    { 
+      title: "Watch Cartoons", 
+      icon: <FaPlay size={28} className="text-white" />, 
+      path: "/child/cartoons/watch",
+      bgColor: "#FF6B6B"
+    },
+    { 
+      title: "Story Books", 
+      icon: <FaBookOpen size={28} className="text-white" />, 
+      path: "/child/cartoons/stories",
+      bgColor: "#4ECDC4"
+    },
+    { 
+      title: "Interactive Games", 
+      icon: <FaGamepad size={28} className="text-white" />, 
+      path: "/child/cartoons/games",
+      bgColor: "#3A86FF"
+    },
+    { 
+      title: "Islamic Songs", 
+      icon: <FaMusic size={28} className="text-white" />, 
+      path: "/child/cartoons/songs",
+      bgColor: "#FFBE0B"
+    },
+  ];
 
   const handleCardClick = (path) => {
     navigate(path);
@@ -30,17 +41,17 @@ const ChildDashboard = () => {
   return (
     <Container
       fluid
-      className="d-flex flex-column justify-content-center"
+      className="py-5"
       style={{
         background: "linear-gradient(to bottom right, #e0f7fa, #fff3e0)",
         minHeight: "100vh",
       }}
     >
-      <h2 className="text-center fw-bold" style={{ color: "#0d6efd" }}>
-        Welcome to Your Learning World!
+      <h2 className="text-center mb-4 fw-bold" style={{ color: "#0d6efd" }}>
+        Islamic Cartoon World
       </h2>
 
-      <Row className="g-4 justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+      <Row className="g-4 justify-content-center">
         {modules.map((module, index) => (
           <Col key={index} xs={12} sm={8} md={6} lg={4} xl={3}>
             <Card
@@ -100,17 +111,17 @@ const ChildDashboard = () => {
                     left: 0,
                     right: 0,
                     height: '50%',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)'
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)'
                   }}
                 />
               </div>
               
-              <Card.Body className="pb-4" style={{ position: 'relative', zIndex: 1,  }}>
+              <Card.Body className="pb-4" style={{ position: 'relative', zIndex: 1 }}>
                 <h5 
                   className="mt-3 mb-0 fw-bold" 
                   style={{
                     color: '#333',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
                   }}
                 >
                   {module.title}
@@ -124,4 +135,4 @@ const ChildDashboard = () => {
   );
 };
 
-export default ChildDashboard;
+export default CartoonModules;
