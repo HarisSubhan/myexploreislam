@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const logUserActivity = require('../utils/activityLogger');
 require('dotenv').config();
 const { createUser, findUserByEmail, findChildByEmail } = require('../models/userModel');
 
@@ -45,6 +46,8 @@ const register = (req, res) => {
       createUser(name, email, hash, role, phone_number, subscription_id, (err, result) => {
         if (err) return res.status(500).json({ error: 'Insert failed' });
 
+        // logUserActivity(user.id, 'Register');
+
         res.status(201).json({ message: 'Parent registered successfully' });
       });
     });
@@ -71,6 +74,8 @@ const login = (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: '1d' }
         );
+
+        logUserActivity(user.id, 'Logged In');
 
         return res.json({
           message: 'Login successful',
@@ -99,6 +104,8 @@ const login = (req, res) => {
             { expiresIn: '1d' }
           );
 
+          logUserActivity(user.id, 'Logged In');
+
           res.json({
             message: 'Login successful',
             token,
@@ -116,11 +123,19 @@ const login = (req, res) => {
   });
 };
 
+const logout = (req, res) => {
+  const userId = req.user.id;
+
+  logUserActivity(userId, 'Logged Out');
+
+  res.json({ message: 'Logout successful' });
+};
 
 
 
 module.exports = {
   register,
   login,
-  setPassword
+  setPassword,
+  logout
 };
