@@ -16,7 +16,6 @@ const getStats = (req, res) => {
 
       stats.totalUsers = stats.parents + stats.children;
 
-      // Count videos
       db.query("SELECT COUNT(*) AS videoCount FROM videos", (err, videoResult) => {
         if (err) return res.status(500).json({ error: 'DB error (videos)' });
         stats.videos = videoResult[0].videoCount;
@@ -29,13 +28,19 @@ const getStats = (req, res) => {
             if (err) return res.status(500).json({ error: 'DB error' });
             stats.quizzes = quizResult[0].quizCount;
 
-            res.json(stats);
+            db.query("SELECT COUNT(*) AS blogCount FROM blogs", (err, blogResult) => {
+              if (err) return res.status(500).json({ error: 'DB error' });
+              stats.blogs = blogResult[0].blogCount;
+
+              res.json(stats);
+            });
           });
         });
       });
     });
   });
 };
+
 
 const getAllParents = (req, res) => {
   const sql = `
@@ -156,6 +161,24 @@ const updateAdminProfile = (req, res) => {
   });
 }
 
+const getAllParentsWithChildren = (req, res) => {
+  try {
+    const allParents = User.getAllParents();
+
+    console.log(allParents);
+    
+    res.status(200).json({
+      success: true,
+      data: allParents
+    });
+  } catch (err) {
+    console.error('Error fetching parents with children:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching parents and their children'
+    });
+  }
+};
 
 module.exports = {
   getStats,
@@ -168,5 +191,6 @@ module.exports = {
   updateChild,
   deleteChild,
   getAdminProfile,
-  updateAdminProfile
+  updateAdminProfile,
+  getAllParentsWithChildren
 };

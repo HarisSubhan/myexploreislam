@@ -142,6 +142,15 @@ const initDB = () => {
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
   )`;
 
+  const userActivityTable=`CREATE TABLE IF NOT EXISTS user_activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    metadata TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )`;
+
 
   db.query(userTable, (err) => {
     if (err) {
@@ -260,6 +269,14 @@ const initDB = () => {
       console.log("❌ Error creating Assignment Submission table:", err.message);
     } else {
       console.log("✅ Assignment Submission table ready.");
+    }
+  });
+
+  db.query(userActivityTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating User Activity table:", err.message);
+    } else {
+      console.log("✅ User Activity table ready.");
     }
   });
 
