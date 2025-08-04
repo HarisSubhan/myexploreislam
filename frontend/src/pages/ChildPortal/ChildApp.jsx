@@ -15,9 +15,9 @@ const ChildApp = () => {
   const menuItems = [
     { icon: <FaUser size={50} />, label: "Account", path: "/child/profile", color: "#FFD166" },
     { icon: <FaBook size={50} />, label: "Modules", path: "/child", color: "#F1066c" },
-    { icon: <FaEnvelope size={50} />, label: "Inbox", path: "/inbox", color: "#06D6A0" },
-    { icon: <FaHistory size={50} />, label: "History", path: "/history", color: "#3A86FF" },
-    { icon: <FaQuestionCircle size={50} />, label: "Help", path: "/help", color: "#FB5607" }
+    { icon: <FaEnvelope size={50} />, label: "Notification", path: "/child/notifications", color: "#06D6A0" },
+    { icon: <FaHistory size={50} />, label: "History", path: "/child/history", color: "#3A86FF" },
+    { icon: <FaQuestionCircle size={50} />, label: "Help", path: "/child/help-Support", color: "#FB5607" }
   ];
 
   const handleNavigation = (path) => {
