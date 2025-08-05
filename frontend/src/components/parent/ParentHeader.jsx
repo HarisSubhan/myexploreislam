@@ -40,7 +40,7 @@ const ParentHeader = ({
         width: '100%',
         marginLeft: 0,
         zIndex: muiTheme.zIndex.drawer + 1,
-        // No need to adjust width/marginLeft based on sidebar for a fixed AppBar
+        
       }}
     >
       <Toolbar>
@@ -49,7 +49,7 @@ const ParentHeader = ({
           aria-label="open drawer"
           edge="start"
           onClick={toggleSidebar}
-          sx={{ mr: { xs: 1, sm: 2 } }} // Slightly less margin on xs
+          sx={{ mr: { xs: 1, sm: 2 } }} 
         >
           <MenuIcon />
         </IconButton>
@@ -59,9 +59,9 @@ const ParentHeader = ({
           src={logo}
           alt="Logo"
           sx={{
-            height: { xs: 30, sm: 40, lg:60 }, // Responsive logo height
+            height: { xs: 30, sm: 40, lg:60 }, 
             mr: 2,
-            // display: { xs: 'none', sm: 'block' } // Keep if you want to hide on xs
+          
           }}
         />
 
@@ -71,7 +71,7 @@ const ParentHeader = ({
           component="div"
           sx={{
             flexGrow: 1,
-            display: { xs: 'none', sm: 'block' } // Hide title on very small screens
+            display: { xs: 'none', sm: 'block' } 
           }}
         >
           Explore Islam
