@@ -125,36 +125,9 @@ const ChildAdd = () => {
               )}
 
               <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="email">
-                  <Form.Label>Email Address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    isInvalid={!!errors.email}
-                    placeholder="Enter child's email"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                
 
-                <Form.Group className="mb-3" controlId="phone">
-                  <Form.Label>Phone Number</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    isInvalid={!!errors.phone}
-                    placeholder="Enter phone number"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.phone}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
+               
                 <Form.Group className="mb-3" controlId="name">
                   <Form.Label>Child's Full Name</Form.Label>
                   <Form.Control
