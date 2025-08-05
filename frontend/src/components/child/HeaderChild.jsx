@@ -34,7 +34,7 @@ const HeaderChild = () => {
   const handleCloseOffcanvas = () => setShowOffcanvas(false);
   const handleShowOffcanvas = () => setShowOffcanvas(true);
 
-  // Memoize theme styles to prevent unnecessary re-renders
+
   const themeStyles = useMemo(
     () => ({
       backgroundColor: themeColor,
