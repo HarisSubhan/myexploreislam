@@ -118,7 +118,7 @@ const ParentHeader = ({
             </MenuItem>
             <MenuItem
               component={RouterLink}
-              to="/parent/settings" 
+              to="/parent/defaulttheme" 
               onClick={handleCloseUserMenu}
             >
               <Typography textAlign="center">Settings</Typography>
