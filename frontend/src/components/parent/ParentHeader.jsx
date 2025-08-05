@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, useTheme, Menu, MenuItem, Divider } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-<<<<<<< HEAD
-import { Navigate, Link as RouterLink, useNavigate } from 'react-router-dom'; // For MenuItem links
-=======
 import { Link as RouterLink, useNavigate } from 'react-router-dom'; // For MenuItem links
->>>>>>> 536343f9ad65f3ee96a1d9a0cc802b70d513fb93
 
 
 import Brightness4Icon from '@mui/icons-material/Brightness4'; 
