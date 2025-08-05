@@ -4,25 +4,54 @@ import { Container, Card, Accordion, ListGroup, Badge } from 'react-bootstrap';
 const FaqsPage = () => {
   const faqs = [
     {
-      question: "Why is the sky blue?",
-      answer: "The sky looks blue because sunlight gets scattered in all directions by the gases in our atmosphere. Blue light scatters more than other colors because it travels as shorter waves!"
+      question: "What is Explore Islam?",
+      answer:
+        "Explore Islam is an online educational platform designed to teach children aged 8–12 about Islam through animated videos, interactive lessons, and fun quizzes - all based on authentic Islamic teachings.",
     },
     {
-      question: "How do birds fly?",
-      answer: "Birds fly by flapping their wings, which pushes air downward and lifts them up. Their light bones, strong muscles, and special feather shapes all help them stay in the air!"
+      question: "How does the platform work?",
+      answer:
+        "Children watch engaging episodes featuring the characters Maryam and Muaz, who explore Islamic values, stories, and everyday situations through animated adventures. Each module ends with a quiz to help reinforce learning in a fun and easy way.",
     },
     {
-      question: "Why do we need to sleep?",
-      answer: "Sleep helps our bodies and brains grow and recharge. While we sleep, our bodies repair themselves and our brains organize all the things we learned during the day!"
+      question: "Is this a good homeschooling tool?",
+      answer:
+        "Yes! Explore Islam is perfect for homeschooling families looking for structured, child-friendly Islamic education. Our platform covers essential Islamic topics in a way that keeps kids excited to learn, while helping parents stay involved",
     },
     {
-      question: "Where does the sun go at night?",
-      answer: "The sun doesn't actually go anywhere! It stays in place while our planet Earth spins around. When our part of Earth turns away from the sun, it becomes night time for us."
+      question: "Is the content suitable for beginners?",
+      answer:
+        "Yes. Whether your child is new to learning about Islam or already familiar with the basics, our platform is designed to be easy to understand, engaging, and rooted in authentic teachings - making it helpful even for families just starting their Islamic journey.",
     },
     {
-      question: "Why do we have to eat vegetables?",
-      answer: "Vegetables are packed with vitamins and minerals that help us grow strong and stay healthy. They're like nature's magic potions that give us superpowers against germs!"
-    }
+      question: "What makes Explore Islam different from other platforms?",
+      answer:
+        "We combine visual storytelling, child-friendly language, and interactive tools in one place. The cartoon series Maryam and Muaz is unique to our platform and helps children connect emotionally with the content, while the built-in quizzes make learning active, not passive.",
+    },
+    {
+      question: "What kind of topics are covered?",
+      answer:
+        "We cover topics like the Five Pillars of Islam, stories of the Prophets, good manners (Akhlaq), understanding Allah’s names, and more - all taught through storytelling, activities, and child-appropriate explanations",
+    },
+    {
+      question: "Can parents track their child’s progress?",
+      answer:
+        "Yes. Parents can create a separate login to track their child’s learning progress, quiz scores,and lesson completion. This helps you stay involved in their Islamic education and support their growth.",
+    },
+    {
+      question: "Can multiple children use the platform?",
+      answer:
+        "Yes, you can create multiple child profiles under one parent account. Each child can go through the modules at their own pace and have separate progress tracking.",
+    },
+    {
+      question: "Is the platform helpful for families new to practicing Islam?",
+      answer:
+        "Absolutely. If you’re a new Muslim or returning to Islamic teachings and want your child to start learning with you, Explore Islam provides a gentle, structured path to start building Islamic knowledge together",
+    },
+    {
+      question: "Is the platform mobile friendly?",
+      answer : "Yes! You can access Explore Islam on your phone, tablet, or computer - making it easy for kids to learn from anywhere, anytime."
+     },
   ];
 
   return (
