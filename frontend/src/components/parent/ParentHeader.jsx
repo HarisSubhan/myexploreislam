@@ -32,18 +32,10 @@ const ParentHeader = ({
   };
 
  const handleLogout = () => {
-<<<<<<< HEAD
-    localStorage.removeItem("token");
-    navigate("/login"); 
-    // console.log("Logout action triggered");
-    handleCloseUserMenu(); 
-  };
-=======
    localStorage.removeItem("token"); 
    handleCloseUserMenu();
    navigate("/login");
  };
->>>>>>> 536343f9ad65f3ee96a1d9a0cc802b70d513fb93
 
   return (
     <AppBar
