@@ -11,7 +11,7 @@ const initDB = () => {
       phone_number VARCHAR(20) DEFAULT NULL,
       subscription_id INT,
       is_active BOOLEAN DEFAULT 1,
-      is_deleted BOOLEAN DEFAULT NULL,
+      is_deleted BOOLEAN DEFAULT 0,
       role ENUM('admin', 'parent', 'child') DEFAULT 'parent',
       max_children INT DEFAULT 2,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -28,6 +28,7 @@ const initDB = () => {
       color VARCHAR(20),
       parent_id INT,
       is_active BOOLEAN DEFAULT 1,
+      is_deleted BOOLEAN DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
     )

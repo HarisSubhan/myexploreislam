@@ -38,10 +38,10 @@ const MainFooter = () => {
                 { name: "Home", url: "/" },
                 {
                   name: "Subscription",
-                  url: "http://localhost:5173/Subscription",
+                  url: "/Subscription",
                 },
-                { name: "Blog", url: "http://localhost:5173/blog" },
-                { name: "FAQs", url: "http://localhost:5173/faqs" },
+                { name: "Blog", url: "/blog" },
+                { name: "FAQs", url: "/faqs" },
               ].map((link, idx) => (
                 <li key={idx}>
                   <a
@@ -63,10 +63,10 @@ const MainFooter = () => {
               {[
                 {
                   name: "About Islam",
-                  url: "http://localhost:5173/about-islam",
+                  url: "/about-islam",
                 },
-                { name: "Contact", url: "http://localhost:5173/Contact" },
-                { name: "Login", url: "http://localhost:5173/login" },
+                { name: "Contact", url: "/Contact" },
+                { name: "Login", url: "/login" },
               ].map((link, idx) => (
                 <li key={idx}>
                   <a

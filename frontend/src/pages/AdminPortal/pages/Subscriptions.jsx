@@ -148,12 +148,14 @@ const ManageSubscriptions = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">Manage Subscriptions</h2>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="mb-4">Manage Subscriptions</h2>
 
-        {/* Add Button */}
-        <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
-          + Add Subscription
-        </Button>
+          {/* Add Button */}
+          <Button variant="success" className="mb-3" onClick={() => setShowModal(true)}>
+            Add Subscription
+          </Button>
+        </div>
 
         {/* Modal Form */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>

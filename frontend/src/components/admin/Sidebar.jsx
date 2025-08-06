@@ -6,10 +6,12 @@ import { MdQuiz, MdAssignment, MdSubscriptions, MdDashboard, MdOutlineViewModule
 import { FaUserFriends, FaChild, FaVideo, FaBookOpen, FaBlogger, FaTrashAlt  } from "react-icons/fa";
 import { BiSolidCategory } from "react-icons/bi";
 import { IoSettings } from "react-icons/io5";
+import whiteLogo from '@images/white_logo.png';
 
 const Sidebar = () => {
   return (
     <div style={{ width: '250px', backgroundColor: 'black', color: '#fff', height: '100vh' }} className="p-3">
+      <img src={whiteLogo} alt="Explore Islam Logo" style={{ height: '50px', marginBottom: '10px' }} />
       <h4 className="mb-4"> Explore Islam</h4>
       <Nav className="flex-column">
         <Nav.Link as={Link} to="/admin/dashboard" className="text-white"><MdDashboard /> Dashboard</Nav.Link>

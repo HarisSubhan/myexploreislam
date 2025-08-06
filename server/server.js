@@ -34,7 +34,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+
 app.use('/api', authRoutes);
+
 app.use('/api/parent', parentRoutes);
 
 app.use('/api/admin', adminRoutes);
@@ -62,6 +64,7 @@ app.use('/api/child-requests', childRequestsRoutes);
 app.use('/api/child', childRoutes);
 
 app.use('/api/quiz-submissions', quizSubmissionRoutes);
+
 app.use('/api/assignment-submissions', assignmentSubmissionRoutes);
 
 app.use('/api', adminRoutes);
