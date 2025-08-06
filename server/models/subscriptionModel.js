@@ -26,14 +26,56 @@ const getAll = (callback) => {
   db.query('SELECT * FROM subscriptions ORDER BY created_at DESC', callback);
 };
 
+const getAllActive = (callback) => {
+  db.query('SELECT * FROM subscriptions where is_active=1 ORDER BY created_at DESC', callback);
+};
+
 const cancel = (parent_id, callback) => {
   const sql = `UPDATE subscriptions SET is_active = FALSE WHERE parent_id = ?`;
   db.query(sql, [parent_id], callback);
 };
 
+const update = (id, data, callback) => {
+  const sql = `
+    UPDATE subscriptions SET 
+    plan_name = ?, 
+    price = ?, 
+    max_children = ?, 
+    start_date = ?, 
+    end_date = ? 
+    WHERE id = ?
+  `;
+  const values = [
+    data.plan_name,
+    data.price,
+    data.max_children,
+    data.start_date,
+    data.end_date,
+    id
+  ];
+  db.query(sql, values, callback);
+};
+
+const updateStatus = (id, data, callback) => {
+  const sql = `
+    UPDATE subscriptions SET 
+    is_active = ?
+    WHERE id = ?
+  `;
+  const values = [
+    data.is_active,
+    id
+  ];
+  db.query(sql, values, callback);
+};
+
+
 module.exports = {
   create,
   getByParentId,
   getAll,
-  cancel
+  cancel,
+  update,
+  updateStatus,
+  getAllActive
 };
