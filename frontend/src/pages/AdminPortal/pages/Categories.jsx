@@ -69,19 +69,22 @@ const ManageCategories = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">📂 Manage Categories</h2>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="mb-4">Manage Categories</h2>
 
-        <Button
-          variant="primary"
-          className="mb-3"
-          onClick={() => {
-            setNewCategory("");
-            setEditingCategory(null);
-            setShowModal(true);
-          }}
-        >
-          ➕ Add Category
-        </Button>
+          <Button
+            variant="primary"
+            className="mb-3"
+            onClick={() => {
+              setNewCategory("");
+              setEditingCategory(null);
+              setShowModal(true);
+            }}
+          >
+            Add Category
+          </Button>
+
+        </div>
 
         <Table bordered striped hover responsive>
           <thead>

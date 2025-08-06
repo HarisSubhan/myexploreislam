@@ -44,9 +44,40 @@ const cancelSubscription = (req, res) => {
   });
 };
 
+const updateSubscription = (req, res) => {
+  const subscriptionId = req.params.id;
+  const { plan_name, price, max_children, start_date, end_date } = req.body;
+
+  Subscription.update(subscriptionId, { plan_name, price, max_children, start_date, end_date }, (err) => {
+    if (err) return res.status(500).json({ error: 'Update failed' });
+    res.json({ message: 'Subscription updated successfully' });
+  });
+};
+
+const activeInactiveSubscription = (req, res) => {
+  const subscriptionId = req.params.id;
+  const { is_active } = req.body;
+
+  Subscription.updateStatus(subscriptionId, { is_active }, (err) => {
+    if (err) return res.status(500).json({ error: 'Update failed' });
+    res.json({ message: 'Subscription updated successfully' });
+  });
+};
+
+const getAllActiveSubscriptions = (req, res) => {
+  Subscription.getAllActive((err, results) => {
+    if (err) return res.status(500).json({ error: 'Error fetching subscriptions' });
+    res.json(results);
+  });
+};
+
+
 module.exports = {
   subscribe,
   getMySubscription,
   getAllSubscriptions,
-  cancelSubscription
+  cancelSubscription,
+  updateSubscription,
+  activeInactiveSubscription,
+  getAllActiveSubscriptions
 };
