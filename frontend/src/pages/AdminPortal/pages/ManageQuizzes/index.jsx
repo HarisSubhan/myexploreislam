@@ -53,11 +53,13 @@ const ManageQuizzes = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">📝 Manage Quizzes</h2>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="mb-4">Manage Quizzes</h2>
 
-        <Link to="/admin/manage-quizzes/add">
-          <Button variant="success" className="mb-3">➕ Add Quiz</Button>
-        </Link>
+          <Link to="/admin/manage-quizzes/add">
+            <Button variant="success" className="mb-3">Add Quiz</Button>
+          </Link>
+        </div>
 
         {loading ? (
           <p>Loading...</p>

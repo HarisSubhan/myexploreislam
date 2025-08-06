@@ -9,7 +9,9 @@ router.use(verifyToken, isAdmin);
 
 router.get('/stats', adminController.getStats);
 router.get('/parents', adminController.getAllParents);
+router.put('/parent_soft_delete/:id', adminController.softDeleteParent);
 router.get('/children', adminController.getAllChildren);
+router.put('/child_soft_delete/:id', adminController.softDeleteChildren);
 
 // Parents
 router.get('/parent/:id', adminController.getSingleParent);
