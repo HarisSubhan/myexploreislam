@@ -2,14 +2,16 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { MdQuiz, MdAssignment, MdSubscriptions, MdDashboard  } from "react-icons/md";
-import { FaUserFriends, FaChild, FaVideo, FaBookOpen, FaBlogger } from "react-icons/fa";
+import { MdQuiz, MdAssignment, MdSubscriptions, MdDashboard, MdOutlineViewModule } from "react-icons/md";
+import { FaUserFriends, FaChild, FaVideo, FaBookOpen, FaBlogger, FaTrashAlt  } from "react-icons/fa";
 import { BiSolidCategory } from "react-icons/bi";
 import { IoSettings } from "react-icons/io5";
+import whiteLogo from '@images/white_logo.png';
 
 const Sidebar = () => {
   return (
     <div style={{ width: '250px', backgroundColor: 'black', color: '#fff', height: '100vh' }} className="p-3">
+      <img src={whiteLogo} alt="Explore Islam Logo" style={{ height: '50px', marginBottom: '10px' }} />
       <h4 className="mb-4"> Explore Islam</h4>
       <Nav className="flex-column">
         <Nav.Link as={Link} to="/admin/dashboard" className="text-white"><MdDashboard /> Dashboard</Nav.Link>
@@ -26,6 +28,8 @@ const Sidebar = () => {
         <Nav.Link as={Link} to="/admin/blogs" className="text-white"><FaBlogger /> Manage Blogs</Nav.Link>
         <Nav.Link as={Link} to="/admin/subscriptions" className="text-white"><MdSubscriptions /> Subscriptions</Nav.Link>
         <Nav.Link as={Link} to="/admin/categories" className="text-white"><BiSolidCategory /> Categories</Nav.Link>
+        <Nav.Link as={Link} to="/admin/categories" className="text-white"><FaTrashAlt /> Trash</Nav.Link>
+        <Nav.Link as={Link} to="/admin/categories" className="text-white"><MdOutlineViewModule /> Module</Nav.Link>
         <Nav.Link as={Link} to="/admin/settings" className="text-white"><IoSettings /> Settings</Nav.Link>
       </Nav>
     </div>

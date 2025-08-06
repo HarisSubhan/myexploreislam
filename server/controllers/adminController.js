@@ -16,7 +16,6 @@ const getStats = (req, res) => {
 
       stats.totalUsers = stats.parents + stats.children;
 
-      // Count videos
       db.query("SELECT COUNT(*) AS videoCount FROM videos", (err, videoResult) => {
         if (err) return res.status(500).json({ error: 'DB error (videos)' });
         stats.videos = videoResult[0].videoCount;
@@ -29,7 +28,12 @@ const getStats = (req, res) => {
             if (err) return res.status(500).json({ error: 'DB error' });
             stats.quizzes = quizResult[0].quizCount;
 
-            res.json(stats);
+            db.query("SELECT COUNT(*) AS blogCount FROM blogs", (err, blogResult) => {
+              if (err) return res.status(500).json({ error: 'DB error' });
+              stats.blogs = blogResult[0].blogCount;
+
+              res.json(stats);
+            });
           });
         });
       });
@@ -37,12 +41,13 @@ const getStats = (req, res) => {
   });
 };
 
+
 const getAllParents = (req, res) => {
   const sql = `
-    SELECT u.id, u.name, u.email, COUNT(c.id) AS child_count
+    SELECT u.id, u.name, u.email, u.phone_number, u.is_active, COUNT(c.id) AS child_count
     FROM users u
     LEFT JOIN children c ON u.id = c.parent_id
-    WHERE u.role = 'parent'
+    WHERE u.role = 'parent' AND u.is_deleted <> 1
     GROUP BY u.id
   `;
   db.query(sql, (err, results) => {
@@ -53,9 +58,10 @@ const getAllParents = (req, res) => {
 
 const getAllChildren = (req, res) => {
   const sql = `
-    SELECT c.id, c.name, c.email, u.name AS parent_name
+    SELECT c.id, c.name, c.email, u.name AS parent_name, c.is_active
     FROM children c
     JOIN users u ON c.parent_id = u.id
+    Where c.is_deleted <> 1
   `;
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: 'DB error' });
@@ -88,6 +94,24 @@ const deleteParent = (req, res) => {
   db.query("DELETE FROM users WHERE id = ? AND role = 'parent'", [id], (err) => {
     if (err) return res.status(500).json({ error: 'Delete failed' });
     res.json({ message: 'Parent deleted' });
+  });
+};
+
+const softDeleteParent = (req, res) => {
+  const { id } = req.params;
+
+  db.query("UPDATE users SET is_deleted = 1 WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json({ error: 'Delete failed' });
+    res.json({ message: 'Parent deleted' });
+  });
+};
+
+const softDeleteChildren = (req, res) => {
+  const { id } = req.params;
+
+  db.query("UPDATE children SET is_deleted = 1 WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json({ error: 'Delete failed' });
+    res.json({ message: 'Child deleted' });
   });
 };
 
@@ -156,6 +180,102 @@ const updateAdminProfile = (req, res) => {
   });
 }
 
+const getAllUsers = (req, res) => {
+  const getParentsQuery = `
+    SELECT 
+      u.id AS user_id,
+      u.name AS user_name,
+      u.email,
+      u.role,
+      u.is_active,
+      u.subscription_id,
+      s.plan_name,
+      (
+        SELECT MAX(created_at)
+        FROM user_activity_logs
+        WHERE user_id = u.id AND action = 'Logged In'
+      ) AS last_login
+    FROM users u
+    LEFT JOIN subscriptions s ON u.subscription_id = s.id
+    WHERE u.role = 'parent'
+  `;
+
+  const getChildrenQuery = `
+    SELECT 
+      c.id AS child_id,
+      c.name AS child_name,
+      c.email AS child_email,
+      c.created_at,
+      c.is_active,
+      u.id AS parent_id,
+      u.name AS parent_name,
+      u.email AS parent_email,
+      u.is_active,
+      u.subscription_id,
+    s.plan_name,
+    (
+      SELECT MAX(ual.created_at)
+      FROM user_activity_logs ual
+      WHERE ual.user_id = c.id AND ual.action = 'Logged In'
+    ) AS child_last_login
+  FROM children c
+  JOIN users u ON u.id = c.parent_id
+  LEFT JOIN subscriptions s ON u.subscription_id = s.id
+  `;
+
+  db.query(getParentsQuery, (err, parents) => {
+    if (err) {
+      console.error('Error fetching parents:', err);
+      return res.status(500).json({ error: 'Error fetching parents' });
+    }
+
+    db.query(getChildrenQuery, (err2, children) => {
+      if (err2) {
+        console.error('Error fetching children:', err2);
+        return res.status(500).json({ error: 'Error fetching children' });
+      }
+
+      const formattedParents = parents.map(p => ({
+        type: 'parent',
+        user_id: p.user_id,
+        name: p.user_name,
+        email: p.email,
+        role: p.role,
+        is_active: p.is_active,
+        subscription: {
+          id: p.subscription_id,
+          plan_name: p.plan_name || null
+        },
+        lastLogin: p.last_login,
+      }));
+
+      const formattedChildren = children.map(c => ({
+        type: 'child',
+        child_id: c.child_id,
+        name: c.child_name,
+        email: c.child_email,
+        color: c.color,
+        created_at: c.created_at,
+        is_active: c.is_active,
+        lastLogin: c.child_last_login,
+        parent: {
+          id: c.parent_id,
+          name: c.parent_name,
+          email: c.parent_email,
+          subscription: {
+            id: c.subscription_id,
+            plan_name: c.plan_name || null
+          },
+        }
+      }));
+
+      const allUsers = [...formattedParents, ...formattedChildren];
+      res.json(allUsers);
+    });
+  });
+};
+
+
 
 module.exports = {
   getStats,
@@ -168,5 +288,8 @@ module.exports = {
   updateChild,
   deleteChild,
   getAdminProfile,
-  updateAdminProfile
+  updateAdminProfile,
+  getAllUsers,
+  softDeleteParent,
+  softDeleteChildren
 };

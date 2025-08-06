@@ -6,7 +6,6 @@ import {
 import AdminLayout from '../AdminApp';
 import axios from 'axios';
 import IncomeChart from '../../../components/admin/IncomeChart';
-// import RecentActivity from "../../../components/admin/RecentActivity";
 import RecentActivity from "../../../components/admin/RecentActivity";
 import UsersTable from "../../../components/admin/UsersTable";
 import TopPerformingStudents from "../../../components/admin/TopPerformingStudents";
@@ -33,8 +32,8 @@ const Dashboard = () => {
           },
         });
         setStats({
-          totalParents: res.data.totalParents || 0,
-          totalChildren: res.data.totalChildren || 0,
+          totalParents: res.data.parents || 0,
+          totalChildren: res.data.children || 0,
           videos: res.data.videos || 0,
           assignments: res.data.assignments || 0,
           quizzes: res.data.quizzes || 0,
