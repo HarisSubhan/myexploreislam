@@ -39,17 +39,10 @@ const findChildByEmail = (email, callback) => {
   db.query(query, [email], callback);
 };
 
-const getAllParents = async () => {
-  const [rows] = await db.query("SELECT * FROM users WHERE role = 'parent'");
-  return rows;
-};
-
-
 module.exports = {
   createUser,
   findUserByEmail,
   getById,
   updateByID,
-  findChildByEmail,
-  getAllParents
+  findChildByEmail
 };

@@ -25,6 +25,6 @@ router.delete('/child/:id', adminController.deleteChild);
 router.get('/profile', adminController.getAdminProfile);
 router.put('/profile', adminController.updateAdminProfile);
 
-router.get('/users', verifyToken, adminController.getAllParentsWithChildren);
+router.get('/users', adminController.getAllUsers);
 
 module.exports = router;

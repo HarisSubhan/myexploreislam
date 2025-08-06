@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const db = require('./config/db');
+// const db = require('./config/db');
 const initDB = require('./config/initDB');
 const authRoutes = require('./routes/authRoutes');
 const parentRoutes = require('./routes/parentRoutes');
@@ -42,9 +42,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/videos', videoRoutes);
-
-// app.use('/uploads', express.static('uploads'));
-
 
 app.use('/api/books', bookRoutes);
 

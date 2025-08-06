@@ -161,24 +161,75 @@ const updateAdminProfile = (req, res) => {
   });
 }
 
-const getAllParentsWithChildren = (req, res) => {
-  try {
-    const allParents = User.getAllParents();
+const getAllUsers = (req, res) => {
+  const getParentsQuery = `
+    SELECT 
+      id AS user_id,
+      name AS user_name,
+      email,
+      role,
+      is_active
+    FROM users
+    WHERE role = 'parent'
+  `;
 
-    console.log(allParents);
-    
-    res.status(200).json({
-      success: true,
-      data: allParents
+  const getChildrenQuery = `
+    SELECT 
+      c.id AS child_id,
+      c.name AS child_name,
+      c.email AS child_email,
+      c.color,
+      c.created_at,
+      u.id AS parent_id,
+      u.name AS parent_name,
+      u.email AS parent_email,
+      u.is_active
+    FROM children c
+    JOIN users u ON u.id = c.parent_id
+  `;
+
+  db.query(getParentsQuery, (err, parents) => {
+    if (err) {
+      console.error('Error fetching parents:', err);
+      return res.status(500).json({ error: 'Error fetching parents' });
+    }
+
+    db.query(getChildrenQuery, (err2, children) => {
+      if (err2) {
+        console.error('Error fetching children:', err2);
+        return res.status(500).json({ error: 'Error fetching children' });
+      }
+
+      const formattedParents = parents.map(p => ({
+        type: 'parent',
+        user_id: p.user_id,
+        name: p.user_name,
+        email: p.email,
+        role: p.role,
+        is_active: p.is_active
+      }));
+
+      const formattedChildren = children.map(c => ({
+        type: 'child',
+        child_id: c.child_id,
+        name: c.child_name,
+        email: c.child_email,
+        color: c.color,
+        created_at: c.created_at,
+        parent: {
+          id: c.parent_id,
+          name: c.parent_name,
+          email: c.parent_email
+        }
+      }));
+
+      const allUsers = [...formattedParents, ...formattedChildren];
+      res.json(allUsers);
     });
-  } catch (err) {
-    console.error('Error fetching parents with children:', err);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching parents and their children'
-    });
-  }
+  });
 };
+
+
 
 module.exports = {
   getStats,
@@ -192,5 +243,5 @@ module.exports = {
   deleteChild,
   getAdminProfile,
   updateAdminProfile,
-  getAllParentsWithChildren
+  getAllUsers
 };
