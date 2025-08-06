@@ -27,6 +27,7 @@ const initDB = () => {
       password VARCHAR(255),
       color VARCHAR(20),
       parent_id INT,
+      is_active BOOLEAN DEFAULT 1,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
     )
@@ -40,6 +41,7 @@ const initDB = () => {
     thumbnail_url VARCHAR(255),
     video_url VARCHAR(255),
     category VARCHAR(100),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -48,6 +50,7 @@ const initDB = () => {
     title VARCHAR(255),
     description TEXT,
     category VARCHAR(100),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -72,6 +75,7 @@ const initDB = () => {
     pages INT,
     file_url VARCHAR(255),
     thumbnail_url VARCHAR(255),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -81,6 +85,7 @@ const initDB = () => {
     banner_image VARCHAR(255),
     publish_date DATE,
     description TEXT,
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -91,6 +96,7 @@ const initDB = () => {
     price DECIMAL(10, 2),
     max_children INT DEFAULT 2,     -- default 2 allowed
     is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN DEFAULT 0,
     start_date DATE,
     end_date DATE, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -104,12 +110,14 @@ const initDB = () => {
     description TEXT,
     file_url VARCHAR(255) NOT NULL,
     category VARCHAR(100),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
   const categoriesTable = `CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    is_deleted BOOLEAN DEFAULT 0
   )`;
 
   const childRequestTable = `CREATE TABLE IF NOT EXISTS child_requests (
@@ -147,6 +155,7 @@ const initDB = () => {
     user_id INT NOT NULL,
     action VARCHAR(255) NOT NULL,
     metadata TEXT,
+    role VARCHAR(10),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`;

@@ -104,7 +104,7 @@ const login = (req, res) => {
             { expiresIn: '1d' }
           );
 
-          logUserActivity(user.id, 'Logged In');
+          logUserActivity(child.id, 'Logged In');
 
           res.json({
             message: 'Login successful',
