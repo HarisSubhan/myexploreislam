@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, useTheme, Menu, MenuItem, Divider } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink } from 'react-router-dom'; // For MenuItem links
+import { Link as RouterLink, useNavigate } from 'react-router-dom'; // For MenuItem links
 
-// MUI Icons for theme toggle and profile
-import Brightness4Icon from '@mui/icons-material/Brightness4'; // Moon
-import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sun
+
+import Brightness4Icon from '@mui/icons-material/Brightness4'; 
+import Brightness7Icon from '@mui/icons-material/Brightness7'; 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-import logo from "@images/logo.png"; // Ensure this path is correct
+import logo from "@images/logo.png"; 
 
 const ParentHeader = ({
   toggleSidebar,
@@ -17,6 +17,7 @@ const ParentHeader = ({
 }) => {
   const muiTheme = useTheme();
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const navigate = useNavigate();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -26,11 +27,11 @@ const ParentHeader = ({
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logout action triggered");
-    handleCloseUserMenu();
-  };
+ const handleLogout = () => {
+   localStorage.removeItem("token"); 
+   handleCloseUserMenu();
+   navigate("/login");
+ };
 
   return (
     <AppBar
@@ -117,7 +118,7 @@ const ParentHeader = ({
             </MenuItem>
             <MenuItem
               component={RouterLink}
-              to="/parent/settings" 
+              to="/parent/defaulttheme" 
               onClick={handleCloseUserMenu}
             >
               <Typography textAlign="center">Settings</Typography>
