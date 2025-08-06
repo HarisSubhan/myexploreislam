@@ -14,14 +14,14 @@ const ManageAssignments = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }
     })
-    .then((res) => {
-      setAssignments(res.data);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Failed to fetch assignments", err);
-      setLoading(false);
-    });
+      .then((res) => {
+        setAssignments(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch assignments", err);
+        setLoading(false);
+      });
   }, []);
 
   const handleDelete = (id) => {
@@ -32,23 +32,25 @@ const ManageAssignments = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
       })
-      .then(() => {
-        setAssignments(assignments.filter((a) => a.id !== id));
-      })
-      .catch((err) => {
-        console.error("Failed to delete assignment", err);
-      });
+        .then(() => {
+          setAssignments(assignments.filter((a) => a.id !== id));
+        })
+        .catch((err) => {
+          console.error("Failed to delete assignment", err);
+        });
     }
   };
 
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">📚 Manage Assignments</h2>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="mb-4">Manage Assignments</h2>
 
-        <Link to="/admin/manage-assignments/add" className="btn btn-success mb-3">
-          ➕ Add Assignment
-        </Link>
+          <Link to="/admin/manage-assignments/add" className="btn btn-success mb-3">
+            Add Assignment
+          </Link>
+        </div>
 
         {loading ? (
           <p>Loading...</p>
