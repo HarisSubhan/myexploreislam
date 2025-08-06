@@ -43,24 +43,24 @@ const AddVideo = () => {
     if (videoType === "single") {
       formData.append("video", singleVideo);
     } else {
-      alert("🚧 Series upload is not yet supported.");
+      alert("Series upload is not yet supported.");
       return;
     }
 
     try {
       await uploadVideoApi(formData);
-      alert("✅ Video uploaded successfully!");
+      alert("Video uploaded successfully!");
       navigate("/admin/videos");
     } catch (error) {
       console.error("Upload error:", error);
-      alert("❌ Failed to upload video.");
+      alert("Failed to upload video.");
     }
   };
 
   return (
     <AdminLayout>
       <Container>
-        <h3 className="my-4">🎬 Add New Video</h3>
+        <h3 className="my-4">Add New Video</h3>
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
@@ -150,7 +150,7 @@ const AddVideo = () => {
           </Row>
 
           <Button type="submit" variant="danger">
-            🚀 Upload Video
+            Upload Video
           </Button>
         </Form>
       </Container>
