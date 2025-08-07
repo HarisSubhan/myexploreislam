@@ -1,4 +1,3 @@
-// src/components/RecentActivity.js
 import { Card, ListGroup } from "react-bootstrap";
 
 const activities = [

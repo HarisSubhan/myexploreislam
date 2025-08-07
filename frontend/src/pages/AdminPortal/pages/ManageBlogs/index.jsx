@@ -49,9 +49,9 @@ const ManageBlogs = () => {
     <AdminLayout>
       <div className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2>✍️ Manage Blogs</h2>
+          <h2>Manage Blogs</h2>
           <Link to="/admin/manage-blogs/add" className="btn btn-success">
-            ➕ Add Blog
+            Add Blog
           </Link>
         </div>
 
