@@ -5,12 +5,16 @@ const router = express.Router();
 const {
   register,
   login,
-  setPassword
+  setPassword,
+  logout
 } = require('../controllers/authController');
+
+const verifyToken = require('../middleware/auth');
 
 // Routes
 router.post('/register', register);
 router.post('/login', login);
-router.post('/set-password', setPassword); // 👈 admin sets password first time
+router.post('/set-password', setPassword);
+router.post('/logout', verifyToken, logout);
 
 module.exports = router;
