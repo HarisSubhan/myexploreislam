@@ -1,96 +1,102 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Badge } from "react-bootstrap";
 import Header from "../../../components/common/Header";
-import MainFooter from './../../../components/MainFooter';
-
-const plan = {
-  id: "pro",
-  name: "Pro",
-  price: 19.99,
-  displayPrice: "$19.99/month",
-  description: "For serious learners and regular users.",
-  features: [
-    "All Basic features",
-    "Unlimited device access",
-    "Priority support",
-    "Download content",
-  ],
-  variant: "outline-primary",
-  badge: "Most Popular",
-  max_children: 5,
-  duration_months: 6
-};
+import MainFooter from "./../../../components/MainFooter";
+import { getsubscriptionsAllActiveApi } from "../../../services/subscribeApi";
 
 const Subscription = () => {
   const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleSubscribeClick = () => {
-    navigate('/register', {
-      state: {
-        planData: {
-          plan_name: `${plan.name} Plan`,
-          price: plan.price,
-          max_children: plan.max_children,
-          start_date: new Date().toISOString().split('T')[0],
-          end_date: new Date(new Date().setMonth(new Date().getMonth() + plan.duration_months))
-                      .toISOString()
-                      .split('T')[0]
-        }
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const data = await getsubscriptionsAllActiveApi();
+        setPlans(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+        console.error("Failed to fetch plans:", err);
       }
+    };
+
+    fetchPlans();
+  }, []);
+
+  const handleSubscribeClick = (plan) => {
+    navigate("/register", {
+      state: {
+        subscription_id: plan.id, 
+        planData: plan, 
+      },
     });
   };
 
   return (
     <div>
-      <Header/>
+      <Header />
       <div className="bg-dark text-white py-5 text-center">
         <Container>
           <h1 className="display-4 fw-bold">Upgrade Your Learning Journey</h1>
           <p className="lead mt-3">
-            Choose our premium plan for the best learning experience. Cancel anytime.
+            Choose our premium plan for the best learning experience. Cancel
+            anytime.
           </p>
-          <Button 
-            variant="primary" 
-            size="lg" 
-            className="mt-3"
-            onClick={handleSubscribeClick}
-          >
-            Get Started
-          </Button>
+          {plans.length > 0 && (
+            <Button
+              variant="primary"
+              size="lg"
+              className="mt-3"
+              onClick={() => handleSubscribeClick(plans[0])}
+            >
+              Get Started
+            </Button>
+          )}
         </Container>
       </div>
 
       <Container className="my-5 text-center">
-        <h2 className="mb-4">Our Premium Plan</h2>
+        <h2 className="mb-4">Our Premium Plans</h2>
         <Row className="justify-content-center">
-          <Col md={6}>
-            <Card className="h-100 shadow-lg border-0">
-              <Card.Body className="d-flex flex-column">
-                <Badge bg="warning" text="dark" className="mb-2">
-                  {plan.badge}
-                </Badge>
-                <Card.Title className="fs-3">{plan.name}</Card.Title>
-                <Card.Subtitle className="text-muted mb-2">
-                  {plan.description}
-                </Card.Subtitle>
-                <h3 className="my-3">{plan.displayPrice}</h3>
-                <ul className="list-unstyled text-start flex-grow-1 px-3">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="mb-2">
-                      ✅ {feature}
+          {plans.map((plan) => (
+            <Col md={6} key={plan.id} className="mb-4">
+              <Card className="h-100 shadow-lg border-0">
+                <Card.Body className="d-flex flex-column">
+                  <Badge bg="warning" text="dark" className="mb-2">
+                    Popular
+                  </Badge>
+                  <Card.Title className="fs-3">{plan.plan_name}</Card.Title>
+                  <Card.Subtitle className="text-muted mb-2">
+                    {plan.max_children} children allowed
+                  </Card.Subtitle>
+                  <h3 className="my-3">${plan.price}</h3>
+                  <ul className="list-unstyled text-start flex-grow-1 px-3">
+                    <li className="mb-2">
+                      ✅ Valid from{" "}
+                      {new Date(plan.start_date).toLocaleDateString()}
                     </li>
-                  ))}
-                </ul>
-                <Button
-                  variant={plan.variant}
-                  onClick={handleSubscribeClick}
-                >
-                  Subscribe Now
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
+                    <li className="mb-2">
+                      ✅ Valid until{" "}
+                      {new Date(plan.end_date).toLocaleDateString()}
+                    </li>
+                    <li className="mb-2">
+                      ✅ Max {plan.max_children} children
+                    </li>
+                  </ul>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleSubscribeClick(plan)}
+                  >
+                    Subscribe Now
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
         </Row>
       </Container>
 
@@ -116,16 +122,18 @@ const Subscription = () => {
         <Container>
           <h2 className="fw-bold">Ready to Level Up?</h2>
           <p className="lead">Join thousands of learners and start today.</p>
-          <Button
-            variant="light"
-            size="lg"
-            onClick={handleSubscribeClick}
-          >
-            Subscribe Now
-          </Button>
+          {plans.length > 0 && (
+            <Button
+              variant="light"
+              size="lg"
+              onClick={() => handleSubscribeClick(plans[0])}
+            >
+              Subscribe Now
+            </Button>
+          )}
         </Container>
       </div>
-      <MainFooter/>
+      <MainFooter />
     </div>
   );
 };
