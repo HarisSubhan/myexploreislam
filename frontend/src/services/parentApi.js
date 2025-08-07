@@ -43,3 +43,25 @@ export const addChildColorAPi = async (colorData) => {
     throw error.response?.data || { message: "Failed to add child color" };
   }
 };
+
+
+export const requestChildApi = async (requested_children = 1) => {
+  const token = getToken();
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/child-requests`,
+      { requested_children }, // data payload
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to send request" };
+  }
+};
+

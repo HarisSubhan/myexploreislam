@@ -11,6 +11,7 @@ const ChangePassword = lazy(() => import("../pages/ParentPortal/pages/ChangePass
 const DefaultTheme = lazy(() => import("../pages/ParentPortal/pages/DefaultTheme"));
 const AddChild = lazy(() => import("../pages/ParentPortal/pages/AddChild"));
 const Account = lazy(() => import("../pages/ParentPortal/pages/Account"));
+const RequestChild = lazy(() => import("../components/parent/RequestChild"));
 
 const ParentRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const ParentRoutes = () => {
           <Route path="changepassword" element={<ChangePassword />} />
           <Route path="addchild" element={<AddChild />} />
           <Route path="defaulttheme" element={<DefaultTheme />} />
+          <Route path="requestchild" element={<RequestChild/>} />
         </Route>
       </Routes>
     </Suspense>
