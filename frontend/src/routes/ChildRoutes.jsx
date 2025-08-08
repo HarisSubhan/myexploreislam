@@ -9,6 +9,8 @@ const VideoModules = lazy(() => import("../pages/ChildPortal/pages/VideoModules"
 const NotificationPageChild = lazy(() => import("../pages/ChildPortal/pages/NotificationPageChild"));
 const HistoryPageChild =  lazy(() => import("../pages/ChildPortal/pages/HistoryPageChild"));
 const HelpPageChild = lazy(() => import("../pages/ChildPortal/pages/HelpPageChild"));
+const VideoSeries = lazy(() => import("../components/child/VideoSeries"));
+const VideoWatch = lazy(() => import("../components/child/VideoWatch"));
 const ChildRoutes = () => {
 
   return (
@@ -19,9 +21,11 @@ const ChildRoutes = () => {
           <Route path="profile" element={<ChildProfilePage />} />
           <Route path="cartoons" element={<CartoonModules />} />
           <Route path="videos" element={<VideoModules />} />
+          <Route path="videos/:category" element={<VideoSeries />} />
+          <Route path="videos/:category/watch" element={<VideoWatch />} />
           <Route path="notifications" element={<NotificationPageChild />} />
           <Route path="history" element={<HistoryPageChild />} />
-          <Route path= "help-Support" element={<HelpPageChild />} />
+          <Route path="help-Support" element={<HelpPageChild />} />
         </Route>
       </Routes>
     </Suspense>
