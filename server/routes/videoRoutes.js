@@ -6,6 +6,7 @@ const {
   uploadVideoFile,
   getAllVideos,
   getVideoById,
+  updateVideoById
 } = require('../controllers/videoController');
 
 // Setup multer
@@ -27,11 +28,16 @@ const upload = multer({ storage: videoStorage });
 router.post(
   '/upload',
   upload.fields([
-    { name: 'video', maxCount: 1 },
+    { name: 'video', maxCount: 20 },
     { name: 'thumbnail', maxCount: 1 },
   ]),
   uploadVideoFile
 );
+
+router.put('/videos/:id', upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), updateVideoById);
 
 router.get('/', getAllVideos);
 router.get('/:id', getVideoById);
