@@ -10,13 +10,13 @@ const modules = [
     title: "Modules", 
     icon: <FaTv size={28} className="text-white" />, 
     path: "/child/videos",
-    bgColor: "#FF6B6B" // Vibrant red
+    bgColor: "#FF6B6B" 
   },
   { 
     title: "Cartoons", 
     icon: <FaPalette size={28} className="text-white" />, 
     path: "/child/cartoons",
-    bgColor: "#4ECDC4" // Teal
+    bgColor: "#4ECDC4" 
   },
 ];
 
@@ -61,7 +61,7 @@ const ChildDashboard = () => {
                 e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
               }}
             >
-              {/* Icon floating above the image */}
+             
               <div 
                 style={{
                   position: 'absolute',
@@ -82,7 +82,7 @@ const ChildDashboard = () => {
                 {module.icon}
               </div>
               
-              {/* Main image container */}
+             
               <div 
                 style={{
                   height: '200px',
@@ -92,7 +92,7 @@ const ChildDashboard = () => {
                   position: 'relative'
                 }}
               >
-                {/* Gradient overlay */}
+                
                 <div 
                   style={{
                     position: 'absolute',
