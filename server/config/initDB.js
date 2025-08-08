@@ -40,11 +40,21 @@ const initDB = () => {
     title VARCHAR(255),
     description TEXT,
     thumbnail_url VARCHAR(255),
+    series_id INT,
     video_url VARCHAR(255),
     category VARCHAR(100),
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
+
+  const seriesTable = `CREATE TABLE IF NOT EXISTS series (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    thumbnail_url VARCHAR(255),
+    is_deleted BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`
 
   const quizTable = `CREATE TABLE IF NOT EXISTS quizzes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,7 +161,7 @@ const initDB = () => {
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
   )`;
 
-  const userActivityTable=`CREATE TABLE IF NOT EXISTS user_activity_logs (
+  const userActivityTable = `CREATE TABLE IF NOT EXISTS user_activity_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     action VARCHAR(255) NOT NULL,
@@ -198,6 +208,14 @@ const initDB = () => {
       console.log("❌ Error creating videos table:", err.message);
     } else {
       console.log("✅ Videos table ready.");
+    }
+  });
+
+  db.query(seriesTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating series table:", err.message);
+    } else {
+      console.log("✅ Series table ready.");
     }
   });
 

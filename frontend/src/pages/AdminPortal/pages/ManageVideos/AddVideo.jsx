@@ -15,9 +15,9 @@ const AddVideo = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [singleVideo, setSingleVideo] = useState(null);
   const [seriesVideos, setSeriesVideos] = useState([]);
-  const [categories, setCategories] = useState([]); 
+  const [categories, setCategories] = useState([]);
 
-  
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -43,8 +43,9 @@ const AddVideo = () => {
     if (videoType === "single") {
       formData.append("video", singleVideo);
     } else {
-      alert("Series upload is not yet supported.");
-      return;
+      for (let i = 0; i < seriesVideos.length; i++) {
+        formData.append("video", seriesVideos[i]);
+      }
     }
 
     try {

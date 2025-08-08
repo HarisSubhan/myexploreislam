@@ -77,7 +77,7 @@ const ManageParents = () => {
                 <td>{index + 1}</td>
                 <td>{parent.name}</td>
                 <td>{parent.email}</td>
-                <td>{parent.phone_number}</td>
+                <td>{(parent.phone_number) ? parent.phone_number : "NA"}</td>
                 <td>
                   {parent.is_active == 1 ? (
                     <span className="badge bg-success">Active</span>
@@ -109,7 +109,7 @@ const ManageParents = () => {
               <div>
                 <p><strong>Name:</strong> {selectedParent.name}</p>
                 <p><strong>Email:</strong> {selectedParent.email}</p>
-                <p><strong>Phone:</strong> {selectedParent.phone_number}</p>
+                <p><strong>Phone:</strong> {(selectedParent.phone_number) ? selectedParent.phone_number : "NA"}</p>
                 <p><strong>Status:</strong> {selectedParent.is_active == 1 ? (<span className="badge bg-success">Active</span>) : (<span className="badge bg-danger">In Active</span>)}
                 </p>
               </div>
