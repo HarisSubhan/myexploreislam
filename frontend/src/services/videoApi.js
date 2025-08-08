@@ -3,12 +3,12 @@ import { baseUrl, getToken } from "../services/config";
 
 export const uploadVideoApi = async (formData) => {
   try {
-    const token = getToken(); // If you're using auth
+    const token = getToken(); 
 
     const response = await axios.post(`${baseUrl}/api/videos/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`, // Include only if your backend requires token
+        Authorization: `Bearer ${token}`, 
       },
     });
 
@@ -44,3 +44,31 @@ export const getVideoByIdApi = async (id) => {
 
   return response.data;
 };
+
+export const getVideosByCategoryApi = async (categorySlug) => {
+  const token = getToken();
+
+  const response = await axios.get(`${baseUrl}/api/videos`, {
+    params: { category: categorySlug },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data; // probably an array of videos
+};
+
+// export const getVideosByCategoryApi = async (categorySlug) => {
+//   const token = getToken();
+
+//   const response = await axios.get(
+//     `${baseUrl}/api/videos/category/${categorySlug}`,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     }
+//   );
+
+//   return response.data;
+// };
