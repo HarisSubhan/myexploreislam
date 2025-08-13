@@ -21,6 +21,7 @@ const RegisterPage = () => {
 
   const [form, setForm] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     phone_number: "",
@@ -138,6 +139,16 @@ const RegisterPage = () => {
                     placeholder="Full Name"
                     name="name"
                     value={form.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    type="text"
+                    placeholder="User Name"
+                    name="username"
+                    value={form.username}
                     onChange={handleChange}
                     required
                   />

@@ -14,6 +14,7 @@ import AdminPasswordSetup from "./pages/SharedPortal/pages/AdminPasswordSetup";
 import ContactUs from "./pages/SharedPortal/pages/ContactUs";
 import FaqsPage from "./pages/SharedPortal/pages/FaqsPage";
 import AboutIslam from "./pages/SharedPortal/pages/AboutIslam";
+import { Toaster } from "react-hot-toast";
 
 
 function RequireAuth({ children, allowedRoles }) {
@@ -34,13 +35,14 @@ function RequireAuth({ children, allowedRoles }) {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         <Route element={<StaticApp />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:titleSlug" element={<BlogDetail />} />
-          <Route path="/Subscriptions" element={<Subscription/>} />
+          <Route path="/Subscriptions" element={<Subscription />} />
           <Route path="/Contact" element={<ContactUs />} />
           <Route path="/faqs" element={<FaqsPage />} />
           <Route path="/about-islam" element={<AboutIslam />} />
