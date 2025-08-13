@@ -33,6 +33,7 @@ import ViewBlog from "../pages/AdminPortal/pages/ManageBlogs/ViewBlog";
 import Subscriptions from "../pages/AdminPortal/pages/Subscriptions";
 import Categories from "../pages/AdminPortal/pages/Categories";
 import Settings from "../pages/AdminPortal/pages/Settings";
+import Modules from "../pages/AdminPortal/pages/Modules";
 
 
 
@@ -72,6 +73,7 @@ const AdminRoutes = () => {
       <Route path="subscriptions" element={<Subscriptions />} />
       <Route path="categories" element={<Categories />} />
       <Route path="settings" element={<Settings />} />
+      <Route path="modules" element={<Modules />} />
     </Routes>
   );
 };
