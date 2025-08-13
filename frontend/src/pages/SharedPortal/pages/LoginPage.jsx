@@ -15,6 +15,7 @@ import logo from "@images/logo.png";
 import { LoginApi } from "../../../services/api";
 import { useUser } from "../../../context/UserContext";
 import Header from "../../../components/common/Header";
+import toast from "react-hot-toast";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,20 +28,22 @@ function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Clear previous error
     setIsLoading(true);
 
     try {
-      const response = await LoginApi({ email, password });
-      const responseData = response.data || response;
+      const response = await LoginApi({
+        identifier: email.trim(),
+        password: password.trim(),
+      });
 
-      if (!responseData) throw new Error("Empty response from server");
-
-      const token = responseData.token || responseData.accessToken;
-      const user = responseData.user || responseData.data;
+      const token = response.token;
+      const user = response.user;
 
       if (!token || !user) {
-        throw new Error("Invalid response structure - missing token or user data");
+        throw new Error(
+          "Invalid response structure - missing token or user data"
+        );
       }
 
       localStorage.setItem("token", token);
@@ -53,6 +56,8 @@ function LoginPage() {
         avatar: user.avatar || null,
       });
 
+      toast.success("Login successful");
+
       const role = user.role.toLowerCase();
       const redirectPaths = {
         admin: "/admin/dashboard",
@@ -61,11 +66,12 @@ function LoginPage() {
       };
       navigate(redirectPaths[role] || "/");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        err.message ||
-        "Login failed. Please check your credentials and try again."
-      );
+      const backendMessage =
+        err.response?.data?.message || err.response?.data?.error || err.message;
+
+      setError(backendMessage); // Show in Alert
+      toast.error(backendMessage); // Show in toast
+    } finally {
       setIsLoading(false);
     }
   };
@@ -75,6 +81,7 @@ function LoginPage() {
       <Header />
       <Container fluid className="vh-100">
         <Row className="h-100">
+          {/* Left Side with Background Image */}
           <Col
             md={6}
             className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white p-0 position-relative"
@@ -88,6 +95,7 @@ function LoginPage() {
             />
           </Col>
 
+          {/* Right Side - Login Form */}
           <Col
             md={6}
             className="d-flex align-items-center justify-content-center"
@@ -95,11 +103,16 @@ function LoginPage() {
           >
             <div style={{ maxWidth: "400px", width: "100%" }}>
               <div className="text-center mb-4">
-                <img src={logo} alt="Explore Islam Logo" style={{ width: 300 }} />
+                <img
+                  src={logo}
+                  alt="Explore Islam Logo"
+                  style={{ width: 300 }}
+                />
                 <h2 className="mt-2 mb-1">Explore Islam</h2>
                 <div className="text-muted">Platform for Young Minds</div>
               </div>
 
+              {/* Error Alert */}
               {error && (
                 <Alert variant="danger" className="text-center">
                   {error}
@@ -109,8 +122,7 @@ function LoginPage() {
               <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3">
                   <Form.Control
-                    type="email"
-                    placeholder="Enter Email"
+                    placeholder="Enter Email or Username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
