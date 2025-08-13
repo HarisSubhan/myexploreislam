@@ -1,9 +1,8 @@
 const db = require('../config/db');
 
 const uploadVideoFile = (req, res) => {
-  const { title, description, category } = req.body;
+  const { title, description, category, series_id } = req.body;
 
-  // Validate files
   if (
     !req.files ||
     !req.files.video ||
@@ -17,40 +16,59 @@ const uploadVideoFile = (req, res) => {
   const videoFiles = req.files.video;
   const thumbnailPath = `/uploads/thumbnails/${req.files.thumbnail[0].filename}`;
 
-  // Check if it's a series (more than one video file)
-  const isSeries = videoFiles.length > 1;
+  // Series ka check — agar series_id mila OR ek saath multiple videos hain
+  const isSeries = !!series_id || videoFiles.length > 1;
 
   if (isSeries) {
-    // Handle multiple videos for series
-    const values = videoFiles.map((file) => [
-      title,
-      description,
-      thumbnailPath,
-      `/uploads/videos/${file.filename}`,
-      category
-    ]);
+    // Multiple videos ek saath upload
+    if (videoFiles.length > 1) {
+      const values = videoFiles.map((file) => [
+        title,
+        description,
+        thumbnailPath,
+        series_id || null,
+        `/uploads/videos/${file.filename}`,
+        category
+      ]);
 
-    const sql = `
-      INSERT INTO videos (title, description, thumbnail_url, video_url, category)
-      VALUES ?
-    `;
+      const sql = `
+        INSERT INTO videos (title, description, thumbnail_url, series_id, video_url, category)
+        VALUES ?
+      `;
 
-    db.query(sql, [values], (err) => {
-      if (err) {
-        console.error('DB Error:', err);
-        return res.status(500).json({ error: 'Database error during series upload.' });
-      }
-      res.status(201).json({ message: 'Series videos uploaded successfully.' });
-    });
+      db.query(sql, [values], (err) => {
+        if (err) {
+          console.error('DB Error:', err);
+          return res.status(500).json({ error: 'Database error during series upload.' });
+        }
+        res.status(201).json({ message: 'Series videos uploaded successfully.' });
+      });
+    } else {
+      // Single file but series ka part
+      const videoPath = `/uploads/videos/${videoFiles[0].filename}`;
+      const sql = `
+        INSERT INTO videos (title, description, thumbnail_url, series_id, video_url, category)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      db.query(
+        sql,
+        [title, description, thumbnailPath, series_id, videoPath, category],
+        (err) => {
+          if (err) {
+            console.error('DB Error:', err);
+            return res.status(500).json({ error: 'Database error during series upload.' });
+          }
+          res.status(201).json({ message: 'Series video uploaded successfully.' });
+        }
+      );
+    }
   } else {
-    // Handle single video
+    // Completely standalone video
     const videoPath = `/uploads/videos/${videoFiles[0].filename}`;
-
     const sql = `
       INSERT INTO videos (title, description, thumbnail_url, video_url, category)
       VALUES (?, ?, ?, ?, ?)
     `;
-
     db.query(
       sql,
       [title, description, thumbnailPath, videoPath, category],
@@ -64,6 +82,7 @@ const uploadVideoFile = (req, res) => {
     );
   }
 };
+
 
 
 const getAllVideos = (req, res) => {
