@@ -6,6 +6,7 @@ const initDB = () => {
     CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100),
+      username VARCHAR(100) UNIQUE,
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
       phone_number VARCHAR(20) DEFAULT NULL,
@@ -23,6 +24,7 @@ const initDB = () => {
     CREATE TABLE IF NOT EXISTS children (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100),
+      username VARCHAR(100) UNIQUE,
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
       color VARCHAR(20),
@@ -52,6 +54,15 @@ const initDB = () => {
     title VARCHAR(255),
     description TEXT,
     thumbnail_url VARCHAR(255),
+    is_deleted BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`
+
+  const modulesTable = `CREATE TABLE IF NOT EXISTS modules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    thumbnail_url VARCHAR(255),
+    is_active BOOLEAN DEFAULT 1,
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`
@@ -232,6 +243,14 @@ const initDB = () => {
       console.log("❌ Error creating Quiz Questions table:", err.message);
     } else {
       console.log("✅ Quiz Questions table ready.");
+    }
+  });
+
+  db.query(modulesTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Modules table:", err.message);
+    } else {
+      console.log("✅ Modules table ready.");
     }
   });
 

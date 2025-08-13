@@ -3,14 +3,22 @@ const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 
-const createUser = (name, email, password, role, phone_number, subscriptionId, callback) => {
-  const sql = 'INSERT INTO users (name, email, password, role, phone_number, subscription_id) VALUES (?, ?, ?, ?, ?, ?)';
-  db.query(sql, [name, email, password, role, phone_number, subscriptionId], callback);
+const createUser = (name, username, email, password, role, phone_number, subscription_id, callback) => {
+  db.query(
+    "INSERT INTO users (name, username, email, password, role, phone_number, subscription_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [name, username, email, password, role, phone_number, subscription_id],
+    callback
+  );
 };
+
 
 const findUserByEmail = (email, callback) => {
   const sql = 'SELECT * FROM users WHERE email = ?';
   db.query(sql, [email], callback);
+};
+
+const findUserByUsername = (username, callback) => {
+  db.query("SELECT * FROM users WHERE username = ?", [username], callback);
 };
 
 
@@ -44,5 +52,6 @@ module.exports = {
   findUserByEmail,
   getById,
   updateByID,
-  findChildByEmail
+  findChildByEmail,
+  findUserByUsername
 };
