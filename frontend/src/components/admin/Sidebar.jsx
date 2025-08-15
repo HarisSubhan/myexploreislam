@@ -29,7 +29,7 @@ const Sidebar = () => {
         <Nav.Link as={Link} to="/admin/subscriptions" className="text-white"><MdSubscriptions /> Subscriptions</Nav.Link>
         <Nav.Link as={Link} to="/admin/categories" className="text-white"><BiSolidCategory /> Categories</Nav.Link>
         <Nav.Link as={Link} to="/admin/categories" className="text-white"><FaTrashAlt /> Trash</Nav.Link>
-        <Nav.Link as={Link} to="/admin/categories" className="text-white"><MdOutlineViewModule /> Module</Nav.Link>
+        <Nav.Link as={Link} to="/admin/modules" className="text-white"><MdOutlineViewModule /> Module</Nav.Link>
         <Nav.Link as={Link} to="/admin/settings" className="text-white"><IoSettings /> Settings</Nav.Link>
       </Nav>
     </div>

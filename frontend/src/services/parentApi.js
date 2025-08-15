@@ -23,6 +23,36 @@ export const addChild = async (childData) => {
 };
 
 
+export const requestedChildApi = async (childData) => {
+  const token = getToken();
+
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/child-requests`,
+      childData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data; // should be the new request object
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to add child"
+    );
+  }
+};
+
+
+
+
+
+
 export const addChildColorAPi = async (colorData) => {
   const token = getToken();
 
