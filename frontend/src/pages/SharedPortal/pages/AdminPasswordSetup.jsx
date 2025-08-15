@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import logo from "@images/logo.png";
 
-const email = "admin@example.com";
+const email = "admin@exploreislam.com";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 function AdminPasswordSetup() {
