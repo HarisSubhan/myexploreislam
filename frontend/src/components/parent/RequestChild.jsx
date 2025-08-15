@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import {
   Container,
   Form,
   Button,
-  Alert,
   Card,
   Row,
   Col,
   Spinner,
-} from 'react-bootstrap';
-import { requestChildApi } from '../../services/parentApi'; 
+} from "react-bootstrap";
+import { requestChildApi } from "../../services/parentApi";
 
 const RequestChild = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [requestedChild, setRequestedChild] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const parentId = localStorage.getItem('userId');
+  const [requestedChildren, setRequestedChildren] = useState("");
+  const parentId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -26,7 +24,8 @@ const RequestChild = () => {
         const res = await axios.get(`/api/requests/${parentId}`);
         setRequests(res.data);
       } catch (err) {
-        console.error('Fetch error:', err);
+        toast.error("Failed to load requests.");
+        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -37,25 +36,27 @@ const RequestChild = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
-    if (!requestedChild.trim()) {
-      setError('Child Name is required');
+    if (!requestedChildren || Number(requestedChildren) <= 0) {
+      toast.error("Please enter a valid number of children.");
       return;
     }
 
     try {
       const newRequest = await requestChildApi({
         parent_id: parentId,
-        requested_children: requestedChild,
+        requested_children: Number(requestedChildren),
       });
 
       setRequests((prev) => [...prev, newRequest]);
-      setSuccess('Request sent successfully!');
-      setRequestedChild('');
+      toast.success("Request submitted successfully.");
+      setRequestedChildren("");
     } catch (err) {
-      setError(err.message || 'Failed to send request.');
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error); // backend error
+      } else {
+        toast.error(err.message || "Failed to send request.");
+      }
       console.error(err);
     }
   };
@@ -63,19 +64,17 @@ const RequestChild = () => {
   return (
     <Container className="mt-5">
       <Card className="shadow-sm p-4">
-        <h3 className="mb-4">Request a Child</h3>
-
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && <Alert variant="success">{success}</Alert>}
+        <h3 className="mb-4">Request Children</h3>
 
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="requestedChild" className="mb-3">
-            <Form.Label>Child Name</Form.Label>
+          <Form.Group controlId="requestedChildren" className="mb-3">
+            <Form.Label>Number of Children</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Enter child Name"
-              value={requestedChild}
-              onChange={(e) => setRequestedChild(e.target.value)}
+              type="number"
+              placeholder="Enter number"
+              value={requestedChildren}
+              onChange={(e) => setRequestedChildren(e.target.value)}
+              min="1"
             />
           </Form.Group>
 
@@ -92,23 +91,23 @@ const RequestChild = () => {
           <Spinner animation="border" />
         </div>
       ) : requests.length === 0 ? (
-        <Alert variant="info">No requests yet.</Alert>
+        <p className="text-muted">No requests yet.</p>
       ) : (
         <Row>
           {requests.map((req) => (
             <Col md={6} lg={4} key={req._id} className="mb-3">
               <Card className="h-100 shadow-sm">
                 <Card.Body>
-                  <Card.Title>{req.requested_children}</Card.Title>
+                  <Card.Title>{req.requested_children} Children</Card.Title>
                   <Card.Text>
-                    <strong>Status:</strong>{' '}
+                    <strong>Status:</strong>{" "}
                     <span
                       className={
-                        req.status === 'pending'
-                          ? 'text-warning'
-                          : req.status === 'approved'
-                          ? 'text-success'
-                          : 'text-danger'
+                        req.status === "pending"
+                          ? "text-warning"
+                          : req.status === "approved"
+                            ? "text-success"
+                            : "text-danger"
                       }
                     >
                       {req.status}
