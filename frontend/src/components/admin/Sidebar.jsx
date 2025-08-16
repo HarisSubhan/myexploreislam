@@ -23,8 +23,8 @@ const Sidebar = () => {
         {/* <Nav.Link as={Link} to="/admin/manage-videos/add" className="text-white ms-3">➕ Add Video</Nav.Link> */}
 
         <Nav.Link as={Link} to="/admin/quizzes" className="text-white"><MdQuiz /> Manage Quizzes</Nav.Link>
-        <Nav.Link as={Link} to="/admin/assignments" className="text-white"><MdAssignment /> Manage Assignments</Nav.Link>
-        <Nav.Link as={Link} to="/admin/manage-books" className="text-white"><FaBookOpen /> Manage Books</Nav.Link>
+        {/* <Nav.Link as={Link} to="/admin/assignments" className="text-white"><MdAssignment /> Manage Assignments</Nav.Link> */}
+        {/* <Nav.Link as={Link} to="/admin/manage-books" className="text-white"><FaBookOpen /> Manage Books</Nav.Link> */}
 
         <Nav.Link as={Link} to="/admin/blogs" className="text-white"><FaBlogger /> Manage Blogs</Nav.Link>
         <Nav.Link as={Link} to="/admin/subscriptions" className="text-white"><MdSubscriptions /> Subscriptions</Nav.Link>
