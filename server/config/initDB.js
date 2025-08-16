@@ -166,6 +166,7 @@ const initDB = () => {
     child_id INT,
     file_url VARCHAR(255),
     marks INT,
+    video_id INT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE

@@ -77,7 +77,7 @@ const ViewQuiz = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-3">📋 View Quiz</h2>
+        <h2 className="mb-3">View Quiz</h2>
 
         <Card className="mb-3">
           <Card.Body>
