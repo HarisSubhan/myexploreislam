@@ -19,10 +19,12 @@ const ChildRoutes = () => {
         <Route path="/" element={<ChildApp />}>
           <Route index element={<ChildDashboard />} />
           <Route path="profile" element={<ChildProfilePage />} />
-          <Route path="cartoons" element={<CartoonModules />} />
-          <Route path="videos" element={<VideoModules />} />
-          {/* <Route path="videos/:moduleId" element={<VideoSeries />} />
-          <Route path="videos/:category/watch" element={<VideoWatch />} /> */}
+          <Route path="cartoon" element={<CartoonModules />} />
+          <Route path="cartoon/series/:id" element={<VideoWatch />} />
+
+          <Route path="module" element={<VideoModules />} />
+          <Route path="module/series/:id" element={<VideoSeries />} />
+          
           <Route path="notifications" element={<NotificationPageChild />} />
           <Route path="history" element={<HistoryPageChild />} />
           <Route path="help-Support" element={<HelpPageChild />} />

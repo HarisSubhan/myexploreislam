@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Spinner, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaTv, FaPalette, FaBook, FaMusic, FaGamepad, FaSignInAlt } from 'react-icons/fa';
+import { FaSignInAlt } from 'react-icons/fa';
 import "../../../components/child/ChildProfilePage.css";
 import { getModuleApi } from '../../../services/moduleApi';
 
-const iconMap = {
-  video: <FaTv size={28} className="text-white" />,
-  art: <FaPalette size={28} className="text-white" />,
-  story: <FaBook size={28} className="text-white" />,
-  music: <FaMusic size={28} className="text-white" />,
-  game: <FaGamepad size={28} className="text-white" />,
-  default: <FaPalette size={28} className="text-white" />
-};
-
-const colorPalette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
 
 const ChildDashboard = () => {
   const navigate = useNavigate();
@@ -31,16 +21,29 @@ const ChildDashboard = () => {
         
         const data = await getModuleApi();
         
-        const formattedModules = data.map((module, index) => ({
-          id: module.id,
-          title: module.name,
-          icon: iconMap.default,
-          path: `/child/module/${module.id}`,
-          bgColor: colorPalette[index % colorPalette.length],
-          thumbnail: module.thumbnail_url 
-            ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${module.thumbnail_url}`
-            : null,
-        }));
+        const formattedModules = data.map((module) => {
+          const baseUrl =
+            import.meta.env.REACT_APP_IMAGE_BASE_URL || "http://localhost:5000";
+
+
+          
+          const thumbnail = module.thumbnail_url
+            ? module.thumbnail_url.startsWith("http")
+              ? module.thumbnail_url
+              : new URL(module.thumbnail_url, baseUrl).href
+            : null;
+          console.log("MODULE:", module.name, "THUMBNAIL URL:", thumbnail);
+
+          return {
+            id: module.id,
+            title: module.name,
+            path: `/child/${module.name}`,
+            thumbnail,
+          };
+        });
+
+        
+
 
         setModules(formattedModules);
       } catch (err) {
@@ -152,43 +155,55 @@ const ChildDashboard = () => {
           <Col key={module.id} xs={12} sm={8} md={6} lg={4} xl={3}>
             <Card
               onClick={() => handleCardClick(module.path)}
-              className="h-100 border-0 text-center overflow-hidden module-card"
               style={{
-                borderRadius: '20px',
-                cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: "pointer",
+                borderRadius: "16px",
+                overflow: "hidden",
+                border: "none",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                transition: "transform 0.25s, box-shadow 0.25s",
+              }}
+              className="h-100"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-6px)";
+                e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
               }}
             >
-              <div 
-                className="module-icon"
-                style={{
-                  backgroundColor: module.bgColor,
-                }}
-              >
-                {module.icon}
-              </div>
-              
-              <div 
-                className="module-thumbnail"
-                style={{
-                  backgroundImage: module.thumbnail ? 
-                    `url(${module.thumbnail})` : 
-                    'linear-gradient(to bottom right, #f5f7fa, #c3cfe2)',
-                }}
-              >
-                {!module.thumbnail && (
-                  <div className="thumbnail-placeholder">
-                    <span>{module.title}</span>
-                  </div>
-                )}
-                <div className="thumbnail-overlay" />
-              </div>
-              
-              <Card.Body className="pb-4">
-                <h5 className="mt-3 mb-0 fw-bold module-title">
+              {module.thumbnail ? (
+                <img
+                  src={module.thumbnail}
+                  alt={module.title}
+                  style={{
+                    width: "100%",
+                    height: "160px",
+                    objectFit: "cover",
+                  }}
+                  onError={(e) => {
+                    e.target.src = "/default-thumb.png";
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "160px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background:
+                      "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+                  }}
+                >
                   {module.title}
-                </h5>
+                </div>
+              )}
+
+              <Card.Body>
+                <h5 className="fw-bold mb-0">{module.title}</h5>
               </Card.Body>
             </Card>
           </Col>

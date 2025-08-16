@@ -1,11 +1,17 @@
-// services/seriesApi.js
-import axios from "axios";
+import { baseUrl, getToken } from "../services/config";
 
-export const getSeriesApi = () => {
-  const token = localStorage.getItem("token"); // 👈 token uthao
-  return axios.get("/api/series", {
+export const getSeriesApi = async () => {
+  const token = getToken();
+  const response = await fetch(`${baseUrl}/api/series/child/all`, {
     headers: {
-      Authorization: `Bearer ${token}`, // 👈 backend ko token bhejo
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to fetch modules");
+  }
+  return response.json();
 };
