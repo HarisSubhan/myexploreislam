@@ -155,6 +155,7 @@ const initDB = () => {
     quiz_id INT,
     child_id INT,
     score INT,
+    answers TEXT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
