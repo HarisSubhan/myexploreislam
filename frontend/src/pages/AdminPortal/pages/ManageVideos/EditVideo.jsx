@@ -10,7 +10,7 @@ const EditVideo = () => {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    category: ""
+    // category: ""
   });
 
   const [thumbnail, setThumbnail] = useState(null);
@@ -43,7 +43,7 @@ const EditVideo = () => {
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("description", form.description);
-    formData.append("category", form.category);
+    // formData.append("category", form.category);
 
     if (thumbnail) formData.append("thumbnail", thumbnail);
     if (video) formData.append("video", video);
@@ -91,7 +91,7 @@ const EditVideo = () => {
           />
         </div>
 
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="form-label">Category</label>
           <input
             name="category"
@@ -100,7 +100,7 @@ const EditVideo = () => {
             className="form-control"
             required
           />
-        </div>
+        </div> */}
 
         <div className="mb-3">
           <label className="form-label">New Thumbnail (optional)</label>

@@ -7,6 +7,7 @@ import { FaUserFriends, FaChild, FaVideo, FaBookOpen, FaBlogger, FaTrashAlt  } f
 import { BiSolidCategory } from "react-icons/bi";
 import { IoSettings } from "react-icons/io5";
 import whiteLogo from '@images/white_logo.png';
+import { SiSteelseries } from "react-icons/si";
 
 const Sidebar = () => {
   return (
@@ -30,6 +31,7 @@ const Sidebar = () => {
         <Nav.Link as={Link} to="/admin/categories" className="text-white"><BiSolidCategory /> Categories</Nav.Link>
         <Nav.Link as={Link} to="/admin/categories" className="text-white"><FaTrashAlt /> Trash</Nav.Link>
         <Nav.Link as={Link} to="/admin/modules" className="text-white"><MdOutlineViewModule /> Module</Nav.Link>
+        <Nav.Link as={Link} to="/admin/series" className="text-white"><SiSteelseries /> Series</Nav.Link>
         <Nav.Link as={Link} to="/admin/settings" className="text-white"><IoSettings /> Settings</Nav.Link>
       </Nav>
     </div>
