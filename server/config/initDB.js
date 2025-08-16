@@ -44,7 +44,6 @@ const initDB = () => {
     thumbnail_url VARCHAR(255),
     series_id INT,
     video_url VARCHAR(255),
-    category VARCHAR(100),
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
@@ -71,7 +70,7 @@ const initDB = () => {
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
-    category VARCHAR(100),
+    video_id INT,
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
@@ -167,6 +166,7 @@ const initDB = () => {
     child_id INT,
     file_url VARCHAR(255),
     marks INT,
+    video_id INT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
