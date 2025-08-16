@@ -77,6 +77,10 @@ app.use('/uploads', express.static('uploads'));
 
 // app.use('/api', adminRoutes);
 
+app.use("/api/videos", videoRoutes);
+
+app.use("/api", videoRoutes);
+
 app.use('/api/series', seriesRoutes);
 
 // Test route
