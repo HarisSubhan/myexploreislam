@@ -62,7 +62,7 @@ const ManageVideos = () => {
               <tr>
                 <th>#</th>
                 <th>Video Title</th>
-                <th>Category</th>
+                {/* <th>Category</th> */}
                 <th>Video URL</th>
                 <th>Thumbnail</th>
                 <th>Uploaded On</th>
@@ -74,7 +74,7 @@ const ManageVideos = () => {
                 <tr key={video.id}>
                   <td>{index + 1}</td>
                   <td>{video.title}</td>
-                  <td>{video.category}</td>
+                  {/* <td>{video.category}</td> */}
                   <td>
                     <a href={`http://localhost:5000${video.video_url}`} target="_blank" rel="noreferrer">Watch</a>
                   </td>

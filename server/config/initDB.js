@@ -44,7 +44,6 @@ const initDB = () => {
     thumbnail_url VARCHAR(255),
     series_id INT,
     video_url VARCHAR(255),
-    category VARCHAR(100),
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
