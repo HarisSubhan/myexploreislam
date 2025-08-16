@@ -13,9 +13,6 @@ const ChildApp = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  
-
-
   const menuItems = [
     {
       icon: <FaUser size={50} />,
