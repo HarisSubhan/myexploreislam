@@ -93,7 +93,7 @@ const EditBlog = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2>✏️ Edit Blog</h2>
+        <h2>Edit Blog</h2>
         {error && <Alert variant="danger">{error}</Alert>}
 
         <Form onSubmit={handleSubmit}>

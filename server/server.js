@@ -79,7 +79,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use("/api/videos", videoRoutes);
 
-app.use("/api", videoRoutes);
+// app.use("/api", videoRoutes);
 
 app.use('/api/series', seriesRoutes);
 
