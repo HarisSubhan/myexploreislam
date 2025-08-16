@@ -48,7 +48,7 @@ const ViewVideo = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">🎥 View Video Details</h2>
+        <h2 className="mb-4">View Video Details</h2>
         <Card>
           <Card.Body>
             <h4>{video.title}</h4>
