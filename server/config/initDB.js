@@ -70,7 +70,7 @@ const initDB = () => {
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
-    category VARCHAR(100),
+    video_id INT,
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;

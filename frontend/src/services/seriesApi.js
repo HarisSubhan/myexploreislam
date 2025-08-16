@@ -1,5 +1,11 @@
+// services/seriesApi.js
 import axios from "axios";
 
 export const getSeriesApi = () => {
-  return axios.get("http://localhost:5000/api/series");
+  const token = localStorage.getItem("token"); // 👈 token uthao
+  return axios.get("/api/series", {
+    headers: {
+      Authorization: `Bearer ${token}`, // 👈 backend ko token bhejo
+    },
+  });
 };

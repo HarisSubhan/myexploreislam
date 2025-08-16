@@ -12,6 +12,11 @@ const Series = () => {
   const [newSeries, setNewSeries] = useState({ title: "", description: "", thumbnail: null });
   const [saving, setSaving] = useState(false);
 
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editSeriesData, setEditSeriesData] = useState({ id: "", title: "", description: "", thumbnail_url: "", thumbnail: null });
+  const [updating, setUpdating] = useState(false);
+
   const token = localStorage.getItem("token");
   const IMAGE_BASE_URL = "http://localhost:5000";
 
@@ -35,7 +40,6 @@ const Series = () => {
         setLoading(false);
       }
     };
-
     fetchSeries();
   }, []);
 
@@ -46,7 +50,6 @@ const Series = () => {
       alert("Title and thumbnail are required");
       return;
     }
-
     try {
       setSaving(true);
       const formData = new FormData();
@@ -61,7 +64,7 @@ const Series = () => {
         },
       });
 
-      setSeriesList((prev) => [res.data, ...prev]); // Add new series to top
+      setSeriesList((prev) => [res.data, ...prev]);
       setShowAddModal(false);
       setNewSeries({ title: "", description: "", thumbnail: null });
     } catch (error) {
@@ -85,10 +88,59 @@ const Series = () => {
     }
   };
 
+  // Open edit modal
+  const handleEditClick = (series) => {
+    setEditSeriesData({
+      id: series.id,
+      title: series.title,
+      description: series.description,
+      thumbnail_url: series.thumbnail_url,
+      thumbnail: null,
+    });
+    setShowEditModal(true);
+  };
+
+  // Update series
+  const handleUpdateSeries = async (e) => {
+    e.preventDefault();
+    if (!editSeriesData.title) {
+      alert("Title is required");
+      return;
+    }
+    try {
+      setUpdating(true);
+      const formData = new FormData();
+      formData.append("title", editSeriesData.title);
+      formData.append("description", editSeriesData.description);
+      formData.append("thumbnail_url", editSeriesData.thumbnail_url); // old image path
+      if (editSeriesData.thumbnail) {
+        formData.append("thumbnail", editSeriesData.thumbnail); // new image
+      }
+
+      const res = await axios.put(`/api/series/${editSeriesData.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Update local table
+      setSeriesList((prev) =>
+        prev.map((s) => (s.id === editSeriesData.id ? { ...s, ...res.data } : s))
+      );
+
+      setShowEditModal(false);
+    } catch (error) {
+      console.error("Error updating series:", error);
+      alert("Failed to update series");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="p-4">
-        {/* Header with Add Series Button */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h2>Manage Series</h2>
           <Button variant="primary" onClick={() => setShowAddModal(true)}>
@@ -96,7 +148,6 @@ const Series = () => {
           </Button>
         </div>
 
-        {/* Loading */}
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" />
@@ -133,7 +184,7 @@ const Series = () => {
                         variant="warning"
                         size="sm"
                         className="me-2"
-                        onClick={() => alert("Edit functionality coming soon")}
+                        onClick={() => handleEditClick(series)}
                       >
                         Edit
                       </Button>
@@ -206,6 +257,66 @@ const Series = () => {
               <div className="text-end">
                 <Button type="submit" variant="primary" disabled={saving}>
                   {saving ? "Saving..." : "Add Series"}
+                </Button>
+              </div>
+            </Form>
+          </Modal.Body>
+        </Modal>
+
+        {/* Edit Series Modal */}
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Series</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={handleUpdateSeries}>
+              <Form.Group className="mb-3">
+                <Form.Label>Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editSeriesData.title}
+                  onChange={(e) =>
+                    setEditSeriesData({ ...editSeriesData, title: e.target.value })
+                  }
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={editSeriesData.description}
+                  onChange={(e) =>
+                    setEditSeriesData({ ...editSeriesData, description: e.target.value })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Current Thumbnail</Form.Label>
+                <div className="mb-2">
+                  <Image
+                    src={getImageUrl(editSeriesData.thumbnail_url)}
+                    alt="Current Thumbnail"
+                    width={80}
+                    height={80}
+                    style={{ objectFit: "cover", border: "1px solid #ddd" }}
+                  />
+                </div>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setEditSeriesData({ ...editSeriesData, thumbnail: e.target.files[0] })
+                  }
+                />
+              </Form.Group>
+
+              <div className="text-end">
+                <Button type="submit" variant="primary" disabled={updating}>
+                  {updating ? "Updating..." : "Update Series"}
                 </Button>
               </div>
             </Form>

@@ -2,9 +2,9 @@ const db = require('../config/db');
 
 // Create Quiz
 const createQuiz = (quizData, callback) => {
-  const { title, description, category } = quizData;
-  const sql = `INSERT INTO quizzes (title, description, category) VALUES (?, ?, ?)`;
-  db.query(sql, [title, description, category], callback);
+  const { title, description, video_id } = quizData;
+  const sql = `INSERT INTO quizzes (title, description, video_id) VALUES (?, ?, ?)`;
+  db.query(sql, [title, description, video_id], callback);
 };
 
 // Add Quiz Questions
@@ -50,10 +50,10 @@ const getQuizById = (id, callback) => {
 
 // Update Quiz + Questions
 const updateQuiz = (id, data, callback) => {
-  const { title, description, category, questions } = data;
+  const { title, description, video_id, questions } = data;
 
-  const updateQuizSql = `UPDATE quizzes SET title = ?, description = ?, category = ? WHERE id = ?`;
-  db.query(updateQuizSql, [title, description, category, id], (err) => {
+  const updateQuizSql = `UPDATE quizzes SET title = ?, description = ?, video_id = ? WHERE id = ?`;
+  db.query(updateQuizSql, [title, description, video_id, id], (err) => {
     if (err) return callback(err);
 
     // Delete old questions
