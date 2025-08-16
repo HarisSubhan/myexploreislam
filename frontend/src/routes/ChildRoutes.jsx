@@ -21,8 +21,8 @@ const ChildRoutes = () => {
           <Route path="profile" element={<ChildProfilePage />} />
           <Route path="cartoons" element={<CartoonModules />} />
           <Route path="videos" element={<VideoModules />} />
-          <Route path="videos/:category" element={<VideoSeries />} />
-          <Route path="videos/:category/watch" element={<VideoWatch />} />
+          {/* <Route path="videos/:moduleId" element={<VideoSeries />} />
+          <Route path="videos/:category/watch" element={<VideoWatch />} /> */}
           <Route path="notifications" element={<NotificationPageChild />} />
           <Route path="history" element={<HistoryPageChild />} />
           <Route path="help-Support" element={<HelpPageChild />} />
