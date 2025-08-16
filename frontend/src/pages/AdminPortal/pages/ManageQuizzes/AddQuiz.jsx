@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Form, Button, Card, Row, Col, ListGroup, Spinner, Alert } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { createQuizApi } from "../../../../services/quizApi";
-import {getCategoriesApi} from "../../../../services/categoryApi";
+import { getAllVideosApi } from "../../../../services/videoApi"; // Make sure this API exists
 
 const AddQuiz = () => {
   const [quizTitle, setQuizTitle] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [videos, setVideos] = useState([]); // Safe default array
+  const [selectedVideo, setSelectedVideo] = useState("");
   const [questions, setQuestions] = useState([{
     question: "",
     options: ["", "", "", ""],
@@ -17,23 +17,30 @@ const AddQuiz = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // Fetch categories
+  // Fetch videos from API
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchVideos = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("token");
-        const response = await getCategoriesApi(token);
-        setCategories(response.data);
+        const response = await getAllVideosApi(token);
+        console.log("Videos API response:", response);
+
+        if (response && Array.isArray(response)) {
+          setVideos(response);
+        } else {
+          setVideos([]);
+        }
       } catch (err) {
-        setError("Failed to load categories");
-        console.error("Error fetching categories:", err);
+        console.error("Error fetching videos:", err);
+        setVideos([]);
+        setError("Failed to load videos");
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchCategories();
+
+    fetchVideos();
   }, []);
 
   const handleQuestionChange = (index, field, value) => {
@@ -64,21 +71,13 @@ const AddQuiz = () => {
     }
   };
 
-  const handleCategoryToggle = (categoryId) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
-    
-    if (selectedCategories.length === 0) {
-      setError("Please select at least one category");
+
+    if (!selectedVideo) {
+      setError("Please select a video for this quiz");
       return;
     }
 
@@ -90,25 +89,20 @@ const AddQuiz = () => {
       option_d: q.options[3],
       correct_option: q.correct,
     }));
-  
+
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
       await createQuizApi({
         title: quizTitle,
-        linked_categories: selectedCategories,
+        video_id: selectedVideo,
         questions: formattedQuestions,
       }, token);
-      
+
       setSuccess(true);
-      // Reset form
       setQuizTitle("");
-      setSelectedCategories([]);
-      setQuestions([{
-        question: "",
-        options: ["", "", "", ""],
-        correct: "",
-      }]);
+      setSelectedVideo("");
+      setQuestions([{ question: "", options: ["", "", "", ""], correct: "" }]);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create quiz");
       console.error("Quiz creation error:", err);
@@ -120,8 +114,8 @@ const AddQuiz = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">📝 Create New Quiz</h2>
-        
+        <h2 className="mb-4">Create New Quiz</h2>
+
         {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
         {success && <Alert variant="success" onClose={() => setSuccess(false)} dismissible>
           Quiz created successfully!
@@ -142,37 +136,25 @@ const AddQuiz = () => {
               </Form.Group>
 
               <Form.Group className="mb-4">
-                <Form.Label>Select Categories</Form.Label>
-                <Card>
-                  <Card.Body style={{ maxHeight: "200px", overflowY: "auto" }}>
-                    {loading ? (
-                      <div className="text-center py-3">
-                        <Spinner animation="border" variant="primary" />
-                      </div>
-                    ) : categories.length > 0 ? (
-                      <ListGroup variant="flush">
-                        {categories.map((category) => (
-                          <ListGroup.Item key={category.id} className="px-0 py-2">
-                            <Form.Check
-                              type="checkbox"
-                              id={`category-${category.id}`}
-                              label={category.name}
-                              checked={selectedCategories.includes(category.id)}
-                              onChange={() => handleCategoryToggle(category.id)}
-                            />
-                          </ListGroup.Item>
-                        ))}
-                      </ListGroup>
-                    ) : (
-                      <div className="text-muted">No categories available</div>
-                    )}
-                  </Card.Body>
-                </Card>
-                <Form.Text className="text-muted">
-                  {selectedCategories.length > 0 
-                    ? `${selectedCategories.length} categories selected` 
-                    : "Select at least one category"}
-                </Form.Text>
+                <Form.Label>Select Video</Form.Label>
+                <Form.Select
+                  value={selectedVideo}
+                  onChange={(e) => setSelectedVideo(e.target.value)}
+                  required
+                >
+                  <option value="">-- Select a video --</option>
+                  {loading ? (
+                    <option disabled>Loading videos...</option>
+                  ) : videos.length > 0 ? (
+                    videos.map((video) => (
+                      <option key={video.id} value={video.id}>
+                        {video.title}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No videos available</option>
+                  )}
+                </Form.Select>
               </Form.Group>
 
               <h5 className="mt-4 mb-3">Quiz Questions</h5>

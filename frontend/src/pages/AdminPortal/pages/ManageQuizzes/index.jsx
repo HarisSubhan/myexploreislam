@@ -3,22 +3,43 @@ import { Table, Button, Modal } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { getVideoByIdApi } from "../../../../services/videoApi"; // apni path sahi lagana
 
 const ManageQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
+  const [videoTitles, setVideoTitles] = useState({}); // { video_id: title }
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState(null);
 
+  // Quizzes fetch
   useEffect(() => {
     axios
       .get("/api/quizzes", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
-      .then((res) => {
-        setQuizzes(res.data);
+      .then(async (res) => {
+        const quizData = res.data;
+        setQuizzes(quizData);
+
+        // Har quiz ka video title fetch karo
+        const titles = {};
+        for (let quiz of quizData) {
+          if (quiz.video_id) {
+            try {
+              const video = await getVideoByIdApi(quiz.video_id);
+
+              titles[quiz.video_id] = video.title || "Untitled Video";
+            } catch (err) {
+              console.error("Error fetching video:", err);
+              titles[quiz.video_id] = "Error loading video";
+            }
+          }
+        }
+        setVideoTitles(titles);
+
         setLoading(false);
       })
       .catch((err) => {
@@ -36,8 +57,8 @@ const ManageQuizzes = () => {
     axios
       .delete(`/api/quizzes/${selectedQuizId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
       .then(() => {
         setQuizzes(quizzes.filter((quiz) => quiz.id !== selectedQuizId));
@@ -57,7 +78,9 @@ const ManageQuizzes = () => {
           <h2 className="mb-4">Manage Quizzes</h2>
 
           <Link to="/admin/manage-quizzes/add">
-            <Button variant="success" className="mb-3">Add Quiz</Button>
+            <Button variant="success" className="mb-3">
+              Add Quiz
+            </Button>
           </Link>
         </div>
 
@@ -69,8 +92,7 @@ const ManageQuizzes = () => {
               <tr>
                 <th>#</th>
                 <th>Quiz Title</th>
-                <th>Category</th>
-                <th>Total Questions</th>
+                <th>Video Title</th>
                 <th>Created On</th>
                 <th>Actions</th>
               </tr>
@@ -80,19 +102,26 @@ const ManageQuizzes = () => {
                 <tr key={quiz.id}>
                   <td>{index + 1}</td>
                   <td>{quiz.title}</td>
-                  <td>{quiz.category}</td>
-                  <td>{quiz.questionCount}</td>
+                  <td>{videoTitles[quiz.video_id] || "No Video Linked"}</td>
                   <td>{new Date(quiz.created_at).toLocaleDateString()}</td>
                   <td>
                     <Link to={`/admin/manage-quizzes/view/${quiz.id}`}>
-                      <Button variant="info" size="sm" className="me-2">View</Button>
+                      <Button variant="info" size="sm" className="me-2">
+                        View
+                      </Button>
                     </Link>
 
                     <Link to={`/admin/manage-quizzes/edit/${quiz.id}`}>
-                      <Button variant="warning" size="sm" className="me-2">Edit</Button>
+                      <Button variant="warning" size="sm" className="me-2">
+                        Edit
+                      </Button>
                     </Link>
 
-                    <Button variant="danger" size="sm" onClick={() => handleDeleteConfirm(quiz.id)}>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDeleteConfirm(quiz.id)}
+                    >
                       Delete
                     </Button>
                   </td>

@@ -34,6 +34,7 @@ import Subscriptions from "../pages/AdminPortal/pages/Subscriptions";
 import Categories from "../pages/AdminPortal/pages/Categories";
 import Settings from "../pages/AdminPortal/pages/Settings";
 import Modules from "../pages/AdminPortal/pages/Modules";
+import Series from "../pages/AdminPortal/pages/Series";
 
 
 
@@ -74,6 +75,7 @@ const AdminRoutes = () => {
       <Route path="categories" element={<Categories />} />
       <Route path="settings" element={<Settings />} />
       <Route path="modules" element={<Modules />} />
+      <Route path="series" element={<Series />} />
     </Routes>
   );
 };

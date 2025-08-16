@@ -2,9 +2,9 @@ const db = require('../config/db');
 
 // Create Quiz
 const createQuiz = (quizData, callback) => {
-  const { title, description, category } = quizData;
-  const sql = `INSERT INTO quizzes (title, description, category) VALUES (?, ?, ?)`;
-  db.query(sql, [title, description, category], callback);
+  const { title, description, video_id } = quizData;
+  const sql = `INSERT INTO quizzes (title, description, video_id) VALUES (?, ?, ?)`;
+  db.query(sql, [title, description, video_id], callback);
 };
 
 // Add Quiz Questions
@@ -29,7 +29,7 @@ const addQuestions = (quizId, questions, callback) => {
 
 // Get All Quizzes
 const getAllQuizzes = (callback) => {
-  const sql = `SELECT * FROM quizzes ORDER BY created_at DESC`;
+  const sql = `SELECT * FROM quizzes WHERE is_deleted = 0 ORDER BY created_at DESC`;
   db.query(sql, callback);
 };
 
@@ -50,10 +50,10 @@ const getQuizById = (id, callback) => {
 
 // Update Quiz + Questions
 const updateQuiz = (id, data, callback) => {
-  const { title, description, category, questions } = data;
+  const { title, description, video_id, questions } = data;
 
-  const updateQuizSql = `UPDATE quizzes SET title = ?, description = ?, category = ? WHERE id = ?`;
-  db.query(updateQuizSql, [title, description, category, id], (err) => {
+  const updateQuizSql = `UPDATE quizzes SET title = ?, description = ?, video_id = ? WHERE id = ?`;
+  db.query(updateQuizSql, [title, description, video_id, id], (err) => {
     if (err) return callback(err);
 
     // Delete old questions
@@ -84,14 +84,8 @@ const updateQuiz = (id, data, callback) => {
 
 // Delete Quiz
 const deleteQuiz = (id, callback) => {
-  const deleteQuestionsSql = `DELETE FROM quiz_questions WHERE quiz_id = ?`;
-  const deleteQuizSql = `DELETE FROM quizzes WHERE id = ?`;
-
-  db.query(deleteQuestionsSql, [id], (err) => {
-    if (err) return callback(err);
-
-    db.query(deleteQuizSql, [id], callback);
-  });
+  const sql = `UPDATE quizzes SET is_deleted = 1 WHERE id = ?`;
+  db.query(sql, [id], callback);
 };
 
 module.exports = {
