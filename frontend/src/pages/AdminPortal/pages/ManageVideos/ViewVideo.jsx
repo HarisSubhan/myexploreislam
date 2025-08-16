@@ -129,7 +129,7 @@ const ViewVideo = () => {
         <Card>
           <Card.Body>
             <h4>{video.title}</h4>
-            <p><strong>Category:</strong> {video.category}</p>
+            {/* <p><strong>Category:</strong> {video.category}</p> */}
             <p><strong>Description:</strong> {video.description}</p>
 
             <div className="mb-3">
