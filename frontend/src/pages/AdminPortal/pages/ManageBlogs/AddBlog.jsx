@@ -3,6 +3,8 @@ import { Form, Button, Alert } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const AddBlog = () => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ const AddBlog = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2>➕ Add New Blog</h2>
+        <h2>Add New Blog</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
@@ -57,15 +59,32 @@ const AddBlog = () => {
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Publish Date</Form.Label>
-            <Form.Control type="date" name="publish_date" onChange={handleChange} required />
+            <Form.Control
+              type="date"
+              name="publish_date"
+              onChange={handleChange}
+              required
+            />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Description</Form.Label>
-            <Form.Control as="textarea" name="description" rows={4} onChange={handleChange} required />
+            <CKEditor
+              editor={ClassicEditor}
+              data={formData.description}
+              onChange={(event, editor) => {
+                const data = editor.getData();
+                setFormData({ ...formData, description: data });
+              }}
+            />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Banner Image</Form.Label>
-            <Form.Control type="file" name="banner_image" onChange={handleChange} required />
+            <Form.Control
+              type="file"
+              name="banner_image"
+              onChange={handleChange}
+              required
+            />
           </Form.Group>
           <Button type="submit">Submit</Button>
         </Form>
