@@ -6,7 +6,9 @@ const {
   uploadVideoFile,
   getAllVideos,
   getVideoById,
-  updateVideoById
+  updateVideoById,
+  getVideosBySeriesId,
+  getUnassignedVideos 
 } = require('../controllers/videoController');
 
 // Setup multer
@@ -74,5 +76,9 @@ router.get('/stream/:filename', (req, res) => {
     fs.createReadStream(videoPath).pipe(res);
   }
 });
+
+router.get('/series/:seriesId', getVideosBySeriesId);
+
+router.get("/unassigned/videos", getUnassignedVideos);
 
 module.exports = router;
