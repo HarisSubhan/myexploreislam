@@ -10,10 +10,10 @@ const seasons = [
 ];
 
 const VideoSeries = () => {
-    const { category } = useParams(); 
+    const { moduleId  } = useParams(); 
     const navigate = useNavigate();
     const handleWatchClick = () => {
-      navigate(`/child/videos/${category}/watch`);
+      navigate(`/child/videos/${moduleId }/watch`);
     };
 
     
@@ -26,7 +26,7 @@ const VideoSeries = () => {
       style={{ background: "#f8f9fa", minHeight: "100vh" }}
     >
       <h2 className="text-center fw-bold mb-5" style={{ color: "#3A86FF" }}>
-        📺{category} Choose Your Season
+        📺{moduleId } Choose Your Season
       </h2>
       <Row className="g-4 mb-5">
         {seasons.map((season, index) => (
