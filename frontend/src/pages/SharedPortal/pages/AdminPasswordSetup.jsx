@@ -24,7 +24,7 @@ function AdminPasswordSetup() {
       toast.success("Password set successfully! Redirecting to login...");
       setTimeout(() => (window.location.href = "/login"));
     } catch (error) {
-      toast.error(error.message); // Backend will handle errors (e.g., "Password already set")
+      toast.error(error.message); 
     } finally {
       setIsSubmitting(false);
     }
