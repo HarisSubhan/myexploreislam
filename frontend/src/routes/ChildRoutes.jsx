@@ -1,17 +1,36 @@
 import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
+import ModulePage1 from "../components/child/ModulePage1";
+import ModuleQuiz from "../components/child/ModuleQuiz";
+import ModuleCompletion from "../components/child/ModuleCompletion";
 
 const ChildApp = lazy(() => import("../pages/ChildPortal/ChildApp"));
-const ChildDashboard = lazy(() => import("../pages/ChildPortal/pages/ChildDashboard"));
-const ChildBookpage = lazy(() => import("../pages/ChildPortal/pages/ChildBookpage"));
-const BookDetail = lazy(() => import("../components/child/BookDetail"));
-const ChildVideopage = lazy(() => import("../pages/ChildPortal/pages/ChildVideopage"));
-const VideoDetail = lazy(() => import("../components/child/VideoDetail"));
-const QuizPage = lazy(() => import("../pages/ChildPortal/pages/QuizPage"));
-const QuizStart = lazy(() => import("../components/child/QuizStart"));
-const AssignmentsPage = lazy(() => import("../pages/ChildPortal/pages/AssignmentsPage"));
-const AssignmentsStart = lazy(() =>import("../components/child/AssignmentsStart"));
-const ChildProfilePage = lazy(() =>import("../pages/ChildPortal/pages/ChildProfilePage"));
+const ChildDashboard = lazy(
+  () => import("../pages/ChildPortal/pages/ChildDashboard")
+);
+const ChildProfilePage = lazy(
+  () => import("../pages/ChildPortal/pages/ChildProfilePage")
+);
+const CartoonModules = lazy(
+  () => import("../pages/ChildPortal/pages/CartoonModules")
+);
+const VideoModules = lazy(
+  () => import("../pages/ChildPortal/pages/VideoModules")
+);
+const NotificationPageChild = lazy(
+  () => import("../pages/ChildPortal/pages/NotificationPageChild")
+);
+const HistoryPageChild = lazy(
+  () => import("../pages/ChildPortal/pages/HistoryPageChild")
+);
+const HelpPageChild = lazy(
+  () => import("../pages/ChildPortal/pages/HelpPageChild")
+);
+const VideoSeries = lazy(() => import("../components/child/VideoSeries"));
+const VideoWatch = lazy(() => import("../components/child/VideoWatch"));
+const ModuleIntroduction = lazy(
+  () => import("../components/child/ModuleIntroduction")
+);
 
 const ChildRoutes = () => {
   return (
@@ -19,16 +38,27 @@ const ChildRoutes = () => {
       <Routes>
         <Route path="/" element={<ChildApp />}>
           <Route index element={<ChildDashboard />} />
-          <Route path="book" element={<ChildBookpage />} />
-          <Route path="book/:bookId" element={<BookDetail />} />
-          <Route path="video" element={<ChildVideopage />} />
-          <Route path="video/:videoId" element={<VideoDetail />} />
-          <Route path="quiz" element={<QuizPage />} />
-          <Route path="quiz/:quizid" element={<QuizStart />} />
-          <Route path="assignments" element={<AssignmentsPage />} />
-          <Route path="assignments/:id" element={<AssignmentsStart />} />
           <Route path="profile" element={<ChildProfilePage />} />
+          <Route path="cartoon" element={<CartoonModules />} />
+          <Route path="cartoon/series/:id" element={<VideoWatch />} />
 
+          {/* FIXED */}
+          <Route path="module" element={<VideoModules />} />
+          <Route path="module/series/:id" element={<VideoSeries />} />
+          <Route
+            path="module/series/:id/introduction"
+            element={<ModuleIntroduction />}
+          />
+          <Route path="module/series/:id/page1" element={<ModulePage1 />} />
+          <Route path="module/series/:id/quiz" element={<ModuleQuiz />} />
+          <Route
+            path="module/series/:id/completion"
+            element={<ModuleCompletion />}
+          />
+
+          <Route path="notifications" element={<NotificationPageChild />} />
+          <Route path="history" element={<HistoryPageChild />} />
+          <Route path="help-Support" element={<HelpPageChild />} />
         </Route>
       </Routes>
     </Suspense>

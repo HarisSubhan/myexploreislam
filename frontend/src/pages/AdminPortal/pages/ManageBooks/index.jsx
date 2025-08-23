@@ -49,9 +49,9 @@ const ManageBooks = () => {
     <AdminLayout>
       <div className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2>📚 Manage Books</h2>
+          <h2>Manage Books</h2>
           <Link to="/admin/manage-books/add" className="btn btn-success">
-            ➕ Add Book
+            Add Book
           </Link>
         </div>
 

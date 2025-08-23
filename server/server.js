@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const db = require('./config/db');
+// const db = require('./config/db');
 const initDB = require('./config/initDB');
 const authRoutes = require('./routes/authRoutes');
 const parentRoutes = require('./routes/parentRoutes');
@@ -25,6 +25,10 @@ const childRoutes = require('./routes/childRoutes');
 const quizSubmissionRoutes = require('./routes/quizSubmissionRoutes');
 const assignmentSubmissionRoutes = require('./routes/assignmentSubmissionRoutes');
 
+const moduleRoutes = require("./routes/moduleRoutes");
+
+const seriesRoutes = require('./routes/seriesRoutes');
+
 
 initDB();
 dotenv.config();
@@ -34,6 +38,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+
+app.use('/api', authRoutes);
+
 app.use('/api/parent', parentRoutes);
 
 app.use('/api/admin', adminRoutes);
@@ -41,9 +48,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/videos', videoRoutes);
-
-// app.use('/uploads', express.static('uploads'));
-
 
 app.use('/api/books', bookRoutes);
 
@@ -64,7 +68,20 @@ app.use('/api/child-requests', childRequestsRoutes);
 app.use('/api/child', childRoutes);
 
 app.use('/api/quiz-submissions', quizSubmissionRoutes);
+
 app.use('/api/assignment-submissions', assignmentSubmissionRoutes);
+
+app.use("/api/modules", moduleRoutes);
+
+app.use('/uploads', express.static('uploads'));
+
+// app.use('/api', adminRoutes);
+
+app.use("/api/videos", videoRoutes);
+
+// app.use("/api", videoRoutes);
+
+app.use('/api/series', seriesRoutes);
 
 // Test route
 app.get('/', (req, res) => {

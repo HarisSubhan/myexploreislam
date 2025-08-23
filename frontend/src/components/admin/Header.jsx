@@ -8,8 +8,10 @@ import {
     ButtonGroup,
 } from "react-bootstrap";
 import { Sun, Moon, Person } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+    const navigate = useNavigate(); 
     const [darkMode, setDarkMode] = useState(false);
 
     const toggleTheme = () => {
@@ -17,6 +19,12 @@ const Header = () => {
         document.body.classList.toggle("bg-dark");
         document.body.classList.toggle("text-light");
     };
+
+      const logoutHandler = () => {
+        localStorage.removeItem("token");         
+        navigate("/login");
+    };
+
 
     return (
         <Navbar
@@ -26,9 +34,9 @@ const Header = () => {
             className="shadow-sm px-3"
         >
             <Container fluid>
-                <Navbar.Brand href="/admin/dashboard" className="fw-bold">
+                {/* <Navbar.Brand href="/admin/dashboard" className="fw-bold">
                     Explore Islam
-                </Navbar.Brand>
+                </Navbar.Brand> */}
 
                 <Nav className="ms-auto align-items-center gap-3">
                     {/* Theme Toggle Button */}
@@ -54,7 +62,7 @@ const Header = () => {
                             <Dropdown.Item href="#/profile">Profile</Dropdown.Item>
                             <Dropdown.Item href="#/settings">Settings</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item href="#/logout">Logout</Dropdown.Item>
+                            <Dropdown.Item onClick={logoutHandler} href="#/logout">Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Nav>

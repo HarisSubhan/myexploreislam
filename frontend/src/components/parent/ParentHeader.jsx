@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, useTheme, Menu, MenuItem, Divider } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink } from 'react-router-dom'; // For MenuItem links
+import { Link as RouterLink, useNavigate } from 'react-router-dom'; // For MenuItem links
 
-// MUI Icons for theme toggle and profile
-import Brightness4Icon from '@mui/icons-material/Brightness4'; // Moon
-import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sun
+
+import Brightness4Icon from '@mui/icons-material/Brightness4'; 
+import Brightness7Icon from '@mui/icons-material/Brightness7'; 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-import logo from "@images/logo.png"; // Ensure this path is correct
+import logo from "@images/logo.png"; 
 
 const ParentHeader = ({
   toggleSidebar,
@@ -17,6 +17,7 @@ const ParentHeader = ({
 }) => {
   const muiTheme = useTheme();
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const navigate = useNavigate();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -26,11 +27,11 @@ const ParentHeader = ({
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logout action triggered");
-    handleCloseUserMenu();
-  };
+ const handleLogout = () => {
+   localStorage.removeItem("token"); 
+   handleCloseUserMenu();
+   navigate("/login");
+ };
 
   return (
     <AppBar
@@ -39,7 +40,7 @@ const ParentHeader = ({
         width: '100%',
         marginLeft: 0,
         zIndex: muiTheme.zIndex.drawer + 1,
-        // No need to adjust width/marginLeft based on sidebar for a fixed AppBar
+        
       }}
     >
       <Toolbar>
@@ -48,7 +49,7 @@ const ParentHeader = ({
           aria-label="open drawer"
           edge="start"
           onClick={toggleSidebar}
-          sx={{ mr: { xs: 1, sm: 2 } }} // Slightly less margin on xs
+          sx={{ mr: { xs: 1, sm: 2 } }} 
         >
           <MenuIcon />
         </IconButton>
@@ -58,9 +59,9 @@ const ParentHeader = ({
           src={logo}
           alt="Logo"
           sx={{
-            height: { xs: 30, sm: 40, lg:60 }, // Responsive logo height
+            height: { xs: 30, sm: 40, lg:60 }, 
             mr: 2,
-            // display: { xs: 'none', sm: 'block' } // Keep if you want to hide on xs
+          
           }}
         />
 
@@ -70,7 +71,7 @@ const ParentHeader = ({
           component="div"
           sx={{
             flexGrow: 1,
-            display: { xs: 'none', sm: 'block' } // Hide title on very small screens
+            display: { xs: 'none', sm: 'block' } 
           }}
         >
           Explore Islam
@@ -117,7 +118,7 @@ const ParentHeader = ({
             </MenuItem>
             <MenuItem
               component={RouterLink}
-              to="/parent/settings" 
+              to="/parent/defaulttheme" 
               onClick={handleCloseUserMenu}
             >
               <Typography textAlign="center">Settings</Typography>

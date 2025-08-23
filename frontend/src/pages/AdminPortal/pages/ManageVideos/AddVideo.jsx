@@ -3,67 +3,70 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { uploadVideoApi } from "../../../../services/videoApi";
 import { useNavigate } from "react-router-dom";
-import { getCategoriesApi } from "../../../../services/categoryApi";
-
+import { getSeriesApi } from "../../../../services/seriesApi"; // ✅ New Series API import
 
 const AddVideo = () => {
   const navigate = useNavigate();
+
   const [videoType, setVideoType] = useState("single");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [singleVideo, setSingleVideo] = useState(null);
   const [seriesVideos, setSeriesVideos] = useState([]);
-  const [categories, setCategories] = useState([]); 
+  const [seriesList, setSeriesList] = useState([]);
+  const [seriesId, setSeriesId] = useState("");
 
-  
+  // Fetch series list
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchSeries = async () => {
       try {
-        const response = await getCategoriesApi();
-        setCategories(response.data);
+        const response = await getSeriesApi();
+        console.log("Series API response:", response);
+        setSeriesList(response.data);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching series:", error);
       }
     };
-
-    fetchCategories();
+    fetchSeries();
   }, []);
 
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("category", category);
     formData.append("thumbnail", thumbnail);
 
-    if (videoType === "single") {
-      formData.append("video", singleVideo);
+    if (videoType === "series") {
+      formData.append("series_id", seriesId);
+      for (let i = 0; i < seriesVideos.length; i++) {
+        formData.append("video", seriesVideos[i]);
+      }
     } else {
-      alert("🚧 Series upload is not yet supported.");
-      return;
+      formData.append("video", singleVideo);
     }
 
     try {
       await uploadVideoApi(formData);
-      alert("✅ Video uploaded successfully!");
+      alert("Video uploaded successfully!");
       navigate("/admin/videos");
     } catch (error) {
       console.error("Upload error:", error);
-      alert("❌ Failed to upload video.");
+      alert("Failed to upload video.");
     }
   };
 
   return (
     <AdminLayout>
       <Container>
-        <h3 className="my-4">🎬 Add New Video</h3>
+        <h3 className="my-4">Add New Video</h3>
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
+              {/* Title */}
               <Form.Group className="mb-3">
                 <Form.Label>Title</Form.Label>
                 <Form.Control
@@ -74,6 +77,7 @@ const AddVideo = () => {
                 />
               </Form.Group>
 
+              {/* Description */}
               <Form.Group className="mb-3">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
@@ -85,22 +89,7 @@ const AddVideo = () => {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Category</Form.Label>
-                <Form.Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-
+              {/* Thumbnail */}
               <Form.Group className="mb-3">
                 <Form.Label>Thumbnail</Form.Label>
                 <Form.Control
@@ -111,6 +100,7 @@ const AddVideo = () => {
                 />
               </Form.Group>
 
+              {/* Video Type */}
               <Form.Group className="mb-3">
                 <Form.Label>Video Type</Form.Label>
                 <Form.Select
@@ -121,6 +111,25 @@ const AddVideo = () => {
                   <option value="series">Series</option>
                 </Form.Select>
               </Form.Group>
+
+              {/* Series Dropdown - Only show if videoType is "series" */}
+              {videoType === "series" && (
+                <Form.Group className="mb-3">
+                  <Form.Label>Select Series</Form.Label>
+                  <Form.Select
+                    value={seriesId}
+                    onChange={(e) => setSeriesId(e.target.value)}
+                    required
+                  >
+                    <option value="">-- Select a Series --</option>
+                    {seriesList.map((series) => (
+                      <option key={series.id} value={series.id}>
+                        {series.title}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              )}
             </Col>
 
             <Col md={6}>
@@ -150,7 +159,7 @@ const AddVideo = () => {
           </Row>
 
           <Button type="submit" variant="danger">
-            🚀 Upload Video
+            Upload Video
           </Button>
         </Form>
       </Container>

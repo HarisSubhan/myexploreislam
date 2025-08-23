@@ -41,6 +41,11 @@ const NAVIGATION = [
     title: "Add Child",
     icon: <ProfileIcon/>
   },
+  {
+    path: "/parent/requestchild",
+    title: "Request Child",
+    icon: <ChangePasswordIcon />,
+  },
   { path: "/parent/payments", title: "Payments", icon: <PaymentIcon /> },
   { kind: "divider" },
   {
@@ -53,11 +58,13 @@ const NAVIGATION = [
     title: "Profile",
     icon: <ProfileIcon />,
   },
+  
   {
     path: "/parent/changepassword",
     title: "Change Password",
     icon: <ChangePasswordIcon />,
   },
+  
   { kind: "divider" },
   
   {
@@ -158,10 +165,10 @@ const ParentApp = () => {
           open={isSidebarOpen}
           onClose={toggleSidebar}
           sx={{
-            width: drawerWidth,
+            
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              width: drawerWidth,
+              
               boxSizing: "border-box",
               marginTop: "64px",
               height: "calc(100vh - 64px)",
@@ -211,7 +218,7 @@ const ParentApp = () => {
             p: 3,
             marginTop: "64px",
             marginLeft: { md: isSidebarOpen ? `${drawerWidth}px` : 0 },
-            width: { md: `calc(100% - ${isSidebarOpen ? drawerWidth : 0}px)` },
+          
             transition: theme.transitions.create(["margin", "width"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,

@@ -3,12 +3,12 @@ const quizModel = require('../models/quizModel');
 
 // CREATE
 const createQuiz = (req, res) => {
-  const { title, description, category, questions } = req.body;
+  const { title, description, video_id, questions } = req.body;
   if (!title || !Array.isArray(questions)) {
     return res.status(400).json({ error: 'Invalid data' });
   }
 
-  quizModel.createQuiz({ title, description, category }, (err, result) => {
+  quizModel.createQuiz({ title, description, video_id }, (err, result) => {
     if (err) return res.status(500).json({ error: 'Quiz creation failed' });
 
     const quizId = result.insertId;
@@ -42,9 +42,9 @@ const getQuizById = (req, res) => {
 // UPDATE
 const updateQuiz = (req, res) => {
   const { id } = req.params;
-  const { title, description, category, questions } = req.body;
+  const { title, description, video_id, questions } = req.body;
 
-  quizModel.updateQuiz(id, { title, description, category, questions }, (err) => {
+  quizModel.updateQuiz(id, { title, description, video_id, questions }, (err) => {
     if (err) return res.status(500).json({ error: 'Failed to update quiz' });
     res.json({ message: 'Quiz updated successfully' });
   });
@@ -67,47 +67,3 @@ module.exports = {
   updateQuiz,
   deleteQuiz,
 };
-
-// ✅ Create Quiz with Questions
-// const createQuiz = (req, res) => {
-//   const { title, description, category, questions } = req.body;
-
-//   if (!title || !questions || !Array.isArray(questions)) {
-//     return res.status(400).json({ error: 'Invalid quiz data' });
-//   }
-
-//   const quizSql = `INSERT INTO quizzes (title, description, category) VALUES (?, ?, ?)`;
-//   db.query(quizSql, [title, description, category], (err, result) => {
-//     if (err) return res.status(500).json({ error: 'Failed to create quiz' });
-
-//     const quizId = result.insertId;
-
-//     const questionValues = questions.map(q => [
-//       quizId,
-//       q.question,
-//       q.option_a,
-//       q.option_b,
-//       q.option_c,
-//       q.option_d,
-//       q.correct_option
-//     ]);
-
-//     const questionSql = `
-//       INSERT INTO quiz_questions 
-//       (quiz_id, question, option_a, option_b, option_c, option_d, correct_option)
-//       VALUES ?
-//     `;
-
-//     db.query(questionSql, [questionValues], (err) => {
-//       if (err) return res.status(500).json({ error: 'Failed to insert questions' });
-
-//       res.status(201).json({ message: 'Quiz created successfully' });
-//     });
-//   });
-// };
-
-
-
-// module.exports = {
-//     createQuiz,
-// };

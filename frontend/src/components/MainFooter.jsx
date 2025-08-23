@@ -1,72 +1,97 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import logo from "@images/logo.png"; // Make sure path is correct
+import logo from "@images/logo.png"; // Adjust path if needed
 
 const MainFooter = () => {
-  
   return (
     <footer
       style={{
         backgroundColor: "#f8f9fa",
-        
         fontFamily: "'Poppins', sans-serif",
         padding: "2rem 0",
+        borderTop: "1px solid #dee2e6",
       }}
     >
       <Container>
-        <Row className="text-center text-md-start align-items-start">
-          
-          <Col xs={12} md={4} className="mb-4 mb-md-0">
-          <h5 className="fw-bold" style={{ color: "#F1066C" }}>
-              About Us
-            </h5>
-            <img
-              src={logo}
-              alt="Kids Learn Logo"
-            
-              style={{ maxWidth: "150px", marginBottom: "1rem" }}
-            />
-           
+        <Row className="text-center text-md-start">
+          <Col xs={12} md={6} lg={3} className="mb-4 mb-lg-0">
+            <div className="text-center">
+              <img
+                src={logo}
+                alt="Kids Learn Logo"
+                style={{ maxWidth: "250px", marginBottom: "1rem" }}
+              />
+            </div>
+
+            {/* <p className="text-muted small">
+              Kids Learn is your trusted platform for gentle, joyful, and
+              authentic Islamic learning.
+            </p> */}
           </Col>
 
-          
-          <Col xs={12} md={4} className="mb-4 mb-md-0">
-  <h5 className="fw-bold" style={{ color: "#F1066C" }}>
-    Quick Links
-  </h5>
-  <ul className="list-unstyled">
-    {["Home", "About", "Blog"].map((link, idx) => {
-      const url = link === "About" ? "#about-islam" : `/${link.toLowerCase()}`;
-      return (
-        <li key={idx}>
-          <a
-            href={url}
-            className="text-dark text-decoration-none d-block py-1"
-          >
-            {link}
-          </a>
-        </li>
-      );
-    })}
-  </ul>
-</Col>
+          <Col xs={12} md={6} lg={3} className="mb-4 mb-lg-0">
+            <h5 className="fw-bold" style={{ color: "#F1066C" }}>
+              Navigation
+            </h5>
+            <ul className="list-unstyled">
+              {[
+                { name: "Home", url: "/" },
+                {
+                  name: "Subscription",
+                  url: "/Subscription",
+                },
+                { name: "Blog", url: "/blog" },
+                { name: "FAQs", url: "/faqs" },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <a
+                    href={link.url}
+                    className="text-dark text-decoration-none d-block py-1"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Col>
 
+          <Col xs={12} md={6} lg={3} className="mb-4 mb-lg-0">
+            <h5 className="fw-bold" style={{ color: "#F1066C" }}>
+              Helpful Links
+            </h5>
+            <ul className="list-unstyled">
+              {[
+                {
+                  name: "About Islam",
+                  url: "/about-islam",
+                },
+                { name: "Contact", url: "/Contact" },
+                { name: "Login", url: "/login" },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <a
+                    href={link.url}
+                    className="text-dark text-decoration-none d-block py-1"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Col>
 
-
-        
-          <Col xs={12} md={4}>
+          <Col xs={12} md={6} lg={3}>
             <h5 className="fw-bold" style={{ color: "#F1066C" }}>
               Contact Us
             </h5>
             <p className="mb-1">📧 support@kidslearn.com</p>
             <p className="mb-1">📞 +1 (234) 567-890</p>
-            <p>📍 123 Learning St, Education City</p>
+            <p className="mb-0">📍 123 Learning St, Education City</p>
           </Col>
         </Row>
 
         <hr className="my-4" />
 
-       
         <Row>
           <Col className="text-center">
             <small className="text-muted">

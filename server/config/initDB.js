@@ -6,12 +6,13 @@ const initDB = () => {
     CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100),
+      username VARCHAR(100) UNIQUE,
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
       phone_number VARCHAR(20) DEFAULT NULL,
       subscription_id INT,
       is_active BOOLEAN DEFAULT 1,
-      is_deleted BOOLEAN DEFAULT NULL,
+      is_deleted BOOLEAN DEFAULT 0,
       role ENUM('admin', 'parent', 'child') DEFAULT 'parent',
       max_children INT DEFAULT 2,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -23,10 +24,13 @@ const initDB = () => {
     CREATE TABLE IF NOT EXISTS children (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100),
+      username VARCHAR(100) UNIQUE,
       email VARCHAR(100) UNIQUE,
       password VARCHAR(255),
       color VARCHAR(20),
       parent_id INT,
+      is_active BOOLEAN DEFAULT 1,
+      is_deleted BOOLEAN DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
     )
@@ -38,16 +42,36 @@ const initDB = () => {
     title VARCHAR(255),
     description TEXT,
     thumbnail_url VARCHAR(255),
+    series_id INT,
     video_url VARCHAR(255),
-    category VARCHAR(100),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
+
+  const seriesTable = `CREATE TABLE IF NOT EXISTS series (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    thumbnail_url VARCHAR(255),
+    is_deleted BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`
+
+  const modulesTable = `CREATE TABLE IF NOT EXISTS modules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    thumbnail_url VARCHAR(255),
+    is_active BOOLEAN DEFAULT 1,
+    is_deleted BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`
 
   const quizTable = `CREATE TABLE IF NOT EXISTS quizzes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
-    category VARCHAR(100),
+    video_id INT,
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -72,6 +96,7 @@ const initDB = () => {
     pages INT,
     file_url VARCHAR(255),
     thumbnail_url VARCHAR(255),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -81,6 +106,7 @@ const initDB = () => {
     banner_image VARCHAR(255),
     publish_date DATE,
     description TEXT,
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
@@ -91,6 +117,7 @@ const initDB = () => {
     price DECIMAL(10, 2),
     max_children INT DEFAULT 2,     -- default 2 allowed
     is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN DEFAULT 0,
     start_date DATE,
     end_date DATE, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -104,12 +131,14 @@ const initDB = () => {
     description TEXT,
     file_url VARCHAR(255) NOT NULL,
     category VARCHAR(100),
+    is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
 
   const categoriesTable = `CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    is_deleted BOOLEAN DEFAULT 0
   )`;
 
   const childRequestTable = `CREATE TABLE IF NOT EXISTS child_requests (
@@ -126,6 +155,7 @@ const initDB = () => {
     quiz_id INT,
     child_id INT,
     score INT,
+    answers TEXT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
@@ -137,9 +167,20 @@ const initDB = () => {
     child_id INT,
     file_url VARCHAR(255),
     marks INT,
+    video_id INT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+  )`;
+
+  const userActivityTable = `CREATE TABLE IF NOT EXISTS user_activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    metadata TEXT,
+    role VARCHAR(10),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`;
 
 
@@ -182,6 +223,14 @@ const initDB = () => {
     }
   });
 
+  db.query(seriesTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating series table:", err.message);
+    } else {
+      console.log("✅ Series table ready.");
+    }
+  });
+
   db.query(quizTable, (err) => {
     if (err) {
       console.log("❌ Error creating Quiz table:", err.message);
@@ -195,6 +244,14 @@ const initDB = () => {
       console.log("❌ Error creating Quiz Questions table:", err.message);
     } else {
       console.log("✅ Quiz Questions table ready.");
+    }
+  });
+
+  db.query(modulesTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Modules table:", err.message);
+    } else {
+      console.log("✅ Modules table ready.");
     }
   });
 
@@ -260,6 +317,14 @@ const initDB = () => {
       console.log("❌ Error creating Assignment Submission table:", err.message);
     } else {
       console.log("✅ Assignment Submission table ready.");
+    }
+  });
+
+  db.query(userActivityTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating User Activity table:", err.message);
+    } else {
+      console.log("✅ User Activity table ready.");
     }
   });
 

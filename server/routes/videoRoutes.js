@@ -6,6 +6,9 @@ const {
   uploadVideoFile,
   getAllVideos,
   getVideoById,
+  updateVideoById,
+  getVideosBySeriesId,
+  getUnassignedVideos 
 } = require('../controllers/videoController');
 
 // Setup multer
@@ -27,11 +30,16 @@ const upload = multer({ storage: videoStorage });
 router.post(
   '/upload',
   upload.fields([
-    { name: 'video', maxCount: 1 },
+    { name: 'video', maxCount: 20 },
     { name: 'thumbnail', maxCount: 1 },
   ]),
   uploadVideoFile
 );
+
+router.put('/videos/:id', upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), updateVideoById);
 
 router.get('/', getAllVideos);
 router.get('/:id', getVideoById);
@@ -68,5 +76,9 @@ router.get('/stream/:filename', (req, res) => {
     fs.createReadStream(videoPath).pipe(res);
   }
 });
+
+router.get('/series/:seriesId', getVideosBySeriesId);
+
+router.get("/unassigned/videos", getUnassignedVideos);
 
 module.exports = router;

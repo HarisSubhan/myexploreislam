@@ -4,7 +4,6 @@ import {
   Button,
   Container,
   Card,
-  Alert,
   Row,
   Col,
   InputGroup,
@@ -12,18 +11,18 @@ import {
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { addChild } from "../../services/api";
+import toast from "react-hot-toast";
 
 const ChildAdd = () => {
   const [formData, setFormData] = useState({
     email: "",
-    phone: "",
+    username: "",
     name: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { color: themeColor, textColor } = useTheme();
 
@@ -44,17 +43,12 @@ const ChildAdd = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Invalid email";
     }
-
-    if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10,15}$/.test(formData.phone)) {
-      newErrors.phone = "Phone must be 10-15 digits";
+    if (!formData.username) {
+      newErrors.username = "Child User Name is required";
     }
-
     if (!formData.name) {
-      newErrors.name = "Child name is required";
+      newErrors.name = "Child Name is required";
     }
-
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
@@ -71,29 +65,30 @@ const ChildAdd = () => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    setSuccessMessage("");
     setErrors({});
 
     try {
-      const data = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phoneNumber: formData.phone,
-      };
+      const res = await addChild(formData);
 
-      const res = await addChild(data);
+     
+      toast.success(res.message || "Child account created!");
 
-      setSuccessMessage(res.message || "Child account created!");
-      setFormData({ email: "", phone: "", name: "", password: "" });
+      
+      setFormData({ email: "", username: "", name: "", password: "" });
     } catch (error) {
-      setErrors({
-        form: error.message || "Something went wrong. Please try again.",
-      });
+     
+      const errMsg =
+        error.response?.data?.error || 
+        error.response?.data?.message || 
+        error.message ||
+        "Something went wrong";
+
+      toast.error(errMsg);
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <Container className="py-5">
@@ -104,57 +99,7 @@ const ChildAdd = () => {
               Create Child Account
             </Card.Header>
             <Card.Body>
-              {successMessage && (
-                <Alert
-                  variant="success"
-                  dismissible
-                  onClose={() => setSuccessMessage("")}
-                >
-                  {successMessage}
-                </Alert>
-              )}
-
-              {errors.form && (
-                <Alert
-                  variant="danger"
-                  dismissible
-                  onClose={() => setErrors({})}
-                >
-                  {errors.form}
-                </Alert>
-              )}
-
               <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="email">
-                  <Form.Label>Email Address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    isInvalid={!!errors.email}
-                    placeholder="Enter child's email"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
-                <Form.Group className="mb-3" controlId="phone">
-                  <Form.Label>Phone Number</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    isInvalid={!!errors.phone}
-                    placeholder="Enter phone number"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.phone}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
                 <Form.Group className="mb-3" controlId="name">
                   <Form.Label>Child's Full Name</Form.Label>
                   <Form.Control
@@ -167,6 +112,36 @@ const ChildAdd = () => {
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.name}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="username">
+                  <Form.Label>Child's User Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    isInvalid={!!errors.username}
+                    placeholder="Enter child's User name"
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.username}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="email">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    isInvalid={!!errors.email}
+                    placeholder="Enter Email"
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
                   </Form.Control.Feedback>
                 </Form.Group>
 

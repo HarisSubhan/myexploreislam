@@ -46,11 +46,13 @@ const ManageVideos = () => {
   return (
     <AdminLayout>
       <div className="p-4">
-        <h2 className="mb-4">🎬 Manage Videos</h2>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="mb-4">Manage Videos</h2>
 
-        <Link to="/admin/manage-videos/add">
-          <Button variant="success" className="mb-3">➕ Add New Video</Button>
-        </Link>
+          <Link to="/admin/manage-videos/add">
+            <Button variant="success" className="mb-3">Add New Video</Button>
+          </Link>
+        </div>
 
         {loading ? (
           <p>Loading...</p>
@@ -60,7 +62,7 @@ const ManageVideos = () => {
               <tr>
                 <th>#</th>
                 <th>Video Title</th>
-                <th>Category</th>
+                {/* <th>Category</th> */}
                 <th>Video URL</th>
                 <th>Thumbnail</th>
                 <th>Uploaded On</th>
@@ -72,7 +74,7 @@ const ManageVideos = () => {
                 <tr key={video.id}>
                   <td>{index + 1}</td>
                   <td>{video.title}</td>
-                  <td>{video.category}</td>
+                  {/* <td>{video.category}</td> */}
                   <td>
                     <a href={`http://localhost:5000${video.video_url}`} target="_blank" rel="noreferrer">Watch</a>
                   </td>

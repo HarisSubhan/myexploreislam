@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const logUserActivity = require('../utils/activityLogger');
 require('dotenv').config();
-const { createUser, findUserByEmail, findChildByEmail } = require('../models/userModel');
+const { createUser, findUserByEmail, findUserByUsername, findChildByEmail } = require('../models/userModel');
 
 // Example: setPassword function
 const setPassword = (req, res) => {
@@ -31,96 +32,139 @@ const setPassword = (req, res) => {
 };
 
 const register = (req, res) => {
-  const { name, email, password, phone_number, subscription_id } = req.body;
+  const { name, username, email, password, phone_number, subscription_id } = req.body;
   const role = 'parent'; // 👈 only parent can register from frontend
 
-  // Check if user already exists
-  findUserByEmail(email, (err, users) => {
+  if (!username || !name || !email || !password) {
+    return res.status(400).json({ error: 'All required fields must be filled' });
+  }
+
+  // Check if username already exists
+  findUserByUsername(username, (err, usersWithUsername) => {
     if (err) return res.status(500).json({ error: 'DB error' });
-    if (users.length > 0) return res.status(400).json({ error: 'Email already registered' });
+    if (usersWithUsername.length > 0) {
+      return res.status(400).json({ error: 'Username already taken' });
+    }
 
-    bcrypt.hash(password, 10, (err, hash) => {
-      if (err) return res.status(500).json({ error: 'Hashing error' });
+    // Check if email already exists
+    findUserByEmail(email, (err, usersWithEmail) => {
+      if (err) return res.status(500).json({ error: 'DB error' });
+      if (usersWithEmail.length > 0) {
+        return res.status(400).json({ error: 'Email already registered' });
+      }
 
-      createUser(name, email, hash, role, phone_number, subscription_id, (err, result) => {
-        if (err) return res.status(500).json({ error: 'Insert failed' });
+      // Hash password
+      bcrypt.hash(password, 10, (err, hash) => {
+        if (err) return res.status(500).json({ error: 'Hashing error' });
 
-        res.status(201).json({ message: 'Parent registered successfully' });
+        // Create new user
+        createUser(name, username, email, hash, role, phone_number, subscription_id, (err, result) => {
+          if (err) return res.status(500).json({ error: 'Insert failed' });
+
+          res.status(201).json({ message: 'Parent registered successfully' });
+        });
       });
     });
   });
 };
 
-
-
 const login = (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body; // 👈 identifier = email ya username
 
-  // First check in `users` table
-  findUserByEmail(email, (err, users) => {
-    if (err) return res.status(500).json({ error: 'Server error' });
+  if (!identifier || !password) {
+    return res.status(400).json({ error: 'Email/Username and password are required' });
+  }
 
-    if (users.length > 0) {
-      const user = users[0];
+  // First check in `users` table (parent)
+  db.query(
+    "SELECT * FROM users WHERE email = ? OR username = ? LIMIT 1",
+    [identifier, identifier],
+    (err, users) => {
+      if (err) return res.status(500).json({ error: 'Server error' });
 
-      bcrypt.compare(password, user.password, (err, match) => {
-        if (err || !match) return res.status(401).json({ error: 'Invalid credentials' });
+      if (users.length > 0) {
+        const user = users[0];
 
-        const token = jwt.sign(
-          { id: user.id, role: user.role },
-          process.env.JWT_SECRET,
-          { expiresIn: '1d' }
-        );
-
-        return res.json({
-          message: 'Login successful',
-          token,
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-          }
-        });
-      });
-    } else {
-      // If not found in users, check in children table
-      findChildByEmail(email, (err, children) => {
-        if (err || children.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
-
-        const child = children[0];
-
-        bcrypt.compare(password, child.password, (err, match) => {
+        bcrypt.compare(password, user.password, (err, match) => {
           if (err || !match) return res.status(401).json({ error: 'Invalid credentials' });
 
           const token = jwt.sign(
-            { id: child.id, role: 'child' },
+            { id: user.id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
           );
 
-          res.json({
+          logUserActivity(user.id, 'Logged In', {}, 'parent');
+
+          return res.json({
             message: 'Login successful',
             token,
             user: {
-              id: child.id,
-              name: child.name,
-              email: child.email,
-              role: 'child',
-              parent_id: child.parent_id
+              id: user.id,
+              name: user.name,
+              username: user.username,
+              email: user.email,
+              role: user.role
             }
           });
         });
-      });
+      } else {
+        // If not found in users, check in children table
+        db.query(
+          "SELECT * FROM children WHERE email = ? OR username = ? LIMIT 1",
+          [identifier, identifier],
+          (err, children) => {
+            if (err || children.length === 0)
+              return res.status(401).json({ error: 'Invalid email/username or password' });
+
+            const child = children[0];
+
+            bcrypt.compare(password, child.password, (err, match) => {
+              if (err || !match)
+                return res.status(401).json({ error: 'Invalid credentials' });
+
+              const token = jwt.sign(
+                { id: child.id, role: 'child' },
+                process.env.JWT_SECRET,
+                { expiresIn: '1d' }
+              );
+
+              logUserActivity(child.id, 'Logged In', {}, 'child');
+
+              res.json({
+                message: 'Login successful',
+                token,
+                user: {
+                  id: child.id,
+                  name: child.name,
+                  username: child.username,
+                  email: child.email,
+                  role: 'child',
+                  parent_id: child.parent_id
+                }
+              });
+            });
+          }
+        );
+      }
     }
-  });
+  );
 };
 
+
+const logout = (req, res) => {
+  const userId = req.user.id;
+
+  logUserActivity(userId, 'Logged Out');
+
+  res.json({ message: 'Logout successful' });
+};
 
 
 
 module.exports = {
   register,
   login,
-  setPassword
+  setPassword,
+  logout
 };
