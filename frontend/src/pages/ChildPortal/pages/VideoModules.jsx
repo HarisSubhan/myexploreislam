@@ -50,6 +50,7 @@ const VideoModules = () => {
   }, []);
 
   const handleClick = (id) => {
+    // ✅ matches ChildRoutes path
     navigate(`/child/module/series/${id}`);
   };
 
