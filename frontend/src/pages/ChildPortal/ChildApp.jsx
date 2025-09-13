@@ -86,7 +86,7 @@ const ChildApp = () => {
           <FaBars />
         </Button>
         <Navbar.Brand className="fw-bold">
-          Explore Islam - Dashboard
+          Explore Islam
         </Navbar.Brand>
       </Navbar>
 
