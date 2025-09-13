@@ -19,58 +19,62 @@ import ParentHeader from "../../../src/components/parent/ParentHeader";
 import {
   Home as HomeIcon,
   Article as ArticleIcon,
-  Payment as PaymentIcon,
-  AccountCircle as ProfileIcon,
   LockReset as ChangePasswordIcon,
   Palette as ThemeIcon,
 } from "@mui/icons-material";
 import { useTheme } from "../../context/ThemeContext";
+import { FaChildren } from "react-icons/fa6";
+import { FaDatabase } from "react-icons/fa";
+import { RiParentLine } from "react-icons/ri";
+import { IoIosNotificationsOutline } from "react-icons/io";
+import { MdContactSupport } from "react-icons/md";
+import { IoSettings } from "react-icons/io5";
 
 const drawerWidth = 240;
 
 const NAVIGATION = [
   { kind: "header", title: "Main Menu" },
-  { path: "/parent", title: "Home", icon: <HomeIcon /> },
+  { path: "/parent", title: "Dashboard", icon: <HomeIcon /> },
   {
-    path: "/parent/subscription",
-    title: "Subscription",
-    icon: <ArticleIcon />,
+    path: "/parent/children",
+    title: "Manage Children",
+    icon: <FaChildren />,
   },
   {
-    path: "/parent/addchild",
-    title: "Add Child",
-    icon: <ProfileIcon/>
-  },
-  {
-    path: "/parent/requestchild",
+    path: "/parent/requests-child",
     title: "Request Child",
     icon: <ChangePasswordIcon />,
   },
-  { path: "/parent/payments", title: "Payments", icon: <PaymentIcon /> },
+  {
+    path: "/parent/learning-reports",
+    title: "Learning Reports",
+    icon: <FaDatabase />,
+  },
+  {
+    path: "/parent/Subscriptions-Billing",
+    title: "Subscriptions & Billing",
+    icon: <ArticleIcon />,
+  },
   { kind: "divider" },
   {
-    path: "/parent/account",
-    title: "Account",
-    icon: <ProfileIcon />,
+    path: "/parent/parental-controls",
+    title: "Parental Controls",
+    icon: <RiParentLine />,
   },
   {
-    path: "/parent/profile",
-    title: "Profile",
-    icon: <ProfileIcon />,
+    path: "/parent/notifications ",
+    title: "Notifications ",
+    icon: <IoIosNotificationsOutline />,
   },
-  
   {
-    path: "/parent/changepassword",
-    title: "Change Password",
-    icon: <ChangePasswordIcon />,
+    path: "/parent/support",
+    title: "Support",
+    icon: <MdContactSupport />,
   },
-  
-  { kind: "divider" },
-  
   {
-    path: "/parent/defaulttheme",
-    title: "Theme Settings",
-    icon: <ThemeIcon />,
+    path: "/parent/account-setting",
+    title: "Account Settings",
+    icon: <IoSettings />,
   },
 ];
 
