@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Container, Card, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Card, Row, Col, Button } from "react-bootstrap";
 import { useTheme } from "../../context/ThemeContext";
 
 const ColorChanging = () => {
@@ -35,6 +35,9 @@ const ColorChanging = () => {
       <Card className="shadow-lg rounded-4 border-0">
         <Card.Header className="text-center py-4 bg-light border-bottom">
           <h4 className="mb-0">🎨 Customize Your Portal Theme</h4>
+          <p className="text-muted mb-0 mt-2">
+            Pick a theme to personalize your portal experience
+          </p>
         </Card.Header>
         <Card.Body>
           <Row className="g-4 justify-content-center">
@@ -58,31 +61,35 @@ const ColorChanging = () => {
                     e.key === "Enter" &&
                     handleColorChange(color.value, color.name, color.textColor)
                   }
-                  className="theme-color-box mb-2"
                   style={{
+                    width: "70px",
+                    height: "70px",
+                    borderRadius: "50%",
                     backgroundColor: color.value,
                     color: color.textColor,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    fontWeight: "bold",
+                    cursor: "pointer",
                     border:
                       themeColor === color.value
                         ? "4px solid var(--text-on-primary)"
-                        : "2px solid #dee2e6",
+                        : "2px solid #ddd",
+                    boxShadow:
+                      themeColor === color.value
+                        ? "0 0 10px rgba(0,0,0,0.2)"
+                        : "0 2px 6px rgba(0,0,0,0.1)",
+                    transition: "all 0.3s ease",
                   }}
                 >
-                  <span className="fw-bold">{color.name}</span>
+                  {color.name[0]}
                 </div>
-                <Form.Check
-                  type="radio"
-                  name="themeColor"
-                  id={`theme-${color.name}`}
-                  label={color.name}
-                  checked={themeColor === color.value}
-                  onChange={() =>
-                    handleColorChange(color.value, color.name, color.textColor)
-                  }
-                />
+                <span className="mt-2 text-center small">{color.name}</span>
               </Col>
             ))}
           </Row>
+
           <div className="text-center mt-5">
             <Button
               variant="outline-primary"
