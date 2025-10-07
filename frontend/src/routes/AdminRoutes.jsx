@@ -35,6 +35,8 @@ import Categories from "../pages/AdminPortal/pages/Categories";
 import Settings from "../pages/AdminPortal/pages/Settings";
 import Modules from "../pages/AdminPortal/pages/Modules";
 import Series from "../pages/AdminPortal/pages/Series";
+import AdminSupportTicket from "../components/admin/AdminSupportTicket.";
+import AdminCoupons from "../components/admin/AdminCoupons";
 
 
 
@@ -70,12 +72,14 @@ const AdminRoutes = () => {
       <Route path="/manage-blogs/edit/:id" element={<EditBlog />} />
       <Route path="/manage-blogs/view/:id" element={<ViewBlog />} />
 
-
       <Route path="subscriptions" element={<Subscriptions />} />
       <Route path="categories" element={<Categories />} />
       <Route path="settings" element={<Settings />} />
       <Route path="modules" element={<Modules />} />
       <Route path="series" element={<Series />} />
+
+      <Route path="support" element={<AdminSupportTicket />} />
+      <Route path="coupons" element={<AdminCoupons />} />
     </Routes>
   );
 };
