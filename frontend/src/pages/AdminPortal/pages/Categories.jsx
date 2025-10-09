@@ -161,6 +161,6 @@ const ManageCategories = () => {
       </div>
     </AdminLayout>
   );
-};
+};  
 
 export default ManageCategories;
