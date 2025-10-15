@@ -9,6 +9,9 @@ import IncomeChart from '../../../components/admin/IncomeChart';
 import RecentActivity from "../../../components/admin/RecentActivity";
 import UsersTable from "../../../components/admin/UsersTable";
 import TopPerformingStudents from "../../../components/admin/TopPerformingStudents";
+import HealthMetricCard from '../../../components/admin/HealthMetricCard';
+import LearningEngagementSection from '../../../components/admin/LearningEngagementSection';
+
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -19,6 +22,45 @@ const Dashboard = () => {
     quizzes: 0,
     blogs: 0,
   });
+
+   const [metrics, setMetrics] = useState({
+     activeSubscriptions: 0,
+     subscriptionChange: 0,
+     newSignups: 0,
+     revenueThisMonth: 0,
+     churnRate: 0,
+     openSupportTickets: 0,
+   });
+
+   const [revenueData, setRevenueData] = useState([]);
+
+    useEffect(() => {
+      // Simulate API fetch
+      const fetchData = async () => {
+        // Mock metrics data
+        setMetrics({
+          activeSubscriptions: 1247,
+          subscriptionChange: 2.3,
+          newSignups: 89,
+          revenueThisMonth: 45280,
+          churnRate: 1.2,
+          openSupportTickets: 23,
+        });
+
+        // Mock revenue data for chart
+        setRevenueData([
+          { month: "Last Month", revenue: 42850 },
+          { month: "This Month", revenue: 45280 },
+        ]);
+      };
+
+      fetchData();
+    }, []);
+
+      const handleSupportTicketsClick = () => {
+        // Navigate to support panel
+        window.location.href = "/admin/support";
+      };
 
   const [loading, setLoading] = useState(true);
 
@@ -77,9 +119,7 @@ const Dashboard = () => {
                       <p className="h4 mb-1 fw-semibold">{item.value}</p>
                       <p className="mb-0 text-muted">{item.label}</p>
                     </div>
-                    <div className={`fs-2 text-${item.color}`}>
-                      {item.icon}
-                    </div>
+                    <div className={`fs-2 text-${item.color}`}>{item.icon}</div>
                   </Card.Body>
                 </Card>
               </Col>
@@ -101,15 +141,67 @@ const Dashboard = () => {
 
       <Container className="mt-4">
         {/* <Col md={6}> */}
-          <TopPerformingStudents />
+        <TopPerformingStudents />
         {/* </Col> */}
       </Container>
-
 
       <Container className="mt-5">
         <UsersTable />
       </Container>
 
+      <Container fluid className="dashboard-container">
+        <Row className="mb-4">
+          <Col>
+            <h1 className="dashboard-title">Platform Health Dashboard</h1>
+            <p className="dashboard-subtitle">
+              Real-time business metrics at a glance
+            </p>
+          </Col>
+        </Row>
+
+        <Row className="g-3 mb-4">
+          {/* Active Subscriptions */}
+          <Col xs={12} md={6} lg={4}>
+            <HealthMetricCard
+              title="Active Subscriptions"
+              value={metrics.activeSubscriptions.toLocaleString()}
+              change={metrics.subscriptionChange}
+              changeLabel="vs last 7 days"
+              icon="👥"
+              variant="primary"
+            />
+          </Col>
+
+          {/* New Signups */}
+          <Col xs={12} md={6} lg={4}>
+            <HealthMetricCard
+              title="New Signups (7d)"
+              value={metrics.newSignups.toLocaleString()}
+              change={12.5}
+              changeLabel="this week"
+              icon="📈"
+              variant="success"
+            />
+          </Col>
+
+          {/* Open Support Tickets */}
+          <Col xs={12} md={6} lg={4}>
+            <HealthMetricCard
+              title="Open Support Tickets"
+              value={metrics.openSupportTickets.toString()}
+              change={-5.2} // Example change
+              changeLabel="vs last week"
+              icon="🎫"
+              variant="warning"
+              clickable={true}
+              onClick={handleSupportTicketsClick}
+            />
+          </Col>
+        </Row>
+      </Container>
+
+      <LearningEngagementSection />
+      
     </AdminLayout>
   );
 };

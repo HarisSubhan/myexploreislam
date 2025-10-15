@@ -1,6 +1,5 @@
 import React from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { FaPlay } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 
 const seasons = [
@@ -10,15 +9,14 @@ const seasons = [
 ];
 
 const VideoSeries = () => {
-    const { category } = useParams(); 
-    const navigate = useNavigate();
-    const handleWatchClick = () => {
-      navigate(`/child/videos/${category}/watch`);
-    };
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-    
+  const handleWatchClick = () => {
+    // ✅ fixed to match ChildRoutes path
+    navigate(`/child/module/series/${id}/introduction`);
+  };
 
-   
   return (
     <Container
       fluid
@@ -26,7 +24,7 @@ const VideoSeries = () => {
       style={{ background: "#f8f9fa", minHeight: "100vh" }}
     >
       <h2 className="text-center fw-bold mb-5" style={{ color: "#3A86FF" }}>
-        📺{category} Choose Your Season
+        📺 {id} Choose Your Season
       </h2>
       <Row className="g-4 mb-5">
         {seasons.map((season, index) => (
@@ -57,9 +55,12 @@ const VideoSeries = () => {
                 {season.title}
               </div>
               <Card.Body>
-                <h3>Title</h3>
+                <h3>{season.title}</h3>
                 <button
-                  onClick={handleWatchClick}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleWatchClick();
+                  }}
                   className="btn btn-primary w-100"
                 >
                   Watch Now

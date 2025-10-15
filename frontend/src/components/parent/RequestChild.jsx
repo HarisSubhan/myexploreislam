@@ -1,37 +1,18 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import {
-  Container,
-  Form,
-  Button,
-  Card,
-  Row,
-  Col,
-  Spinner,
-} from "react-bootstrap";
-import { requestChildApi } from "../../services/parentApi";
+import { Container, Form, Button, Card, Row, Col } from "react-bootstrap";
+import { requestedChildApi } from "../../services/parentApi";
 
 const RequestChild = () => {
   const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [requestedChildren, setRequestedChildren] = useState("");
   const parentId = localStorage.getItem("userId");
 
+  // Clear requests when parentId changes (happens during logout/login)
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const res = await axios.get(`/api/requests/${parentId}`);
-        setRequests(res.data);
-      } catch (err) {
-        toast.error("Failed to load requests.");
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
+    return () => {
+      setRequests([]); // Cleanup on unmount
     };
-
-    fetchRequests();
   }, [parentId]);
 
   const handleSubmit = async (e) => {
@@ -43,29 +24,29 @@ const RequestChild = () => {
     }
 
     try {
-      const newRequest = await requestChildApi({
+      const newRequest = await requestedChildApi({
         parent_id: parentId,
         requested_children: Number(requestedChildren),
       });
 
       setRequests((prev) => [...prev, newRequest]);
-      toast.success("Request submitted successfully.");
       setRequestedChildren("");
+      toast.success("Request submitted successfully.");
     } catch (err) {
-      if (err.response?.data?.error) {
-        toast.error(err.response.data.error); // backend error
-      } else {
-        toast.error(err.message || "Failed to send request.");
-      }
-      console.error(err);
+      toast.error(err.message || "Failed to send request.");
     }
+  };
+
+  // Format date helper function
+  const formatRequestDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString))) return "N/A";
+    return new Date(dateString).toLocaleString();
   };
 
   return (
     <Container className="mt-5">
       <Card className="shadow-sm p-4">
         <h3 className="mb-4">Request Children</h3>
-
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="requestedChildren" className="mb-3">
             <Form.Label>Number of Children</Form.Label>
@@ -77,7 +58,6 @@ const RequestChild = () => {
               min="1"
             />
           </Form.Group>
-
           <Button type="submit" variant="primary">
             Send Request
           </Button>
@@ -86,36 +66,23 @@ const RequestChild = () => {
 
       <h4 className="mt-5 mb-3">Sent Requests</h4>
 
-      {loading ? (
-        <div className="text-center my-4">
-          <Spinner animation="border" />
-        </div>
-      ) : requests.length === 0 ? (
+      {requests.length === 0 ? (
         <p className="text-muted">No requests yet.</p>
       ) : (
         <Row>
           {requests.map((req) => (
-            <Col md={6} lg={4} key={req._id} className="mb-3">
+            <Col md={6} lg={4} key={req.id || req._id} className="mb-3">
               <Card className="h-100 shadow-sm">
                 <Card.Body>
-                  <Card.Title>{req.requested_children} Children</Card.Title>
+                  <Card.Title>
+                    {req.requested_children || "-"} Children
+                  </Card.Title>
                   <Card.Text>
-                    <strong>Status:</strong>{" "}
-                    <span
-                      className={
-                        req.status === "pending"
-                          ? "text-warning"
-                          : req.status === "approved"
-                            ? "text-success"
-                            : "text-danger"
-                      }
-                    >
-                      {req.status}
-                    </span>
+                    <strong>Status:</strong> {req.status || "-"}
                   </Card.Text>
-                  <small className="text-muted">
-                    {new Date(req.created_at).toLocaleString()}
-                  </small>
+                  <Card.Text>
+                    <strong>Date Time:</strong> {formatRequestDate(req.created_at || req.createdAt)}
+                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>

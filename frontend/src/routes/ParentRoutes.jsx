@@ -1,5 +1,10 @@
 import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
+import Children from "../pages/ParentPortal/pages/Children";
+import LearningReports from "../pages/ParentPortal/pages/LearningReports";
+import ParentalControls from "../pages/ParentPortal/pages/ParentalControls";
+import ParentNotifications from "../pages/ParentPortal/pages/ParentNotifications";
+import ParentSupports from "../pages/ParentPortal/pages/ParentSupports";
 
 // Lazy-loaded components
 const ParentApp = lazy(() => import("../pages/ParentPortal/ParentApp"));
@@ -19,14 +24,20 @@ const ParentRoutes = () => {
       <Routes>
         <Route path="/" element={<ParentApp />}>
           <Route index element={<ParentDashboard />} />
-          <Route path="subscription" element={<Subscription />} />
-          <Route path="payments" element={<Payments />} />
-          <Route path="account" element={<Account />} />
+          <Route path="children" element={<Children />} />
+          <Route path="requests-child" element={<RequestChild />} />
+          <Route path="learning-reports" element={<LearningReports />} />
+          <Route path="subscriptions-billing" element={<Subscription />} />
+          <Route path="parental-controls" element={<ParentalControls />} />
+          <Route path="notifications" element={<ParentNotifications />} />
+          <Route path="support" element={<ParentSupports />} />
+          <Route path="account-setting" element={<DefaultTheme />} />
+
+          {/* <Route path="payments" element={<Payments />} />
           <Route path="profile" element={<Profile />} />
           <Route path="changepassword" element={<ChangePassword />} />
           <Route path="addchild" element={<AddChild />} />
-          <Route path="defaulttheme" element={<DefaultTheme />} />
-          <Route path="requestchild" element={<RequestChild/>} />
+          <Route path="defaulttheme" element={<DefaultTheme />} /> */}
         </Route>
       </Routes>
     </Suspense>
