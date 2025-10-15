@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
 import {
-  FaUsers, FaVideo, FaBook, FaQuestionCircle, FaBlogger
+  FaUsers, FaVideo, FaQuestionCircle, FaBlogger, FaCreditCard
 } from 'react-icons/fa';
 import AdminLayout from '../AdminApp';
 import axios from 'axios';
@@ -18,7 +18,7 @@ const Dashboard = () => {
     totalParents: 0,
     totalChildren: 0,
     videos: 0,
-    assignments: 0,
+    subscription: 0,
     quizzes: 0,
     blogs: 0,
   });
@@ -77,7 +77,7 @@ const Dashboard = () => {
           totalParents: res.data.parents || 0,
           totalChildren: res.data.children || 0,
           videos: res.data.videos || 0,
-          assignments: res.data.assignments || 0,
+          subscription: res.data.subscriptions || 0,
           quizzes: res.data.quizzes || 0,
           blogs: res.data.blogs || 0,
         });
@@ -95,7 +95,7 @@ const Dashboard = () => {
     { label: 'Total Parents', value: stats.totalParents, icon: <FaUsers />, color: 'primary' },
     { label: 'Total Children', value: stats.totalChildren, icon: <FaUsers />, color: 'secondary' },
     { label: 'Total Videos', value: stats.videos, icon: <FaVideo />, color: 'info' },
-    { label: 'Total Assignments', value: stats.assignments, icon: <FaBook />, color: 'success' },
+    { label: 'Total Subscription', value: stats.subscription, icon: <FaCreditCard />, color: 'success' },
     { label: 'Total Quizzes', value: stats.quizzes, icon: <FaQuestionCircle />, color: 'warning' },
     { label: 'Total Blogs', value: stats.blogs, icon: <FaBlogger />, color: 'danger' },
   ];

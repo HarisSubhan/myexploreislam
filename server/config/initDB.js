@@ -184,6 +184,39 @@ const initDB = () => {
   )`;
 
 
+  const ticketsTable = `
+    CREATE TABLE IF NOT EXISTS tickets (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      ticket_number VARCHAR(50) UNIQUE NOT NULL,
+      subject VARCHAR(255) NOT NULL,
+      description TEXT,
+      status ENUM('OPEN', 'PENDING', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') DEFAULT 'OPEN',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `;
+
+  const couponTable = `
+    CREATE TABLE IF NOT EXISTS coupons (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    coupon_code VARCHAR(50) NOT NULL UNIQUE,
+    coupon_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    discount_type ENUM('PERCENTAGE', 'FIXED') NOT NULL,
+    discount_value DECIMAL(10,2) NOT NULL,
+    max_discount DECIMAL(10,2),
+    min_purchase_amount DECIMAL(10,2),
+    valid_from DATE NOT NULL,
+    valid_until DATE NOT NULL,
+    usage_limit INT DEFAULT 1,
+    subscription_id INT,
+    status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  )
+  `;
+
+
   db.query(userTable, (err) => {
     if (err) {
       console.log('❌ Error creating users table:', err.code, err.message);
@@ -325,6 +358,23 @@ const initDB = () => {
       console.log("❌ Error creating User Activity table:", err.message);
     } else {
       console.log("✅ User Activity table ready.");
+    }
+  });
+
+  db.query(ticketsTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Tickets table:", err.message);
+    } else {
+      console.log("✅ Tickets table ready.");
+    }
+  });
+
+
+  db.query(couponTable, (err) => {
+    if (err) {
+      console.log("❌ Error creating Coupons table:", err.message);
+    } else {
+      console.log("✅ Coupons table ready.");
     }
   });
 
