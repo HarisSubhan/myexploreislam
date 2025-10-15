@@ -1,53 +1,141 @@
-import React, { useState } from "react";
-import { Container, Card, ProgressBar, Alert } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Card,
+  ProgressBar,
+  Alert,
+  Button,
+  Spinner,
+} from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import axios from "axios";
 
 const ModuleQuiz = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { seriesId, videoId } = useParams();
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [score, setScore] = useState(0);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [quizId, setQuizId] = useState(null);
+  const [childId] = useState(1); // In a real app, this would come from auth context
 
-  const questions = [
-    {
-      question: "What is the main concept covered in this module?",
-      options: ["Option A", "Option B", "Option C", "Option D"],
-      correctAnswer: 1, // Index of correct option
-    },
-    {
-      question: "Which of these is a key principle discussed?",
-      options: ["Principle 1", "Principle 2", "Principle 3", "Principle 4"],
-      correctAnswer: 2,
-    },
-    {
-      question: "What was the main example used in the lesson?",
-      options: ["Example A", "Example B", "Example C", "Example D"],
-      correctAnswer: 0,
-    },
-  ];
+  useEffect(() => {
+    fetchQuizData();
+  }, [videoId]);
 
-  const handleAnswerSelect = (index) => {
-    setSelectedAnswer(index);
-    if (showFeedback) setShowFeedback(false);
+  const fetchQuizData = async () => {
+    try {
+      setLoading(true);
+      // In a real app, you would fetch the quiz based on videoId/seriesId
+      const response = await axios.get("http://localhost:5000/api/quizzes/1"); // Using quiz ID 1 for demo
+      const quizData = response.data;
+
+      setQuizId(quizData.id);
+
+      // Transform API data to match our component structure
+      const transformedQuestions = quizData.questions.map((q, index) => ({
+        id: q.id || index + 1,
+        question: q.question,
+        options: [q.option_a, q.option_b, q.option_c, q.option_d],
+        correctAnswer: getCorrectAnswerIndex(q.correct_option),
+        correctOption: q.correct_option,
+      }));
+
+      setQuestions(transformedQuestions);
+    } catch (err) {
+      setError("Failed to load quiz. Please try again.");
+      console.error("Error fetching quiz:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = () => {
+  const getCorrectAnswerIndex = (correctOption) => {
+    switch (correctOption) {
+      case "a":
+        return 0;
+      case "b":
+        return 1;
+      case "c":
+        return 2;
+      case "d":
+        return 3;
+      default:
+        return 0;
+    }
+  };
+
+  const getOptionLetter = (index) => {
+    return String.fromCharCode(97 + index); // a, b, c, d
+  };
+
+  const handleAnswerSelect = (index) => {
+    if (!showFeedback && !loading) {
+      setSelectedAnswer(index);
+    }
+  };
+
+  const submitQuizResults = async (finalScore, answers) => {
+    try {
+      await axios.post("http://localhost:5000/api/quiz-submissions/submit", {
+        quiz_id: quizId,
+        child_id: childId,
+        score: finalScore,
+        answers: answers,
+      });
+    } catch (err) {
+      console.error("Error submitting quiz results:", err);
+      // Continue navigation even if submission fails
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (selectedAnswer === null) return;
+
     const correct = selectedAnswer === questions[currentQuestion].correctAnswer;
     setIsCorrect(correct);
     setShowFeedback(true);
 
-    // Auto-advance after showing feedback
-    setTimeout(() => {
-      if (currentQuestion < questions.length - 1) {
+    if (correct) {
+      setScore(score + 1);
+    }
+
+    // Prepare answers for submission
+    const currentAnswers = questions
+      .slice(0, currentQuestion + 1)
+      .map((q, index) => ({
+        question_id: q.id,
+        selected_option: getOptionLetter(selectedAnswer),
+      }));
+
+    if (currentQuestion < questions.length - 1) {
+      setTimeout(() => {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedAnswer(null);
         setShowFeedback(false);
-      } else {
-        navigate(`/child/module/series/${id}/completion`);
-      }
-    }, 1500);
+      }, 2000);
+    } else {
+      // Submit final results
+      const finalScore = correct ? score + 1 : score;
+      const allAnswers = [...currentAnswers];
+
+      setTimeout(async () => {
+        await submitQuizResults(finalScore, allAnswers);
+        navigate(`/child/series/${seriesId}/completion/${videoId}`, {
+          state: {
+            score: finalScore,
+            totalQuestions: questions.length,
+            quizId: quizId,
+          },
+        });
+      }, 2000);
+    }
   };
 
   const handleBack = () => {
@@ -56,9 +144,64 @@ const ModuleQuiz = () => {
       setSelectedAnswer(null);
       setShowFeedback(false);
     } else {
-      navigate(`/child/module/series/${id}/page1`);
+      navigate(`/child/series/${seriesId}/page1/${videoId}`);
     }
   };
+
+  if (loading) {
+    return (
+      <Container
+        fluid
+        className="py-5 d-flex flex-column justify-content-center align-items-center"
+        style={{
+          background: "linear-gradient(135deg, #f8fbff 0%, #e6f0ff 100%)",
+          minHeight: "100vh",
+        }}
+      >
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3 text-muted">Loading quiz...</p>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container
+        fluid
+        className="py-5 d-flex flex-column justify-content-center align-items-center"
+        style={{
+          background: "linear-gradient(135deg, #f8fbff 0%, #e6f0ff 100%)",
+          minHeight: "100vh",
+        }}
+      >
+        <Alert variant="danger" className="text-center">
+          {error}
+          <div className="mt-3">
+            <Button variant="primary" onClick={fetchQuizData}>
+              Try Again
+            </Button>
+          </div>
+        </Alert>
+      </Container>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <Container
+        fluid
+        className="py-5 d-flex flex-column justify-content-center align-items-center"
+        style={{
+          background: "linear-gradient(135deg, #f8fbff 0%, #e6f0ff 100%)",
+          minHeight: "100vh",
+        }}
+      >
+        <Alert variant="warning" className="text-center">
+          No questions available for this quiz.
+        </Alert>
+      </Container>
+    );
+  }
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
@@ -73,9 +216,9 @@ const ModuleQuiz = () => {
     >
       <div className="text-center mb-4">
         <h4 className="fw-bold" style={{ color: "#3a86ff" }}>
-          LESSON 1 - WHAT IS ISLAM?
+          KNOWLEDGE CHECK
         </h4>
-        <p className="text-muted">Test your knowledge from the lesson</p>
+        <p className="text-muted">Test your understanding of the lesson</p>
       </div>
 
       <Card
@@ -94,10 +237,17 @@ const ModuleQuiz = () => {
           </span>
           <ProgressBar
             now={progress}
-            style={{ width: "60%", height: "10px" }}
+            style={{ width: "60%", height: "12px" }}
             variant="primary"
           />
           <span className="text-muted">{Math.round(progress)}%</span>
+        </div>
+
+        {/* Score indicator */}
+        <div className="text-center mb-3">
+          <small className="text-muted">
+            Score: {score} / {currentQuestion}
+          </small>
         </div>
 
         {/* Question section */}
@@ -117,7 +267,7 @@ const ModuleQuiz = () => {
                         ? "border-success bg-light-success"
                         : selectedAnswer === index
                           ? "border-danger bg-light-danger"
-                          : ""
+                          : "border-light-subtle"
                       : "border-primary bg-light-primary"
                     : "border-light-subtle"
                 } 
@@ -125,27 +275,35 @@ const ModuleQuiz = () => {
                 style={{
                   transition: "all 0.2s ease",
                   cursor: !showFeedback ? "pointer" : "default",
+                  backgroundColor:
+                    selectedAnswer === index
+                      ? showFeedback
+                        ? isCorrect
+                          ? "#d1f2eb"
+                          : "#f8d7da"
+                        : "#e3f2fd"
+                      : "white",
                 }}
-                onClick={() => !showFeedback && handleAnswerSelect(index)}
+                onClick={() => handleAnswerSelect(index)}
               >
                 <div className="d-flex align-items-center">
                   <div
                     className={`d-flex justify-content-center align-items-center me-3 ${
                       selectedAnswer === index
                         ? showFeedback
-                          ? isCorrect && selectedAnswer === index
+                          ? isCorrect
                             ? "bg-success"
-                            : selectedAnswer === index
-                              ? "bg-danger"
-                              : "bg-primary"
+                            : "bg-danger"
                           : "bg-primary"
                         : "bg-light border"
                     } 
                     rounded-circle`}
                     style={{
-                      width: "24px",
-                      height: "24px",
-                      minWidth: "24px",
+                      width: "28px",
+                      height: "28px",
+                      minWidth: "28px",
+                      fontSize: "0.9rem",
+                      fontWeight: "bold",
                     }}
                   >
                     {selectedAnswer === index && showFeedback ? (
@@ -164,12 +322,7 @@ const ModuleQuiz = () => {
                       </span>
                     )}
                   </div>
-                  <label
-                    className="text-dark mb-0 flex-grow-1"
-                    style={{ cursor: !showFeedback ? "pointer" : "default" }}
-                  >
-                    {option}
-                  </label>
+                  <span className="text-dark flex-grow-1">{option}</span>
                 </div>
               </div>
             ))}
@@ -181,61 +334,40 @@ const ModuleQuiz = () => {
               variant={isCorrect ? "success" : "danger"}
               className="mt-4 mb-0"
             >
+              <strong>{isCorrect ? "✓ Correct! " : "✗ Incorrect. "}</strong>
               {isCorrect
-                ? "✓ Correct! Well done!"
-                : "✗ Incorrect. The right answer is: " +
-                  questions[currentQuestion].options[
-                    questions[currentQuestion].correctAnswer
-                  ]}
+                ? "Well done! You understand this concept."
+                : `The correct answer is: ${
+                    questions[currentQuestion].options[
+                      questions[currentQuestion].correctAnswer
+                    ]
+                  }`}
             </Alert>
           )}
         </div>
 
         {/* Navigation buttons */}
         <div className="d-flex justify-content-between mt-4">
-          <button
+          <Button
             onClick={handleBack}
-            className="px-4 py-2 d-flex align-items-center rounded-3 border-0"
-            style={{
-              background: "#e9ecef",
-              color: "#495057",
-              transition: "all 0.2s ease",
-            }}
-            onMouseOver={(e) => (e.target.style.background = "#dee2e6")}
-            onMouseOut={(e) => (e.target.style.background = "#e9ecef")}
+            variant="outline-primary"
+            className="d-flex align-items-center"
           >
-            <span className="me-2">⬅</span> Back
-          </button>
+            <FaArrowLeft className="me-2" />
+            Back
+          </Button>
 
-          <button
+          <Button
             onClick={handleSubmit}
             disabled={selectedAnswer === null || showFeedback}
-            className={`px-4 py-2 d-flex align-items-center rounded-3 border-0 ${
-              selectedAnswer === null || showFeedback
-                ? "bg-gray-400"
-                : "bg-primary"
-            }`}
-            style={{
-              color:
-                selectedAnswer === null || showFeedback ? "#6c757d" : "white",
-              transition: "all 0.2s ease",
-            }}
-            onMouseOver={(e) => {
-              if (!(selectedAnswer === null || showFeedback)) {
-                e.target.style.background = "#0b5ed7";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!(selectedAnswer === null || showFeedback)) {
-                e.target.style.background = "#0d6efd";
-              }
-            }}
+            variant={selectedAnswer === null ? "outline-secondary" : "primary"}
+            className="d-flex align-items-center"
           >
             {currentQuestion < questions.length - 1
               ? "Next Question"
               : "Finish Quiz"}
-            <span className="ms-2">➡</span>
-          </button>
+            <FaArrowRight className="ms-2" />
+          </Button>
         </div>
       </Card>
     </Container>

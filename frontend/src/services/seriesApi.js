@@ -15,3 +15,5 @@ export const getSeriesApi = async () => {
   }
   return response.json();
 };
+
+
