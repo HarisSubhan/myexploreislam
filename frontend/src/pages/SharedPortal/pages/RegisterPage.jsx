@@ -80,7 +80,7 @@ const RegisterPage = () => {
         
         setTimeout(() => {
           navigate("/parent");
-        }, 2000);
+        },);
       } else {
         
         if (res && res.message) {

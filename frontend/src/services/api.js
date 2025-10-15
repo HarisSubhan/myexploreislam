@@ -7,6 +7,20 @@ export const LoginApi = async (data) => {
   return res.data; // Return the response data as is
 };
 
+export const setPasswordApi = async (email, password) => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/auth/set-password`,
+      { email, password }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Server error. Try again later."
+    );
+  }
+};
+
 export const RegisterApi = async (data) => {
   const res = await axios.post(`${baseUrl}/api/auth/register`, data);
   return res.data;
