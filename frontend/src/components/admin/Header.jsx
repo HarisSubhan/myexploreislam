@@ -1,75 +1,83 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import {
-    Navbar,
-    Container,
-    Nav,
-    Button,
-    Dropdown,
-    ButtonGroup,
+  Navbar,
+  Container,
+  Nav,
+  Button,
+  Dropdown,
+  ButtonGroup,
 } from "react-bootstrap";
-import { Sun, Moon, Person } from "react-bootstrap-icons";
+import { Person } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-    const navigate = useNavigate(); 
-    const [darkMode, setDarkMode] = useState(false);
+  const navigate = useNavigate();
 
-    const toggleTheme = () => {
-        setDarkMode(!darkMode);
-        document.body.classList.toggle("bg-dark");
-        document.body.classList.toggle("text-light");
-    };
+  const logoutHandler = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
-      const logoutHandler = () => {
-        localStorage.removeItem("token");         
-        navigate("/login");
-    };
+  const dropdownItems = useMemo(
+    () => [
+      { href: "#/profile", label: "Profile" },
+      { href: "#/settings", label: "Settings" },
+      { type: "divider" },
+      { href: "#/logout", label: "Logout", onClick: logoutHandler },
+    ],
+    [logoutHandler]
+  );
 
+  const userButtons = useMemo(
+    () => [
+      { label: "Child", onClick: () => {} },
+      { label: "Parent", onClick: () => {} },
+    ],
+    []
+  );
 
-    return (
-        <Navbar
-            bg={darkMode ? "dark" : "light"}
-            variant={darkMode ? "dark" : "light"}
-            expand="lg"
-            className="shadow-sm px-3"
-        >
-            <Container fluid>
-                {/* <Navbar.Brand href="/admin/dashboard" className="fw-bold">
-                    Explore Islam
-                </Navbar.Brand> */}
+  return (
+    <Navbar expand="lg" className="shadow-sm px-3">
+      <Container fluid>
+        <Nav className="ms-auto align-items-center gap-3">
+          <div>
+            {userButtons.map((button, index) => (
+              <Button
+                key={button.label}
+                className={index > 0 ? "ms-2" : ""}
+                onClick={button.onClick}
+              >
+                {button.label}
+              </Button>
+            ))}
+          </div>
 
-                <Nav className="ms-auto align-items-center gap-3">
-                    {/* Theme Toggle Button */}
-                    <Button
-                        variant={darkMode ? "light" : "outline-dark"}
-                        onClick={toggleTheme}
-                        title="Toggle Theme"
-                    >
-                        {darkMode ? <Sun /> : <Moon />}
-                    </Button>
-
-                    {/* User Dropdown */}
-                    <Dropdown as={ButtonGroup}>
-                        <Button variant={darkMode ? "light" : "outline-dark"}>
-                            <Person />
-                        </Button>
-                        <Dropdown.Toggle
-                            split
-                            variant={darkMode ? "light" : "outline-dark"}
-                            id="dropdown-split-basic"
-                        />
-                        <Dropdown.Menu align="end">
-                            <Dropdown.Item href="#/profile">Profile</Dropdown.Item>
-                            <Dropdown.Item href="#/settings">Settings</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item onClick={logoutHandler} href="#/logout">Logout</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Nav>
-            </Container>
-        </Navbar>
-
-    );
+          {/* User Dropdown */}
+          <Dropdown as={ButtonGroup}>
+            <Button>
+              <Person />
+            </Button>
+            <Dropdown.Toggle split id="dropdown-split-basic" />
+            <Dropdown.Menu align="end">
+              {dropdownItems.map((item, index) =>
+                item.type === "divider" ? (
+                  <Dropdown.Divider key={`divider-${index}`} />
+                ) : (
+                  <Dropdown.Item
+                    key={item.href}
+                    href={item.href}
+                    onClick={item.onClick}
+                  >
+                    {item.label}
+                  </Dropdown.Item>
+                )
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
+        </Nav>
+      </Container>
+    </Navbar>
+  );
 };
 
 export default Header;
