@@ -29,6 +29,12 @@ const moduleRoutes = require("./routes/moduleRoutes");
 
 const seriesRoutes = require('./routes/seriesRoutes');
 
+const ticketRoutes = require("./routes/ticketRoutes");
+
+const couponRoutes = require("./routes/couponRoutes");
+
+const dashboardRoutes = require("./routes/dashboardRoutes");
+
 
 initDB();
 dotenv.config();
@@ -82,6 +88,14 @@ app.use("/api/videos", videoRoutes);
 // app.use("/api", videoRoutes);
 
 app.use('/api/series', seriesRoutes);
+
+app.use("/api/tickets", ticketRoutes);
+
+app.use("/api/coupons", couponRoutes);
+
+app.use("/api/dashboard", dashboardRoutes);
+
+
 
 // Test route
 app.get('/', (req, res) => {

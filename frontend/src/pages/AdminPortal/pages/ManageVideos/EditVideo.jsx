@@ -66,7 +66,7 @@ const EditVideo = () => {
 
   return (
     <AdminLayout>
-      <h3 className="my-4">✏️ Edit Video (ID: {id})</h3>
+      <h3 className="my-4">Edit Video</h3>
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div className="mb-3">

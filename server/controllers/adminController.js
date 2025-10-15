@@ -20,9 +20,9 @@ const getStats = (req, res) => {
         if (err) return res.status(500).json({ error: 'DB error (videos)' });
         stats.videos = videoResult[0].videoCount;
 
-        db.query("SELECT COUNT(*) AS assignmentCount FROM assignments", (err, assignmentResult) => {
+        db.query("SELECT COUNT(*) AS subscriptionCount FROM subscriptions", (err, subscriptionResult) => {
           if (err) return res.status(500).json({ error: 'DB error' });
-          stats.assignments = assignmentResult[0].assignmentCount;
+          stats.subscriptions = subscriptionResult[0].subscriptionCount;
 
           db.query("SELECT COUNT(*) AS quizCount FROM quizzes", (err, quizResult) => {
             if (err) return res.status(500).json({ error: 'DB error' });
