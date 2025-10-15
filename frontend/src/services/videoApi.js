@@ -33,17 +33,17 @@ export const getAllVideosApi = async () => {
   }));
 };
 
-export const getVideoByIdApi = async (id) => {
-  const token = getToken();
+// export const getVideoByIdApi = async (id) => {
+//   const token = getToken();
 
-  const response = await axios.get(`${baseUrl}/api/videos/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+//   const response = await axios.get(`${baseUrl}/api/videos/${id}`, {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   });
 
-  return response.data;
-};
+//   return response.data;
+// };
 
 export const getVideosByCategoryApi = async (categorySlug) => {
   const token = getToken();
@@ -72,3 +72,36 @@ export const getVideosByCategoryApi = async (categorySlug) => {
 
 //   return response.data;
 // };
+
+export const getVideosBySeriesApi = async (seriesId) => {
+  const token = getToken();
+  const response = await fetch(`${baseUrl}/api/videos/series/${seriesId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to fetch videos");
+  }
+  return response.json();
+};
+
+// Get video by ID
+export const getVideoByIdApi = async (videoId) => {
+  const token = getToken();
+  const response = await fetch(`${baseUrl}/api/videos/${videoId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to fetch video");
+  }
+  return response.json();
+};

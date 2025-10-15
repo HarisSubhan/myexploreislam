@@ -1,66 +1,131 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { getSeriesApi } from "../../../services/seriesApi";
+import { getAllVideosApi } from "../../../services/videoApi";
 
-const SeriesList = () => {
+const CartoonModules = () => {
   const navigate = useNavigate();
-  const [series, setSeries] = useState([]);
+  const [singleVideos, setSingleVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchSeries = async () => {
+    const fetchVideos = async () => {
       try {
         setLoading(true);
+        setError(null);
 
-        const cached = localStorage.getItem("seriesCache");
-        if (cached) {
-          setSeries(JSON.parse(cached));
-          setLoading(false);
-          return;
+        // Check cache with expiration (5 minutes)
+        const cached = localStorage.getItem("singleVideosCache");
+        const cacheTimestamp = localStorage.getItem(
+          "singleVideosCacheTimestamp"
+        );
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        if (cached && cacheTimestamp) {
+          const cacheAge = Date.now() - parseInt(cacheTimestamp);
+          if (cacheAge < CACHE_DURATION) {
+            setSingleVideos(JSON.parse(cached));
+            setLoading(false);
+            return;
+          }
         }
 
-        const data = await getSeriesApi();
+        const data = await getAllVideosApi();
         const baseUrl =
-          import.meta.env.REACT_APP_IMAGE_BASE_URL || "http://localhost:5000";
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
-        const formatted = data.map((item) => ({
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          thumbnail: item.thumbnail_url?.startsWith("http")
-            ? item.thumbnail_url
-            : new URL(item.thumbnail_url, baseUrl).href,
-        }));
+        console.log("API Response:", data);
 
-        setSeries(formatted);
+        // Filter videos where series_id is null (single videos)
+        const singleVideosData = data
+          .filter((video) => video.series_id === null)
+          .map((item) => ({
+            id: item.id,
+            title: item.title || "Untitled Video",
+            description: item.description || "No description available",
+            thumbnail: item.thumbnail_url
+              ? item.thumbnail_url.startsWith("http")
+                ? item.thumbnail_url
+                : item.thumbnail_url.startsWith("/")
+                  ? `${baseUrl}${item.thumbnail_url}`
+                  : `${baseUrl}/${item.thumbnail_url}`
+              : "https://via.placeholder.com/300x200?text=No+Thumbnail",
+            videoUrl: item.video_url
+              ? item.video_url.startsWith("http")
+                ? item.video_url
+                : item.video_url.startsWith("/")
+                  ? `${baseUrl}${item.video_url}`
+                  : `${baseUrl}/${item.video_url}`
+              : null,
+          }));
 
-        // Cache for next reload
-        localStorage.setItem("seriesCache", JSON.stringify(formatted));
+        console.log("Processed Videos:", singleVideosData);
+
+        setSingleVideos(singleVideosData);
+
+        // Cache with timestamp
+        localStorage.setItem(
+          "singleVideosCache",
+          JSON.stringify(singleVideosData)
+        );
+        localStorage.setItem(
+          "singleVideosCacheTimestamp",
+          Date.now().toString()
+        );
       } catch (err) {
-        console.log("Series API Error:", err);
+        console.error("Videos API Error:", err);
+        setError("Failed to load videos. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSeries();
+    fetchVideos();
   }, []);
 
-  const handleClick = (id) => {
-    navigate(`/child/cartoon/series/${id}`);
+  const handleClick = (videoId) => {
+    navigate(`/child/singles/${videoId}`);
+  };
+
+  const clearCache = () => {
+    localStorage.removeItem("singleVideosCache");
+    localStorage.removeItem("singleVideosCacheTimestamp");
+    window.location.reload();
   };
 
   return (
     <Container fluid className="py-5" style={{ minHeight: "100vh" }}>
-      <h2 className="text-center fw-bold mb-4" style={{ color: "#0d6efd" }}>
-        Select a Cartoon Series
-      </h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold" style={{ color: "#0d6efd" }}>
+          Single Videos
+        </h2>
+        <Button
+          onClick={clearCache}
+          variant="outline-secondary"
+          size="sm"
+          title="Clear cache and reload"
+        >
+          Refresh
+        </Button>
+      </div>
+
+      {error && (
+        <div className="alert alert-danger text-center">
+          {error}
+          <Button
+            onClick={() => window.location.reload()}
+            className="btn btn-sm btn-outline-danger ms-3"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       <Row className="g-4 justify-content-center">
-        {(loading ? Array(8).fill({}) : series).map((item, index) => (
+        {(loading ? Array(8).fill({}) : singleVideos).map((item, index) => (
           <Col xs={12} sm={6} md={4} lg={3} key={item.id || index}>
             <Card
               className="h-100 border-0 text-center"
@@ -93,9 +158,16 @@ const SeriesList = () => {
                 <img
                   src={item.thumbnail}
                   alt={item.title}
-                  style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    backgroundColor: "#f8f9fa",
+                  }}
                   onError={(e) => {
-                    e.target.src = "/default-thumb.png";
+                    e.target.src =
+                      "https://via.placeholder.com/300x200?text=No+Thumbnail";
+                    e.target.style.backgroundColor = "#f8f9fa";
                   }}
                 />
               )}
@@ -108,8 +180,20 @@ const SeriesList = () => {
                   </>
                 ) : (
                   <>
-                    <h5 className="fw-bold mb-1">{item.title}</h5>
-                    <p className="small text-muted mb-0">{item.description}</p>
+                    <h5 className="fw-bold mb-1" style={{ fontSize: "1rem" }}>
+                      {item.title}
+                    </h5>
+                    <p
+                      className="small text-muted mb-0"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {item.description}
+                    </p>
                   </>
                 )}
               </Card.Body>
@@ -117,8 +201,14 @@ const SeriesList = () => {
           </Col>
         ))}
       </Row>
+
+      {!loading && !error && singleVideos.length === 0 && (
+        <div className="text-center py-5">
+          <p className="text-muted">No single videos available</p>
+        </div>
+      )}
     </Container>
   );
 };
 
-export default SeriesList;
+export default CartoonModules;

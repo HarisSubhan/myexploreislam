@@ -3,7 +3,7 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import { uploadVideoApi } from "../../../../services/videoApi";
 import { useNavigate } from "react-router-dom";
-import { getSeriesApi } from "../../../../services/seriesApi"; // ✅ New Series API import
+import { getSeriesApi } from "../../../../services/seriesApi";
 
 const AddVideo = () => {
   const navigate = useNavigate();
@@ -14,24 +14,26 @@ const AddVideo = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [singleVideo, setSingleVideo] = useState(null);
   const [seriesVideos, setSeriesVideos] = useState([]);
-  const [seriesList, setSeriesList] = useState([]);
+  const [seriesList, setSeriesList] = useState([]); 
   const [seriesId, setSeriesId] = useState("");
 
-  // Fetch series list
   useEffect(() => {
     const fetchSeries = async () => {
       try {
         const response = await getSeriesApi();
         console.log("Series API response:", response);
-        setSeriesList(response.data);
+
+        const seriesData = Array.isArray(response) ? response : response.data;
+        setSeriesList(seriesData || []); 
       } catch (error) {
         console.error("Error fetching series:", error);
+        setSeriesList([]); 
       }
     };
     fetchSeries();
   }, []);
 
-  // Submit form
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,7 +68,7 @@ const AddVideo = () => {
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
-              {/* Title */}
+            
               <Form.Group className="mb-3">
                 <Form.Label>Title</Form.Label>
                 <Form.Control
@@ -77,7 +79,7 @@ const AddVideo = () => {
                 />
               </Form.Group>
 
-              {/* Description */}
+              
               <Form.Group className="mb-3">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
@@ -89,7 +91,6 @@ const AddVideo = () => {
                 />
               </Form.Group>
 
-              {/* Thumbnail */}
               <Form.Group className="mb-3">
                 <Form.Label>Thumbnail</Form.Label>
                 <Form.Control
@@ -112,7 +113,7 @@ const AddVideo = () => {
                 </Form.Select>
               </Form.Group>
 
-              {/* Series Dropdown - Only show if videoType is "series" */}
+           
               {videoType === "series" && (
                 <Form.Group className="mb-3">
                   <Form.Label>Select Series</Form.Label>
@@ -122,7 +123,8 @@ const AddVideo = () => {
                     required
                   >
                     <option value="">-- Select a Series --</option>
-                    {seriesList.map((series) => (
+                    
+                    {seriesList?.map((series) => (
                       <option key={series.id} value={series.id}>
                         {series.title}
                       </option>
@@ -150,7 +152,9 @@ const AddVideo = () => {
                     type="file"
                     accept="video/*"
                     multiple
-                    onChange={(e) => setSeriesVideos(e.target.files)}
+                    onChange={(e) =>
+                      setSeriesVideos(Array.from(e.target.files))
+                    }
                     required
                   />
                 </Form.Group>
