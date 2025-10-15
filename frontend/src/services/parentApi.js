@@ -23,15 +23,16 @@ export const addChild = async (childData) => {
 };
 
 
-export const requestedChildApi = async ({ requested_children }) => {
+export const requestedChildApi = async (requested_children) => {
+  // Remove parent_id from parameter
   const token = getToken();
 
   if (!token) throw new Error("You are not logged in. Please log in first.");
 
   try {
     const response = await axios.post(
-      `${baseUrl}/api/child-requests`,
-      { requested_children },                   // send JSON body
+      `${baseUrl}/api/child-requests`, // Add trailing slash to match backend
+      { requested_children },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -40,7 +41,6 @@ export const requestedChildApi = async ({ requested_children }) => {
       }
     );
 
-    // You can return the full data object from the backend
     return response.data;
   } catch (error) {
     throw new Error(

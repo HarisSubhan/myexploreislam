@@ -34,28 +34,44 @@ const ModuleIntroduction = lazy(
 
 const ChildRoutes = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+          Loading...
+        </div>
+      }
+    >
       <Routes>
         <Route path="/" element={<ChildApp />}>
+          {/* DASHBOARD & PROFILE */}
           <Route index element={<ChildDashboard />} />
           <Route path="profile" element={<ChildProfilePage />} />
-          <Route path="cartoon" element={<CartoonModules />} />
-          <Route path="cartoon/series/:id" element={<VideoWatch />} />
 
-          {/* FIXED */}
-          <Route path="module" element={<VideoModules />} />
-          <Route path="module/series/:id" element={<VideoSeries />} />
+          {/* SINGLE MODEL (Standalone videos) */}
+          <Route path="singles" element={<CartoonModules />} />
+          <Route path="singles/:videoId" element={<VideoWatch />} />
+
+          {/* SERIES MODEL (Structured learning path) */}
+          <Route path="series" element={<VideoModules />} />
+          <Route path="series/:seriesId" element={<VideoSeries />} />
           <Route
-            path="module/series/:id/introduction"
+            path="series/:seriesId/introduction/:videoId"
             element={<ModuleIntroduction />}
           />
-          <Route path="module/series/:id/page1" element={<ModulePage1 />} />
-          <Route path="module/series/:id/quiz" element={<ModuleQuiz />} />
           <Route
-            path="module/series/:id/completion"
+            path="series/:seriesId/page1/:videoId"
+            element={<ModulePage1 />}
+          />
+          <Route
+            path="series/:seriesId/quiz/:videoId"
+            element={<ModuleQuiz />}
+          />
+          <Route
+            path="series/:seriesId/completion/:videoId"
             element={<ModuleCompletion />}
           />
 
+          {/* OTHER PAGES */}
           <Route path="notifications" element={<NotificationPageChild />} />
           <Route path="history" element={<HistoryPageChild />} />
           <Route path="help-Support" element={<HelpPageChild />} />
