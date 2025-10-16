@@ -24,7 +24,7 @@ import {
   FaExclamationCircle,
   FaUser,
 } from "react-icons/fa";
-import ticketApi from "../../../services/ticketapi";
+import ticketApi from "../../../services/ticketApi";
 
 // Memoized Status Badge Component
 const StatusBadge = React.memo(({ status }) => {

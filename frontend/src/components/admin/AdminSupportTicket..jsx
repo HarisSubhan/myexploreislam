@@ -14,7 +14,8 @@ import {
   Spinner,
 } from "react-bootstrap";
 import AdminLayout from "../../pages/AdminPortal/AdminApp";
-import { ticketApi } from "../../services/ticketapi";
+import ticketApi from "../../services/ticketApi";
+
 
 const AdminSupportTicket = () => {
   const [tickets, setTickets] = useState([]);
