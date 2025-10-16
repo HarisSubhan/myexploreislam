@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
 import {
-  FaUsers, FaVideo, FaQuestionCircle, FaBlogger, FaCreditCard
-} from 'react-icons/fa';
-import AdminLayout from '../AdminApp';
-import axios from 'axios';
-import IncomeChart from '../../../components/admin/IncomeChart';
+  FaUsers,
+  FaVideo,
+  FaQuestionCircle,
+  FaBlogger,
+  FaCreditCard,
+} from "react-icons/fa";
+import AdminLayout from "../AdminApp";
+
+import IncomeChart from "../../../components/admin/IncomeChart";
 import RecentActivity from "../../../components/admin/RecentActivity";
 import UsersTable from "../../../components/admin/UsersTable";
 import TopPerformingStudents from "../../../components/admin/TopPerformingStudents";
-import HealthMetricCard from '../../../components/admin/HealthMetricCard';
-import LearningEngagementSection from '../../../components/admin/LearningEngagementSection';
-
+import HealthMetricCard from "../../../components/admin/HealthMetricCard";
+import LearningEngagementSection from "../../../components/admin/LearningEngagementSection";
+import { dashboardAPI } from "../../../services/dashboardApi";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -23,66 +27,65 @@ const Dashboard = () => {
     blogs: 0,
   });
 
-   const [metrics, setMetrics] = useState({
-     activeSubscriptions: 0,
-     subscriptionChange: 0,
-     newSignups: 0,
-     revenueThisMonth: 0,
-     churnRate: 0,
-     openSupportTickets: 0,
-   });
+  const [metrics, setMetrics] = useState({
+    activeSubscriptions: 0,
+    subscriptionChange: 0,
+    newSignups: 0,
+    revenueThisMonth: 0,
+    churnRate: 0,
+    openSupportTickets: 0,
+  });
 
-   const [revenueData, setRevenueData] = useState([]);
+  const [revenueData, setRevenueData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [metricsLoading, setMetricsLoading] = useState(true);
 
-    useEffect(() => {
-      // Simulate API fetch
-      const fetchData = async () => {
-        // Mock metrics data
-        setMetrics({
-          activeSubscriptions: 1247,
-          subscriptionChange: 2.3,
-          newSignups: 89,
-          revenueThisMonth: 45280,
-          churnRate: 1.2,
-          openSupportTickets: 23,
-        });
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setMetricsLoading(true);
 
-        // Mock revenue data for chart
+        // Fetch dashboard summary for HealthMetricCard data
+        const summaryResponse = await dashboardAPI.getSummary();
+        const summaryData = summaryResponse.data;
+
+        // Update metrics with real API data
+        setMetrics((prevMetrics) => ({
+          ...prevMetrics,
+          activeSubscriptions: summaryData.active_subscriptions_7days || 0,
+          newSignups: summaryData.new_signups_7days || 0,
+          openSupportTickets: summaryData.open_tickets_7days || 0,
+        }));
+
+        // Mock revenue data for chart (you can replace this with real API call if available)
         setRevenueData([
           { month: "Last Month", revenue: 42850 },
           { month: "This Month", revenue: 45280 },
         ]);
-      };
+      } catch (error) {
+        console.error("Failed to fetch dashboard summary", error);
+      } finally {
+        setMetricsLoading(false);
+      }
+    };
 
-      fetchData();
-    }, []);
-
-      const handleSupportTicketsClick = () => {
-        // Navigate to support panel
-        window.location.href = "/admin/support";
-      };
-
-  const [loading, setLoading] = useState(true);
+    fetchDashboardData();
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('/api/admin/stats', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const statsResponse = await dashboardAPI.getStats();
         setStats({
-          totalParents: res.data.parents || 0,
-          totalChildren: res.data.children || 0,
-          videos: res.data.videos || 0,
-          subscription: res.data.subscriptions || 0,
-          quizzes: res.data.quizzes || 0,
-          blogs: res.data.blogs || 0,
+          totalParents: statsResponse.parents || 0,
+          totalChildren: statsResponse.children || 0,
+          videos: statsResponse.videos || 0,
+          subscription: statsResponse.subscriptions || 0,
+          quizzes: statsResponse.quizzes || 0,
+          blogs: statsResponse.blogs || 0,
         });
       } catch (err) {
-        console.error('Failed to fetch stats', err);
+        console.error("Failed to fetch stats", err);
       } finally {
         setLoading(false);
       }
@@ -91,13 +94,47 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
+  const handleSupportTicketsClick = () => {
+    window.location.href = "/admin/support";
+  };
+
   const cardData = [
-    { label: 'Total Parents', value: stats.totalParents, icon: <FaUsers />, color: 'primary' },
-    { label: 'Total Children', value: stats.totalChildren, icon: <FaUsers />, color: 'secondary' },
-    { label: 'Total Videos', value: stats.videos, icon: <FaVideo />, color: 'info' },
-    { label: 'Total Subscription', value: stats.subscription, icon: <FaCreditCard />, color: 'success' },
-    { label: 'Total Quizzes', value: stats.quizzes, icon: <FaQuestionCircle />, color: 'warning' },
-    { label: 'Total Blogs', value: stats.blogs, icon: <FaBlogger />, color: 'danger' },
+    {
+      label: "Total Parents",
+      value: stats.totalParents,
+      icon: <FaUsers />,
+      color: "primary",
+    },
+    {
+      label: "Total Children",
+      value: stats.totalChildren,
+      icon: <FaUsers />,
+      color: "secondary",
+    },
+    {
+      label: "Total Videos",
+      value: stats.videos,
+      icon: <FaVideo />,
+      color: "info",
+    },
+    {
+      label: "Total Subscription",
+      value: stats.subscription,
+      icon: <FaCreditCard />,
+      color: "success",
+    },
+    {
+      label: "Total Quizzes",
+      value: stats.quizzes,
+      icon: <FaQuestionCircle />,
+      color: "warning",
+    },
+    {
+      label: "Total Blogs",
+      value: stats.blogs,
+      icon: <FaBlogger />,
+      color: "danger",
+    },
   ];
 
   return (
@@ -128,6 +165,56 @@ const Dashboard = () => {
         )}
       </Container>
 
+      <Container fluid className="dashboard-container">
+        <Row className="mb-4 p-5">
+          <Col>
+            <h1 className="dashboard-title">
+              Real-time business metrics at a glance
+            </h1>
+          </Col>
+        </Row>
+
+        <Row className="g-3 mb-4">
+          {/* Active Subscriptions - Dynamic from API */}
+          <Col xs={12} md={6} lg={4}>
+            <HealthMetricCard
+              title="Active Subscriptions (7d)"
+              value={metrics.activeSubscriptions.toLocaleString()}
+              change={metrics.subscriptionChange}
+              changeLabel="vs last 7 days"
+              icon="👥"
+              variant="primary"
+            />
+          </Col>
+
+          {/* New Signups - Dynamic from API */}
+          <Col xs={12} md={6} lg={4}>
+            <HealthMetricCard
+              title="New Signups (7d)"
+              value={metrics.newSignups.toLocaleString()}
+              change={12.5} // You can make this dynamic too if API provides it
+              changeLabel="this week"
+              icon="📈"
+              variant="success"
+            />
+          </Col>
+
+          {/* Open Support Tickets - Dynamic from API */}
+          <Col xs={12} md={6} lg={4}>
+            <HealthMetricCard
+              title="Open Support Tickets (7d)"
+              value={metrics.openSupportTickets.toString()}
+              change={-5.2} // You can make this dynamic too if API provides it
+              changeLabel="vs last week"
+              icon="🎫"
+              variant="warning"
+              clickable={true}
+              onClick={handleSupportTicketsClick}
+            />
+          </Col>
+        </Row>
+      </Container>
+
       <Container className="mt-5 d-flex justify-content-between flex-wrap gap-4">
         <Card className="shadow-sm border-0" style={{ width: "70%" }}>
           <Card.Body>
@@ -140,68 +227,14 @@ const Dashboard = () => {
       </Container>
 
       <Container className="mt-4">
-        {/* <Col md={6}> */}
         <TopPerformingStudents />
-        {/* </Col> */}
       </Container>
 
       <Container className="mt-5">
         <UsersTable />
       </Container>
 
-      <Container fluid className="dashboard-container">
-        <Row className="mb-4">
-          <Col>
-            <h1 className="dashboard-title">Platform Health Dashboard</h1>
-            <p className="dashboard-subtitle">
-              Real-time business metrics at a glance
-            </p>
-          </Col>
-        </Row>
-
-        <Row className="g-3 mb-4">
-          {/* Active Subscriptions */}
-          <Col xs={12} md={6} lg={4}>
-            <HealthMetricCard
-              title="Active Subscriptions"
-              value={metrics.activeSubscriptions.toLocaleString()}
-              change={metrics.subscriptionChange}
-              changeLabel="vs last 7 days"
-              icon="👥"
-              variant="primary"
-            />
-          </Col>
-
-          {/* New Signups */}
-          <Col xs={12} md={6} lg={4}>
-            <HealthMetricCard
-              title="New Signups (7d)"
-              value={metrics.newSignups.toLocaleString()}
-              change={12.5}
-              changeLabel="this week"
-              icon="📈"
-              variant="success"
-            />
-          </Col>
-
-          {/* Open Support Tickets */}
-          <Col xs={12} md={6} lg={4}>
-            <HealthMetricCard
-              title="Open Support Tickets"
-              value={metrics.openSupportTickets.toString()}
-              change={-5.2} // Example change
-              changeLabel="vs last week"
-              icon="🎫"
-              variant="warning"
-              clickable={true}
-              onClick={handleSupportTicketsClick}
-            />
-          </Col>
-        </Row>
-      </Container>
-
       <LearningEngagementSection />
-      
     </AdminLayout>
   );
 };

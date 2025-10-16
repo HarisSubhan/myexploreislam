@@ -10,8 +10,11 @@ import {
   Col,
   Modal,
   Dropdown,
+  Alert,
+  Spinner,
 } from "react-bootstrap";
 import AdminLayout from "../../pages/AdminPortal/AdminApp";
+import { ticketApi } from "../../services/ticketapi";
 
 const AdminSupportTicket = () => {
   const [tickets, setTickets] = useState([]);
@@ -22,162 +25,111 @@ const AdminSupportTicket = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [replyMessage, setReplyMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // Mock data - replace with API calls
+  // Fetch tickets from API
+  const fetchTickets = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await ticketApi.getAll();
+      console.log("API Response:", response);
+
+      // Transform API data to match your frontend structure
+      const transformedTickets =
+        response.tickets?.map((ticket) => {
+          console.log("Processing ticket:", ticket);
+
+          // Extract user info - adjust based on your actual API response structure
+          const userInfo = ticket.parent_id || ticket.user || {};
+
+          return {
+            id: ticket.id || ticket._id,
+            ticketNumber:
+              ticket.ticket_number ||
+              ticket.ticketNumber ||
+              `TKT-${ticket.id?.toString().slice(-6)}`,
+            subject: ticket.subject || "No Subject",
+            description: ticket.description || "No description provided",
+            user: {
+              name: userInfo.name || userInfo.username || "Unknown User",
+              email: userInfo.email || "No email",
+              type: "parent", // Assuming all tickets are from parents
+            },
+            priority: ticket.priority?.toLowerCase() || "medium",
+            status: ticket.status?.toLowerCase() || "open",
+            category: ticket.category || "general",
+            assignedTo: ticket.assignedTo || "Not assigned",
+            createdAt: ticket.createdAt
+              ? new Date(ticket.createdAt).toLocaleString()
+              : new Date().toLocaleString(),
+            updatedAt: ticket.updatedAt
+              ? new Date(ticket.updatedAt).toLocaleString()
+              : new Date().toLocaleString(),
+            lastReply: calculateLastReply(ticket.updatedAt || ticket.createdAt),
+            messages: ticket.messages?.map((msg) => ({
+              id: msg._id || msg.id,
+              sender:
+                msg.sender === "agent"
+                  ? "Support Agent"
+                  : userInfo.name || "User",
+              message: msg.message || msg.content,
+              timestamp: msg.timestamp
+                ? new Date(msg.timestamp).toLocaleString()
+                : new Date().toLocaleString(),
+              type: msg.sender === "agent" ? "agent" : "user",
+            })) || [
+              {
+                id: 1,
+                sender: userInfo.name || "User",
+                message: ticket.description || "No message",
+                timestamp: ticket.createdAt
+                  ? new Date(ticket.createdAt).toLocaleString()
+                  : new Date().toLocaleString(),
+                type: "user",
+              },
+            ],
+          };
+        }) || [];
+
+      console.log("Transformed tickets:", transformedTickets);
+      setTickets(transformedTickets);
+    } catch (err) {
+      console.error("Error fetching tickets:", err);
+      setError(err.message || "Failed to load tickets");
+      // Fallback to empty array
+      setTickets([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to calculate last reply time
+  const calculateLastReply = (dateString) => {
+    if (!dateString) return "Unknown";
+
+    try {
+      const now = new Date();
+      const updated = new Date(dateString);
+      const diffMs = now - updated;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return "Just now";
+      if (diffMins < 60) return `${diffMins} minutes ago`;
+      if (diffHours < 24) return `${diffHours} hours ago`;
+      return `${diffDays} days ago`;
+    } catch (e) {
+      return "Unknown";
+    }
+  };
+
+  // Load tickets on component mount
   useEffect(() => {
-    const mockTickets = [
-      {
-        id: 1,
-        ticketNumber: "TKT-2024-001",
-        subject: "Video playback issue",
-        description: "Videos are buffering constantly and not playing smoothly",
-        user: {
-          name: "Sarah Johnson",
-          email: "sarah@example.com",
-          type: "parent",
-        },
-        priority: "high",
-        status: "open",
-        category: "technical",
-        assignedTo: "Support Agent 1",
-        createdAt: "2024-01-15 14:30",
-        updatedAt: "2024-01-15 16:45",
-        lastReply: "2 hours ago",
-        messages: [
-          {
-            id: 1,
-            sender: "Sarah Johnson",
-            message:
-              "Hello, I'm having trouble with video playback. The videos keep buffering every few seconds.",
-            timestamp: "2024-01-15 14:30",
-            type: "user",
-          },
-          {
-            id: 2,
-            sender: "Support Agent 1",
-            message:
-              "We're looking into this issue. Can you tell us what device and browser you're using?",
-            timestamp: "2024-01-15 15:15",
-            type: "agent",
-          },
-        ],
-      },
-      {
-        id: 2,
-        ticketNumber: "TKT-2024-002",
-        subject: "Billing question",
-        description: "Charged twice for this month's subscription",
-        user: { name: "Mike Chen", email: "mike@example.com", type: "parent" },
-        priority: "medium",
-        status: "in-progress",
-        category: "billing",
-        assignedTo: "Finance Team",
-        createdAt: "2024-01-14 09:15",
-        updatedAt: "2024-01-15 10:20",
-        lastReply: "1 day ago",
-        messages: [
-          {
-            id: 1,
-            sender: "Mike Chen",
-            message:
-              "I was charged twice for my subscription this month. Can you help refund one charge?",
-            timestamp: "2024-01-14 09:15",
-            type: "user",
-          },
-        ],
-      },
-      {
-        id: 3,
-        ticketNumber: "TKT-2024-003",
-        subject: "Course content missing",
-        description: "Math fundamentals course shows as empty",
-        user: {
-          name: "Emma Davis",
-          email: "emma@example.com",
-          type: "teacher",
-        },
-        priority: "medium",
-        status: "resolved",
-        category: "content",
-        assignedTo: "Content Team",
-        createdAt: "2024-01-13 11:45",
-        updatedAt: "2024-01-14 16:30",
-        lastReply: "2 days ago",
-        messages: [
-          {
-            id: 1,
-            sender: "Emma Davis",
-            message:
-              "The Math Fundamentals course appears to be empty with no lessons.",
-            timestamp: "2024-01-13 11:45",
-            type: "user",
-          },
-          {
-            id: 2,
-            sender: "Content Team",
-            message:
-              "This has been fixed. The course content is now available.",
-            timestamp: "2024-01-14 16:30",
-            type: "agent",
-          },
-        ],
-      },
-      {
-        id: 4,
-        ticketNumber: "TKT-2024-004",
-        subject: "Account login problem",
-        description: "Cannot login to parent account",
-        user: {
-          name: "David Wilson",
-          email: "david@example.com",
-          type: "parent",
-        },
-        priority: "high",
-        status: "open",
-        category: "account",
-        assignedTo: "Support Agent 2",
-        createdAt: "2024-01-15 08:20",
-        updatedAt: "2024-01-15 08:20",
-        lastReply: "Just now",
-        messages: [
-          {
-            id: 1,
-            sender: "David Wilson",
-            message:
-              'I\'m unable to login to my parent account. Getting "invalid credentials" error.',
-            timestamp: "2024-01-15 08:20",
-            type: "user",
-          },
-        ],
-      },
-      {
-        id: 5,
-        ticketNumber: "TKT-2024-005",
-        subject: "Child progress not updating",
-        description: "Progress bar stuck at 75% for a week",
-        user: { name: "Lisa Brown", email: "lisa@example.com", type: "parent" },
-        priority: "low",
-        status: "pending",
-        category: "technical",
-        assignedTo: "Not assigned",
-        createdAt: "2024-01-14 16:40",
-        updatedAt: "2024-01-14 16:40",
-        lastReply: "1 day ago",
-        messages: [
-          {
-            id: 1,
-            sender: "Lisa Brown",
-            message:
-              "My child's progress bar has been stuck at 75% for over a week.",
-            timestamp: "2024-01-14 16:40",
-            type: "user",
-          },
-        ],
-      },
-    ];
-
-    setTickets(mockTickets);
-    setFilteredTickets(mockTickets);
+    fetchTickets();
   }, []);
 
   // Filter tickets based on search and filters
@@ -232,74 +184,108 @@ const AdminSupportTicket = () => {
     setShowModal(true);
   };
 
-  const handleReply = () => {
-    if (!replyMessage.trim()) return;
+  const handleReply = async () => {
+    if (!replyMessage.trim() || !selectedTicket) return;
 
-    // Add new reply to the ticket
-    const newMessage = {
-      id: selectedTicket.messages.length + 1,
-      sender: "Support Agent",
-      message: replyMessage,
-      timestamp: new Date().toLocaleString(),
-      type: "agent",
-    };
+    try {
+      setActionLoading(true);
 
-    const updatedTickets = tickets.map((ticket) =>
-      ticket.id === selectedTicket.id
-        ? {
-            ...ticket,
-            messages: [...ticket.messages, newMessage],
-            status: "in-progress",
-            updatedAt: new Date().toLocaleString(),
-            lastReply: "Just now",
-          }
-        : ticket
-    );
+      // Here you would typically make an API call to add a reply
+      // For now, we'll update locally and you can add the API integration later
 
-    setTickets(updatedTickets);
-    setReplyMessage("");
-    setSelectedTicket({
-      ...selectedTicket,
-      messages: [...selectedTicket.messages, newMessage],
-      status: "in-progress",
-      updatedAt: new Date().toLocaleString(),
-      lastReply: "Just now",
-    });
-  };
+      const newMessage = {
+        id: selectedTicket.messages.length + 1,
+        sender: "Support Agent",
+        message: replyMessage,
+        timestamp: new Date().toISOString(),
+        type: "agent",
+      };
 
-  const handleStatusChange = (ticketId, newStatus) => {
-    const updatedTickets = tickets.map((ticket) =>
-      ticket.id === ticketId
-        ? {
-            ...ticket,
-            status: newStatus,
-            updatedAt: new Date().toLocaleString(),
-          }
-        : ticket
-    );
+      const updatedTickets = tickets.map((ticket) =>
+        ticket.id === selectedTicket.id
+          ? {
+              ...ticket,
+              messages: [...ticket.messages, newMessage],
+              status: "in-progress",
+              updatedAt: new Date().toISOString(),
+              lastReply: "Just now",
+            }
+          : ticket
+      );
 
-    setTickets(updatedTickets);
+      setTickets(updatedTickets);
+      setReplyMessage("");
+      setSelectedTicket({
+        ...selectedTicket,
+        messages: [...selectedTicket.messages, newMessage],
+        status: "in-progress",
+        updatedAt: new Date().toISOString(),
+        lastReply: "Just now",
+      });
 
-    if (selectedTicket && selectedTicket.id === ticketId) {
-      setSelectedTicket({ ...selectedTicket, status: newStatus });
+      // TODO: Add API call to update ticket with new message
+      // await ticketApi.update(selectedTicket.id, {
+      //   messages: [...selectedTicket.messages, newMessage],
+      //   status: "in-progress"
+      // });
+    } catch (err) {
+      setError("Failed to send reply: " + err.message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const handleAssignTicket = (ticketId, assignee) => {
-    const updatedTickets = tickets.map((ticket) =>
-      ticket.id === ticketId
-        ? {
-            ...ticket,
-            assignedTo: assignee,
-            updatedAt: new Date().toLocaleString(),
-          }
-        : ticket
-    );
+  const handleStatusChange = async (ticketId, newStatus) => {
+    try {
+      const updatedTickets = tickets.map((ticket) =>
+        ticket.id === selectedTicket.id
+          ? {
+              ...ticket,
+              status: newStatus,
+              updatedAt: new Date().toISOString(),
+            }
+          : ticket
+      );
 
-    setTickets(updatedTickets);
+      setTickets(updatedTickets);
 
-    if (selectedTicket && selectedTicket.id === ticketId) {
-      setSelectedTicket({ ...selectedTicket, assignedTo: assignee });
+      if (selectedTicket && selectedTicket.id === ticketId) {
+        setSelectedTicket({ ...selectedTicket, status: newStatus });
+      }
+
+      // TODO: Add API call to update ticket status
+      // await ticketApi.update(ticketId, { status: newStatus });
+    } catch (err) {
+      setError("Failed to update ticket status: " + err.message);
+      // Revert on error
+      fetchTickets();
+    }
+  };
+
+  const handleAssignTicket = async (ticketId, assignee) => {
+    try {
+      const updatedTickets = tickets.map((ticket) =>
+        ticket.id === ticketId
+          ? {
+              ...ticket,
+              assignedTo: assignee,
+              updatedAt: new Date().toISOString(),
+            }
+          : ticket
+      );
+
+      setTickets(updatedTickets);
+
+      if (selectedTicket && selectedTicket.id === ticketId) {
+        setSelectedTicket({ ...selectedTicket, assignedTo: assignee });
+      }
+
+      // TODO: Add API call to assign ticket
+      // await ticketApi.update(ticketId, { assignedTo: assignee });
+    } catch (err) {
+      setError("Failed to assign ticket: " + err.message);
+      // Revert on error
+      fetchTickets();
     }
   };
 
@@ -309,6 +295,21 @@ const AdminSupportTicket = () => {
     inProgress: tickets.filter((t) => t.status === "in-progress").length,
     resolved: tickets.filter((t) => t.status === "resolved").length,
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "50vh" }}
+        >
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading tickets...</span>
+          </Spinner>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -322,9 +323,17 @@ const AdminSupportTicket = () => {
             </p>
           </Col>
           <Col xs="auto">
-            <Button variant="primary">+ New Ticket</Button>
+            <Button variant="primary" onClick={fetchTickets}>
+              Refresh
+            </Button>
           </Col>
         </Row>
+
+        {error && (
+          <Alert variant="danger" dismissible onClose={() => setError("")}>
+            {error}
+          </Alert>
+        )}
 
         {/* Statistics Cards */}
         <Row className="mb-4">
@@ -424,6 +433,8 @@ const AdminSupportTicket = () => {
           </Card.Body>
         </Card>
 
+      
+
         {/* Tickets Table */}
         <Card>
           <Card.Header>
@@ -439,126 +450,139 @@ const AdminSupportTicket = () => {
             </Row>
           </Card.Header>
           <Card.Body className="p-0">
-            <Table responsive hover className="mb-0">
-              <thead>
-                <tr>
-                  <th>Ticket #</th>
-                  <th>Subject</th>
-                  <th>User</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                  <th>Assigned To</th>
-                  <th>Last Update</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTickets.map((ticket) => (
-                  <tr key={ticket.id}>
-                    <td>
-                      <strong>{ticket.ticketNumber}</strong>
-                    </td>
-                    <td>
-                      <div>
-                        <div className="fw-bold">{ticket.subject}</div>
-                        <small className="text-muted">
-                          {ticket.description}
-                        </small>
-                      </div>
-                    </td>
-                    <td>
-                      <div>
-                        <div>{ticket.user.name}</div>
-                        <small className="text-muted">
-                          {ticket.user.email}
-                        </small>
-                        <Badge bg="secondary" className="ms-1">
-                          {ticket.user.type}
-                        </Badge>
-                      </div>
-                    </td>
-                    <td>
-                      <Badge bg={getPriorityVariant(ticket.priority)}>
-                        {ticket.priority.toUpperCase()}
-                      </Badge>
-                    </td>
-                    <td>
-                      <Badge bg={getStatusVariant(ticket.status)}>
-                        {ticket.status.replace("-", " ").toUpperCase()}
-                      </Badge>
-                    </td>
-                    <td>{ticket.assignedTo}</td>
-                    <td>
-                      <div>
-                        <div>{ticket.updatedAt.split(" ")[0]}</div>
-                        <small className="text-muted">{ticket.lastReply}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="d-flex gap-1">
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => handleViewTicket(ticket)}
-                        >
-                          View
-                        </Button>
-                        <Dropdown>
-                          <Dropdown.Toggle
-                            variant="outline-secondary"
-                            size="sm"
-                            id="dropdown-basic"
-                          >
-                            ⋮
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item
-                              onClick={() =>
-                                handleStatusChange(ticket.id, "in-progress")
-                              }
-                            >
-                              Mark In Progress
-                            </Dropdown.Item>
-                            <Dropdown.Item
-                              onClick={() =>
-                                handleStatusChange(ticket.id, "resolved")
-                              }
-                            >
-                              Mark Resolved
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item
-                              onClick={() =>
-                                handleAssignTicket(ticket.id, "Support Agent 1")
-                              }
-                            >
-                              Assign to Me
-                            </Dropdown.Item>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      </div>
-                    </td>
+            {filteredTickets.length > 0 ? (
+              <Table responsive hover className="mb-0">
+                <thead>
+                  <tr>
+                    <th>Ticket #</th>
+                    <th>Subject</th>
+                    <th>User</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Last Update</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-
-            {filteredTickets.length === 0 && (
+                </thead>
+                <tbody>
+                  {filteredTickets.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td>
+                        <strong>{ticket.ticketNumber}</strong>
+                      </td>
+                      <td>
+                        <div>
+                          <div className="fw-bold">{ticket.subject}</div>
+                          <small className="text-muted">
+                            {ticket.description}
+                          </small>
+                        </div>
+                      </td>
+                      <td>
+                        <div>
+                          <div>{ticket.user.name}</div>
+                          <small className="text-muted">
+                            {ticket.user.email}
+                          </small>
+                          <Badge bg="secondary" className="ms-1">
+                            {ticket.user.type}
+                          </Badge>
+                        </div>
+                      </td>
+                      <td>
+                        <Badge bg={getPriorityVariant(ticket.priority)}>
+                          {ticket.priority.toUpperCase()}
+                        </Badge>
+                      </td>
+                      <td>
+                        <Badge bg={getStatusVariant(ticket.status)}>
+                          {ticket.status.replace("-", " ").toUpperCase()}
+                        </Badge>
+                      </td>
+                      <td>{ticket.assignedTo}</td>
+                      <td>
+                        <div>
+                          <div>{ticket.updatedAt.split(" ")[0]}</div>
+                          <small className="text-muted">
+                            {ticket.lastReply}
+                          </small>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex gap-1">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => handleViewTicket(ticket)}
+                          >
+                            View
+                          </Button>
+                          <Dropdown>
+                            <Dropdown.Toggle
+                              variant="outline-secondary"
+                              size="sm"
+                              id="dropdown-basic"
+                            >
+                              ⋮
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item
+                                onClick={() =>
+                                  handleStatusChange(ticket.id, "in-progress")
+                                }
+                              >
+                                Mark In Progress
+                              </Dropdown.Item>
+                              <Dropdown.Item
+                                onClick={() =>
+                                  handleStatusChange(ticket.id, "resolved")
+                                }
+                              >
+                                Mark Resolved
+                              </Dropdown.Item>
+                              <Dropdown.Divider />
+                              <Dropdown.Item
+                                onClick={() =>
+                                  handleAssignTicket(
+                                    ticket.id,
+                                    "Support Agent 1"
+                                  )
+                                }
+                              >
+                                Assign to Me
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
               <div className="text-center py-5">
                 <div className="fs-1">📭</div>
                 <p className="text-muted">
-                  No tickets found matching your filters
+                  {tickets.length === 0
+                    ? "No tickets found"
+                    : "No tickets found matching your filters"}
                 </p>
-                <Button
-                  variant="outline-primary"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("all");
-                    setPriorityFilter("all");
-                  }}
-                >
-                  Clear Filters
-                </Button>
+                {tickets.length === 0 ? (
+                  <Button variant="primary" onClick={fetchTickets}>
+                    Try Again
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline-primary"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setStatusFilter("all");
+                      setPriorityFilter("all");
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
               </div>
             )}
           </Card.Body>
@@ -622,6 +646,7 @@ const AdminSupportTicket = () => {
                       placeholder="Type your response here..."
                       value={replyMessage}
                       onChange={(e) => setReplyMessage(e.target.value)}
+                      disabled={actionLoading}
                     />
                   </Form.Group>
                 </div>
@@ -632,8 +657,12 @@ const AdminSupportTicket = () => {
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleReply}>
-              Send Reply
+            <Button
+              variant="primary"
+              onClick={handleReply}
+              disabled={!replyMessage.trim() || actionLoading}
+            >
+              {actionLoading ? "Sending..." : "Send Reply"}
             </Button>
           </Modal.Footer>
         </Modal>
