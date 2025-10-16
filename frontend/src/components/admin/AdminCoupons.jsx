@@ -1,3 +1,4 @@
+// components/AdminCoupons.js
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -13,8 +14,12 @@ import {
   Alert,
   Tooltip,
   OverlayTrigger,
+  Spinner,
+  ProgressBar,
 } from "react-bootstrap";
+import { couponApi } from "../../services/couponApi";
 import AdminLayout from "../../pages/AdminPortal/AdminApp";
+
 
 const AdminCoupons = () => {
   const [coupons, setCoupons] = useState([]);
@@ -26,132 +31,42 @@ const AdminCoupons = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // Form state
+  // Form state - matching your API structure
   const [formData, setFormData] = useState({
-    code: "",
-    name: "",
+    coupon_code: "",
+    coupon_name: "",
     description: "",
-    type: "discount",
-    discountType: "percentage",
-    discountValue: "",
-    maxDiscount: "",
-    minPurchase: "",
-    validFrom: "",
-    validUntil: "",
-    usageLimit: "",
-    usageCount: 0,
-    userLimit: "",
-    planType: "all",
+    discount_type: "percentage",
+    discount_value: "",
+    max_discount: "",
+    min_purchase_amount: "",
+    valid_from: "",
+    valid_until: "",
+    usage_limit: "",
+    subscription_id: "",
     status: "active",
   });
 
-  // Mock data - replace with API calls
-  useEffect(() => {
-    const mockCoupons = [
-      {
-        id: 1,
-        code: "WELCOME20",
-        name: "Welcome Discount",
-        description: "20% off for new users",
-        type: "discount",
-        discountType: "percentage",
-        discountValue: 20,
-        maxDiscount: 50,
-        minPurchase: 0,
-        validFrom: "2024-01-01",
-        validUntil: "2024-12-31",
-        usageLimit: 1000,
-        usageCount: 247,
-        userLimit: 1,
-        planType: "all",
-        status: "active",
-        createdAt: "2024-01-01",
-        createdBy: "Admin",
-      },
-      {
-        id: 2,
-        code: "FREETRIAL",
-        name: "Free One Week Trial",
-        description: "7-day free trial for new users",
-        type: "trial",
-        discountType: "trial",
-        discountValue: 100,
-        trialDays: 7,
-        validFrom: "2024-01-01",
-        validUntil: "2024-12-31",
-        usageLimit: 5000,
-        usageCount: 1289,
-        userLimit: 1,
-        planType: "premium",
-        status: "active",
-        createdAt: "2024-01-01",
-        createdBy: "Admin",
-      },
-      {
-        id: 3,
-        code: "SUMMER25",
-        name: "Summer Sale",
-        description: "25% off summer promotion",
-        type: "discount",
-        discountType: "percentage",
-        discountValue: 25,
-        maxDiscount: 100,
-        minPurchase: 50,
-        validFrom: "2024-06-01",
-        validUntil: "2024-08-31",
-        usageLimit: 500,
-        usageCount: 89,
-        userLimit: 1,
-        planType: "all",
-        status: "active",
-        createdAt: "2024-05-15",
-        createdBy: "Marketing",
-      },
-      {
-        id: 4,
-        code: "FAMILY15",
-        name: "Family Plan Discount",
-        description: "15% off family plans",
-        type: "discount",
-        discountType: "percentage",
-        discountValue: 15,
-        maxDiscount: 75,
-        minPurchase: 0,
-        validFrom: "2024-03-01",
-        validUntil: "2024-03-31",
-        usageLimit: 100,
-        usageCount: 100,
-        userLimit: 1,
-        planType: "family",
-        status: "expired",
-        createdAt: "2024-02-20",
-        createdBy: "Sales",
-      },
-      {
-        id: 5,
-        code: "STUDENT10",
-        name: "Student Discount",
-        description: "10% off for students",
-        type: "discount",
-        discountType: "percentage",
-        discountValue: 10,
-        maxDiscount: 30,
-        minPurchase: 0,
-        validFrom: "2024-01-01",
-        validUntil: "2024-12-31",
-        usageLimit: 2000,
-        usageCount: 456,
-        userLimit: 1,
-        planType: "all",
-        status: "active",
-        createdAt: "2024-01-01",
-        createdBy: "Admin",
-      },
-    ];
+  // Fetch coupons from API
+  const fetchCoupons = async () => {
+    setLoading(true);
+    try {
+      const response = await couponApi.getAllCoupons();
+      setCoupons(response.data || []);
+      setFilteredCoupons(response.data || []);
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+      showAlert("Failed to fetch coupons", "danger");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setCoupons(mockCoupons);
-    setFilteredCoupons(mockCoupons);
+  useEffect(() => {
+    fetchCoupons();
   }, []);
 
   // Filter coupons
@@ -161,18 +76,22 @@ const AdminCoupons = () => {
     if (searchTerm) {
       result = result.filter(
         (coupon) =>
-          coupon.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          coupon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          coupon.description.toLowerCase().includes(searchTerm.toLowerCase())
+          coupon.coupon_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          coupon.coupon_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          coupon.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (statusFilter !== "all") {
-      result = result.filter((coupon) => coupon.status === statusFilter);
+      result = result.filter((coupon) => 
+        coupon.status?.toLowerCase() === statusFilter.toLowerCase()
+      );
     }
 
     if (typeFilter !== "all") {
-      result = result.filter((coupon) => coupon.type === typeFilter);
+      result = result.filter((coupon) => 
+        coupon.discount_type?.toLowerCase() === typeFilter.toLowerCase()
+      );
     }
 
     setFilteredCoupons(result);
@@ -183,55 +102,92 @@ const AdminCoupons = () => {
     setTimeout(() => setAlert({ show: false, message: "", type: "" }), 5000);
   };
 
-  const handleCreateCoupon = () => {
-    // Generate unique code if not provided
-    const code = formData.code || generateCouponCode();
+  const handleCreateCoupon = async () => {
+    setActionLoading(true);
+    try {
+      // Format data for API
+      const apiData = {
+        ...formData,
+        discount_value: parseFloat(formData.discount_value),
+        max_discount: formData.max_discount ? parseFloat(formData.max_discount) : null,
+        min_purchase_amount: formData.min_purchase_amount ? parseFloat(formData.min_purchase_amount) : 0,
+        usage_limit: parseInt(formData.usage_limit),
+        subscription_id: formData.subscription_id ? parseInt(formData.subscription_id) : null,
+      };
 
-    const newCoupon = {
-      id: coupons.length + 1,
-      ...formData,
-      code,
-      usageCount: 0,
-      createdAt: new Date().toISOString().split("T")[0],
-      createdBy: "Admin",
-    };
-
-    setCoupons([...coupons, newCoupon]);
-    setShowCreateModal(false);
-    resetForm();
-    showAlert("Coupon created successfully!");
-  };
-
-  const handleEditCoupon = () => {
-    const updatedCoupons = coupons.map((coupon) =>
-      coupon.id === selectedCoupon.id ? { ...coupon, ...formData } : coupon
-    );
-
-    setCoupons(updatedCoupons);
-    setShowEditModal(false);
-    resetForm();
-    showAlert("Coupon updated successfully!");
-  };
-
-  const handleDeleteCoupon = (id) => {
-    if (window.confirm("Are you sure you want to delete this coupon?")) {
-      setCoupons(coupons.filter((coupon) => coupon.id !== id));
-      showAlert("Coupon deleted successfully!");
+      await couponApi.createCoupon(apiData);
+      setShowCreateModal(false);
+      resetForm();
+      fetchCoupons(); // Refresh the list
+      showAlert("Coupon created successfully!");
+    } catch (error) {
+      console.error("Error creating coupon:", error);
+      showAlert("Failed to create coupon", "danger");
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const handleDuplicateCoupon = (coupon) => {
-    const duplicatedCoupon = {
-      ...coupon,
-      id: coupons.length + 1,
-      code: generateCouponCode(),
-      usageCount: 0,
-      createdAt: new Date().toISOString().split("T")[0],
-      status: "active",
-    };
+  const handleEditCoupon = async () => {
+    if (!selectedCoupon) return;
+    
+    setActionLoading(true);
+    try {
+      const apiData = {
+        ...formData,
+        discount_value: parseFloat(formData.discount_value),
+        max_discount: formData.max_discount ? parseFloat(formData.max_discount) : null,
+        min_purchase_amount: formData.min_purchase_amount ? parseFloat(formData.min_purchase_amount) : 0,
+        usage_limit: parseInt(formData.usage_limit),
+        subscription_id: formData.subscription_id ? parseInt(formData.subscription_id) : null,
+      };
 
-    setCoupons([...coupons, duplicatedCoupon]);
-    showAlert("Coupon duplicated successfully!");
+      await couponApi.updateCoupon(selectedCoupon.id, apiData);
+      setShowEditModal(false);
+      resetForm();
+      fetchCoupons(); // Refresh the list
+      showAlert("Coupon updated successfully!");
+    } catch (error) {
+      console.error("Error updating coupon:", error);
+      showAlert("Failed to update coupon", "danger");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteCoupon = async (id) => {
+    if (window.confirm("Are you sure you want to delete this coupon?")) {
+      try {
+        await couponApi.deleteCoupon(id);
+        fetchCoupons(); // Refresh the list
+        showAlert("Coupon deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting coupon:", error);
+        showAlert("Failed to delete coupon", "danger");
+      }
+    }
+  };
+
+  const handleDuplicateCoupon = async (coupon) => {
+    try {
+      const duplicatedCoupon = {
+        ...coupon,
+        coupon_code: generateCouponCode(),
+        usage_count: 0,
+        status: "ACTIVE",
+      };
+
+      delete duplicatedCoupon.id;
+      delete duplicatedCoupon.created_at;
+      delete duplicatedCoupon.updated_at;
+
+      await couponApi.createCoupon(duplicatedCoupon);
+      fetchCoupons(); // Refresh the list
+      showAlert("Coupon duplicated successfully!");
+    } catch (error) {
+      console.error("Error duplicating coupon:", error);
+      showAlert("Failed to duplicate coupon", "danger");
+    }
   };
 
   const generateCouponCode = () => {
@@ -245,68 +201,82 @@ const AdminCoupons = () => {
 
   const resetForm = () => {
     setFormData({
-      code: "",
-      name: "",
+      coupon_code: "",
+      coupon_name: "",
       description: "",
-      type: "discount",
-      discountType: "percentage",
-      discountValue: "",
-      maxDiscount: "",
-      minPurchase: "",
-      validFrom: "",
-      validUntil: "",
-      usageLimit: "",
-      usageCount: 0,
-      userLimit: "",
-      planType: "all",
+      discount_type: "percentage",
+      discount_value: "",
+      max_discount: "",
+      min_purchase_amount: "",
+      valid_from: "",
+      valid_until: "",
+      usage_limit: "",
+      subscription_id: "",
       status: "active",
     });
   };
 
   const openEditModal = (coupon) => {
     setSelectedCoupon(coupon);
-    setFormData(coupon);
+    setFormData({
+      coupon_code: coupon.coupon_code,
+      coupon_name: coupon.coupon_name,
+      description: coupon.description,
+      discount_type: coupon.discount_type?.toLowerCase(),
+      discount_value: coupon.discount_value,
+      max_discount: coupon.max_discount,
+      min_purchase_amount: coupon.min_purchase_amount,
+      valid_from: coupon.valid_from?.split('T')[0],
+      valid_until: coupon.valid_until?.split('T')[0],
+      usage_limit: coupon.usage_limit,
+      subscription_id: coupon.subscription_id,
+      status: coupon.status?.toLowerCase(),
+    });
     setShowEditModal(true);
   };
 
   const getStatusVariant = (status) => {
+    const statusLower = status?.toLowerCase();
     const variants = {
       active: "success",
       inactive: "secondary",
       expired: "warning",
       exhausted: "danger",
     };
-    return variants[status] || "secondary";
+    return variants[statusLower] || "secondary";
   };
 
   const getTypeVariant = (type) => {
+    const typeLower = type?.toLowerCase();
     const variants = {
-      discount: "primary",
-      trial: "info",
+      percentage: "primary",
+      fixed: "info",
     };
-    return variants[type] || "secondary";
-  };
-
-  const calculateUsagePercentage = (coupon) => {
-    return Math.round((coupon.usageCount / coupon.usageLimit) * 100);
+    return variants[typeLower] || "secondary";
   };
 
   const isCouponValid = (coupon) => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date();
+    const validFrom = new Date(coupon.valid_from);
+    const validUntil = new Date(coupon.valid_until);
+    
     return (
-      coupon.status === "active" &&
-      coupon.validFrom <= today &&
-      coupon.validUntil >= today &&
-      coupon.usageCount < coupon.usageLimit
+      coupon.status === "ACTIVE" &&
+      today >= validFrom &&
+      today <= validUntil
     );
   };
 
   const couponStats = {
     total: coupons.length,
-    active: coupons.filter((c) => c.status === "active").length,
-    discount: coupons.filter((c) => c.type === "discount").length,
-    trial: coupons.filter((c) => c.type === "trial").length,
-    expired: coupons.filter((c) => c.status === "expired").length,
+    active: coupons.filter((c) => c.status === "ACTIVE").length,
+    percentage: coupons.filter((c) => c.discount_type === "PERCENTAGE").length,
+    fixed: coupons.filter((c) => c.discount_type === "FIXED").length,
+    expired: coupons.filter((c) => {
+      const today = new Date();
+      const validUntil = new Date(c.valid_until);
+      return today > validUntil;
+    }).length,
   };
 
   const CopyButton = ({ text }) => {
@@ -339,6 +309,16 @@ const AdminCoupons = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: "400px" }}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="admin-coupons">
@@ -357,9 +337,7 @@ const AdminCoupons = () => {
         <Row className="mb-4">
           <Col>
             <h2>🎫 Coupons & Discount Codes</h2>
-            <p className="text-muted">
-              Manage discount codes and free trial promotions
-            </p>
+            <p className="text-muted">Manage discount codes and promotions</p>
           </Col>
           <Col xs="auto">
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
@@ -389,16 +367,16 @@ const AdminCoupons = () => {
           <Col md={2} sm={4} xs={6}>
             <Card className="text-center stat-card">
               <Card.Body>
-                <h4 className="text-info">{couponStats.discount}</h4>
-                <Card.Text>Discount Codes</Card.Text>
+                <h4 className="text-info">{couponStats.percentage}</h4>
+                <Card.Text>Percentage</Card.Text>
               </Card.Body>
             </Card>
           </Col>
           <Col md={2} sm={4} xs={6}>
             <Card className="text-center stat-card">
               <Card.Body>
-                <h4 className="text-warning">{couponStats.trial}</h4>
-                <Card.Text>Free Trials</Card.Text>
+                <h4 className="text-warning">{couponStats.fixed}</h4>
+                <Card.Text>Fixed Amount</Card.Text>
               </Card.Body>
             </Card>
           </Col>
@@ -414,7 +392,10 @@ const AdminCoupons = () => {
             <Card className="text-center stat-card">
               <Card.Body>
                 <h4 className="text-secondary">
-                  {coupons.reduce((sum, coupon) => sum + coupon.usageCount, 0)}
+                  {coupons.reduce(
+                    (sum, coupon) => sum + (coupon.usage_count || 0),
+                    0
+                  )}
                 </h4>
                 <Card.Text>Total Uses</Card.Text>
               </Card.Body>
@@ -448,21 +429,19 @@ const AdminCoupons = () => {
                     <option value="all">All Statuses</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
-                    <option value="expired">Expired</option>
-                    <option value="exhausted">Exhausted</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={3}>
                 <Form.Group>
-                  <Form.Label>Type</Form.Label>
+                  <Form.Label>Discount Type</Form.Label>
                   <Form.Select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
                   >
                     <option value="all">All Types</option>
-                    <option value="discount">Discount Codes</option>
-                    <option value="trial">Free Trials</option>
+                    <option value="percentage">Percentage</option>
+                    <option value="fixed">Fixed Amount</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -490,8 +469,13 @@ const AdminCoupons = () => {
                 <Card.Title>Coupons ({filteredCoupons.length})</Card.Title>
               </Col>
               <Col xs="auto">
-                <Button variant="outline-primary" size="sm">
-                  Export CSV
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={fetchCoupons}
+                  disabled={loading}
+                >
+                  {loading ? "Refreshing..." : "Refresh"}
                 </Button>
               </Col>
             </Row>
@@ -504,9 +488,10 @@ const AdminCoupons = () => {
                     <th>Code</th>
                     <th>Name</th>
                     <th>Type</th>
-                    <th>Discount/Offer</th>
-                    <th>Usage</th>
+                    <th>Discount</th>
+                    <th>Min Purchase</th>
                     <th>Validity</th>
+                    <th>Usage</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -519,71 +504,79 @@ const AdminCoupons = () => {
                     >
                       <td>
                         <div className="d-flex align-items-center">
-                          <strong className="coupon-code">{coupon.code}</strong>
-                          <CopyButton text={coupon.code} />
+                          <strong className="coupon-code">
+                            {coupon.coupon_code}
+                          </strong>
+                          <CopyButton text={coupon.coupon_code} />
                         </div>
                       </td>
                       <td>
                         <div>
-                          <div className="fw-bold">{coupon.name}</div>
+                          <div className="fw-bold">{coupon.coupon_name}</div>
                           <small className="text-muted">
                             {coupon.description}
                           </small>
                         </div>
                       </td>
                       <td>
-                        <Badge bg={getTypeVariant(coupon.type)}>
-                          {coupon.type.toUpperCase()}
+                        <Badge bg={getTypeVariant(coupon.discount_type)}>
+                          {coupon.discount_type}
                         </Badge>
                       </td>
                       <td>
-                        {coupon.type === "discount" ? (
-                          <div>
-                            <strong>{coupon.discountValue}%</strong>
-                            {coupon.maxDiscount && (
-                              <small className="text-muted">
-                                {" "}
-                                up to ${coupon.maxDiscount}
+                        <div>
+                          <strong>
+                            {coupon.discount_type === "PERCENTAGE"
+                              ? `${coupon.discount_value}%`
+                              : `$${coupon.discount_value}`}
+                          </strong>
+                          {coupon.max_discount &&
+                            coupon.discount_type === "PERCENTAGE" && (
+                              <small className="text-muted d-block">
+                                Max: ${coupon.max_discount}
                               </small>
                             )}
-                          </div>
-                        ) : (
-                          <div>
-                            <strong>{coupon.trialDays} days free</strong>
-                          </div>
-                        )}
+                        </div>
                       </td>
+                      <td>${coupon.min_purchase_amount || "0"}</td>
                       <td>
-                        <div className="usage-progress">
-                          <div className="d-flex justify-content-between small">
-                            <span>
-                              {coupon.usageCount}/{coupon.usageLimit}
-                            </span>
-                            <span>{calculateUsagePercentage(coupon)}%</span>
+                        <div className="small">
+                          <div>
+                            From:{" "}
+                            {new Date(coupon.valid_from).toLocaleDateString()}
                           </div>
-                          <div className="progress" style={{ height: "4px" }}>
-                            <div
-                              className={`progress-bar ${
-                                calculateUsagePercentage(coupon) > 80
-                                  ? "bg-warning"
-                                  : "bg-success"
-                              }`}
-                              style={{
-                                width: `${calculateUsagePercentage(coupon)}%`,
-                              }}
-                            ></div>
+                          <div>
+                            To:{" "}
+                            {new Date(coupon.valid_until).toLocaleDateString()}
                           </div>
                         </div>
                       </td>
                       <td>
                         <div className="small">
-                          <div>From: {coupon.validFrom}</div>
-                          <div>To: {coupon.validUntil}</div>
+                          <div>
+                            {coupon.usage_count || 0} / {coupon.usage_limit}
+                          </div>
+                          {coupon.usage_limit > 0 && (
+                            <ProgressBar
+                              now={
+                                ((coupon.usage_count || 0) /
+                                  coupon.usage_limit) *
+                                100
+                              }
+                              variant={
+                                (coupon.usage_count || 0) / coupon.usage_limit >
+                                0.8
+                                  ? "warning"
+                                  : "success"
+                              }
+                              style={{ height: "4px" }}
+                            />
+                          )}
                         </div>
                       </td>
                       <td>
                         <Badge bg={getStatusVariant(coupon.status)}>
-                          {coupon.status.toUpperCase()}
+                          {coupon.status}
                         </Badge>
                       </td>
                       <td>
@@ -626,18 +619,18 @@ const AdminCoupons = () => {
               <div className="text-center py-5">
                 <div className="fs-1">🎫</div>
                 <p className="text-muted">
-                  No coupons found matching your filters
+                  {coupons.length === 0
+                    ? "No coupons created yet"
+                    : "No coupons found matching your filters"}
                 </p>
-                <Button
-                  variant="outline-primary"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("all");
-                    setTypeFilter("all");
-                  }}
-                >
-                  Clear Filters
-                </Button>
+                {coupons.length === 0 && (
+                  <Button
+                    variant="primary"
+                    onClick={() => setShowCreateModal(true)}
+                  >
+                    Create Your First Coupon
+                  </Button>
+                )}
               </div>
             )}
           </Card.Body>
@@ -658,7 +651,7 @@ const AdminCoupons = () => {
               setFormData={setFormData}
               mode="create"
               generateCode={() =>
-                setFormData({ ...formData, code: generateCouponCode() })
+                setFormData({ ...formData, coupon_code: generateCouponCode() })
               }
             />
           </Modal.Body>
@@ -666,11 +659,16 @@ const AdminCoupons = () => {
             <Button
               variant="secondary"
               onClick={() => setShowCreateModal(false)}
+              disabled={actionLoading}
             >
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleCreateCoupon}>
-              Create Coupon
+            <Button
+              variant="primary"
+              onClick={handleCreateCoupon}
+              disabled={actionLoading}
+            >
+              {actionLoading ? "Creating..." : "Create Coupon"}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -692,11 +690,19 @@ const AdminCoupons = () => {
             />
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowEditModal(false)}
+              disabled={actionLoading}
+            >
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleEditCoupon}>
-              Update Coupon
+            <Button
+              variant="primary"
+              onClick={handleEditCoupon}
+              disabled={actionLoading}
+            >
+              {actionLoading ? "Updating..." : "Update Coupon"}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -721,11 +727,11 @@ const CouponForm = ({ formData, setFormData, mode, generateCode }) => {
           <Form.Label>Coupon Code *</Form.Label>
           <InputGroup>
             <Form.Control
-              value={formData.code}
+              value={formData.coupon_code}
               onChange={(e) =>
-                handleChange("code", e.target.value.toUpperCase())
+                handleChange("coupon_code", e.target.value.toUpperCase())
               }
-              placeholder="e.g., WELCOME20"
+              placeholder="e.g., EID51"
               required
             />
             {mode === "create" && (
@@ -744,9 +750,9 @@ const CouponForm = ({ formData, setFormData, mode, generateCode }) => {
         <Form.Group>
           <Form.Label>Coupon Name *</Form.Label>
           <Form.Control
-            value={formData.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            placeholder="e.g., Welcome Discount"
+            value={formData.coupon_name}
+            onChange={(e) => handleChange("coupon_name", e.target.value)}
+            placeholder="e.g., Eid Discount"
             required
           />
         </Form.Group>
@@ -767,88 +773,62 @@ const CouponForm = ({ formData, setFormData, mode, generateCode }) => {
 
       <Col md={6}>
         <Form.Group>
-          <Form.Label>Coupon Type *</Form.Label>
+          <Form.Label>Discount Type *</Form.Label>
           <Form.Select
-            value={formData.type}
-            onChange={(e) => handleChange("type", e.target.value)}
+            value={formData.discount_type}
+            onChange={(e) => handleChange("discount_type", e.target.value)}
           >
-            <option value="discount">Discount Code</option>
-            <option value="trial">Free Trial</option>
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount ($)</option>
           </Form.Select>
         </Form.Group>
       </Col>
 
-      {formData.type === "discount" && (
-        <>
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Discount Type</Form.Label>
-              <Form.Select
-                value={formData.discountType}
-                onChange={(e) => handleChange("discountType", e.target.value)}
-              >
-                <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Discount Value *</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type="number"
-                  value={formData.discountValue}
-                  onChange={(e) =>
-                    handleChange("discountValue", e.target.value)
-                  }
-                  placeholder={
-                    formData.discountType === "percentage" ? "20" : "50"
-                  }
-                  required
-                />
-                <InputGroup.Text>
-                  {formData.discountType === "percentage" ? "%" : "$"}
-                </InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Maximum Discount</Form.Label>
-              <Form.Control
-                type="number"
-                value={formData.maxDiscount}
-                onChange={(e) => handleChange("maxDiscount", e.target.value)}
-                placeholder="Leave empty for no limit"
-              />
-            </Form.Group>
-          </Col>
-        </>
-      )}
-
-      {formData.type === "trial" && (
-        <Col md={6}>
-          <Form.Group>
-            <Form.Label>Trial Days *</Form.Label>
+      <Col md={6}>
+        <Form.Group>
+          <Form.Label>Discount Value *</Form.Label>
+          <InputGroup>
             <Form.Control
               type="number"
-              value={formData.trialDays || ""}
-              onChange={(e) => handleChange("trialDays", e.target.value)}
-              placeholder="7"
+              step="0.01"
+              value={formData.discount_value}
+              onChange={(e) => handleChange("discount_value", e.target.value)}
+              placeholder={formData.discount_type === "percentage" ? "50" : "25"}
               required
             />
+            <InputGroup.Text>
+              {formData.discount_type === "percentage" ? "%" : "$"}
+            </InputGroup.Text>
+          </InputGroup>
+        </Form.Group>
+      </Col>
+
+      {formData.discount_type === "percentage" && (
+        <Col md={6}>
+          <Form.Group>
+            <Form.Label>Maximum Discount ($)</Form.Label>
+            <Form.Control
+              type="number"
+              step="0.01"
+              value={formData.max_discount}
+              onChange={(e) => handleChange("max_discount", e.target.value)}
+              placeholder="100"
+            />
+            <Form.Text className="text-muted">
+              Leave empty for no maximum limit
+            </Form.Text>
           </Form.Group>
         </Col>
       )}
 
-      <Col md={6}>
+      <Col md={formData.discount_type === "percentage" ? 6 : 12}>
         <Form.Group>
-          <Form.Label>Minimum Purchase Amount</Form.Label>
+          <Form.Label>Minimum Purchase Amount ($)</Form.Label>
           <Form.Control
             type="number"
-            value={formData.minPurchase}
-            onChange={(e) => handleChange("minPurchase", e.target.value)}
+            step="0.01"
+            value={formData.min_purchase_amount}
+            onChange={(e) => handleChange("min_purchase_amount", e.target.value)}
             placeholder="0"
           />
         </Form.Group>
@@ -859,8 +839,8 @@ const CouponForm = ({ formData, setFormData, mode, generateCode }) => {
           <Form.Label>Valid From *</Form.Label>
           <Form.Control
             type="date"
-            value={formData.validFrom}
-            onChange={(e) => handleChange("validFrom", e.target.value)}
+            value={formData.valid_from}
+            onChange={(e) => handleChange("valid_from", e.target.value)}
             required
           />
         </Form.Group>
@@ -871,8 +851,8 @@ const CouponForm = ({ formData, setFormData, mode, generateCode }) => {
           <Form.Label>Valid Until *</Form.Label>
           <Form.Control
             type="date"
-            value={formData.validUntil}
-            onChange={(e) => handleChange("validUntil", e.target.value)}
+            value={formData.valid_until}
+            onChange={(e) => handleChange("valid_until", e.target.value)}
             required
           />
         </Form.Group>
@@ -883,38 +863,29 @@ const CouponForm = ({ formData, setFormData, mode, generateCode }) => {
           <Form.Label>Usage Limit *</Form.Label>
           <Form.Control
             type="number"
-            value={formData.usageLimit}
-            onChange={(e) => handleChange("usageLimit", e.target.value)}
-            placeholder="1000"
+            value={formData.usage_limit}
+            onChange={(e) => handleChange("usage_limit", e.target.value)}
+            placeholder="100"
             required
           />
+          <Form.Text className="text-muted">
+            Maximum number of times this coupon can be used
+          </Form.Text>
         </Form.Group>
       </Col>
 
       <Col md={6}>
         <Form.Group>
-          <Form.Label>Uses Per User</Form.Label>
+          <Form.Label>Subscription ID</Form.Label>
           <Form.Control
             type="number"
-            value={formData.userLimit}
-            onChange={(e) => handleChange("userLimit", e.target.value)}
-            placeholder="1"
+            value={formData.subscription_id}
+            onChange={(e) => handleChange("subscription_id", e.target.value)}
+            placeholder="2"
           />
-        </Form.Group>
-      </Col>
-
-      <Col md={6}>
-        <Form.Group>
-          <Form.Label>Applicable Plan</Form.Label>
-          <Form.Select
-            value={formData.planType}
-            onChange={(e) => handleChange("planType", e.target.value)}
-          >
-            <option value="all">All Plans</option>
-            <option value="basic">Basic Plan</option>
-            <option value="premium">Premium Plan</option>
-            <option value="family">Family Plan</option>
-          </Form.Select>
+          <Form.Text className="text-muted">
+            Leave empty if applicable to all subscriptions
+          </Form.Text>
         </Form.Group>
       </Col>
 
