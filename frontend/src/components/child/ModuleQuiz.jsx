@@ -9,7 +9,8 @@ import {
 } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import axios from "axios";
+import { getQuizBySeriesVideoApi, submitQuizApi } from "../../services/quizApi";
+
 
 const ModuleQuiz = () => {
   const navigate = useNavigate();
@@ -27,14 +28,20 @@ const ModuleQuiz = () => {
 
   useEffect(() => {
     fetchQuizData();
-  }, [videoId]);
+  }, [seriesId, videoId]);
 
   const fetchQuizData = async () => {
     try {
       setLoading(true);
-      // In a real app, you would fetch the quiz based on videoId/seriesId
-      const response = await axios.get("http://localhost:5000/api/quizzes/1"); // Using quiz ID 1 for demo
-      const quizData = response.data;
+      setError(null);
+
+      // Fetch quiz based on seriesId and videoId
+      const quizData = await getQuizBySeriesVideoApi(seriesId, videoId);
+
+      if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+        setError("No quiz available for this lesson.");
+        return;
+      }
 
       setQuizId(quizData.id);
 
@@ -42,7 +49,9 @@ const ModuleQuiz = () => {
       const transformedQuestions = quizData.questions.map((q, index) => ({
         id: q.id || index + 1,
         question: q.question,
-        options: [q.option_a, q.option_b, q.option_c, q.option_d],
+        options: [q.option_a, q.option_b, q.option_c, q.option_d].filter(
+          (opt) => opt !== null && opt !== ""
+        ),
         correctAnswer: getCorrectAnswerIndex(q.correct_option),
         correctOption: q.correct_option,
       }));
@@ -83,11 +92,13 @@ const ModuleQuiz = () => {
 
   const submitQuizResults = async (finalScore, answers) => {
     try {
-      await axios.post("http://localhost:5000/api/quiz-submissions/submit", {
+      await submitQuizApi({
         quiz_id: quizId,
         child_id: childId,
         score: finalScore,
         answers: answers,
+        series_id: seriesId,
+        video_id: videoId,
       });
     } catch (err) {
       console.error("Error submitting quiz results:", err);
@@ -132,6 +143,8 @@ const ModuleQuiz = () => {
             score: finalScore,
             totalQuestions: questions.length,
             quizId: quizId,
+            seriesId: seriesId,
+            videoId: videoId,
           },
         });
       }, 2000);
@@ -180,6 +193,15 @@ const ModuleQuiz = () => {
             <Button variant="primary" onClick={fetchQuizData}>
               Try Again
             </Button>
+            <Button
+              variant="outline-primary"
+              className="ms-2"
+              onClick={() =>
+                navigate(`/child/series/${seriesId}/page1/${videoId}`)
+              }
+            >
+              Back to Lesson
+            </Button>
           </div>
         </Alert>
       </Container>
@@ -198,6 +220,16 @@ const ModuleQuiz = () => {
       >
         <Alert variant="warning" className="text-center">
           No questions available for this quiz.
+          <div className="mt-3">
+            <Button
+              variant="primary"
+              onClick={() =>
+                navigate(`/child/series/${seriesId}/page1/${videoId}`)
+              }
+            >
+              Back to Lesson
+            </Button>
+          </div>
         </Alert>
       </Container>
     );
