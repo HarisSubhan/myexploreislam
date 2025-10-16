@@ -35,6 +35,10 @@ const couponRoutes = require("./routes/couponRoutes");
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
+const parentDashboardRoutes = require("./routes/parentDashboardRoutes");
+
+const parentChildrenRoutes = require("./routes/parentChildrenRoutes");
+
 
 initDB();
 dotenv.config();
@@ -95,7 +99,13 @@ app.use("/api/coupons", couponRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
 
+app.use("/api/parent-dashboard", parentDashboardRoutes);
 
+app.use("/api/parent-dashboard", parentDashboardRoutes);
+
+app.use("/api/parent", parentChildrenRoutes);
+
+app.use("/api/children", parentChildrenRoutes);
 
 // Test route
 app.get('/', (req, res) => {

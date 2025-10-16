@@ -29,6 +29,7 @@ const initDB = () => {
       password VARCHAR(255),
       color VARCHAR(20),
       parent_id INT,
+      age INT,
       is_active BOOLEAN DEFAULT 1,
       is_deleted BOOLEAN DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
