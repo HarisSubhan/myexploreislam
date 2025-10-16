@@ -20,6 +20,7 @@ import {
   FaEnvelope,
   FaCheckCircle,
   FaTimesCircle,
+  FaSync,
   FaExclamationCircle,
   FaUser,
 } from "react-icons/fa";
@@ -70,7 +71,7 @@ const SummaryCards = React.memo(({ summary }) => {
         key: "progress",
         value: summary?.in_progress_tickets,
         label: "In Progress",
-        icon: FaCheckCircle,
+        icon: FaSync,
         className: "bg-warning text-dark",
       },
       {
@@ -152,7 +153,7 @@ const TicketRow = React.memo(({ ticket }) => {
 
 // Memoized Tickets Table Component
 const TicketsTable = React.memo(
-  ({ tickets, loading, currentUser, onOpenTicket }) => {
+  ({ tickets, loading, currentUser, onOpenTicket, onRefresh }) => {
     if (loading) {
       return (
         <div className="text-center py-4">
@@ -167,8 +168,19 @@ const TicketsTable = React.memo(
         <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
           <small className="text-muted">
             Showing {tickets.length} ticket(s)
+            
           </small>
           <div className="d-flex gap-2 flex-shrink-0">
+            <Button
+              variant="outline-primary"
+              onClick={onRefresh}
+              disabled={loading}
+              size="sm"
+              className="d-flex align-items-center"
+            >
+              <FaSync className="me-1" />
+              Refresh
+            </Button>
             <Button
               variant="primary"
               onClick={onOpenTicket}
@@ -301,13 +313,10 @@ const ParentSupports = () => {
     setLoading(true);
     setError("");
     try {
-      console.log("🔄 Fetching tickets for user:", currentUser.id);
       const response = await ticketApi.getAll();
-      console.log("📦 Tickets API response:", response);
-      setTickets(response.tickets || response.data || []);
+      setTickets(response.tickets || []);
     } catch (err) {
-      console.error("❌ Error fetching tickets:", err);
-      setError(err.message || "Failed to load tickets");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -317,14 +326,24 @@ const ParentSupports = () => {
     if (!currentUser?.id) return;
 
     try {
-      console.log("🔄 Fetching summary for user:", currentUser.id);
       const response = await ticketApi.getSummary();
-      console.log("📊 Summary API response:", response);
-      setSummary(response.data || response);
+      setSummary(response.data);
     } catch (err) {
-      console.error("❌ Error fetching summary:", err);
+      console.error("Error fetching summary:", err);
     }
   }, [currentUser]);
+
+  const handleRefresh = useCallback(async () => {
+    if (!currentUser?.id) {
+      setError("Please log in to refresh tickets");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+    await Promise.all([fetchTickets(), fetchSummary()]);
+    setSuccess("Tickets refreshed successfully!");
+  }, [currentUser, fetchTickets, fetchSummary]);
 
   const handleOpenTicket = useCallback(() => {
     if (!currentUser?.id) {
@@ -354,30 +373,22 @@ const ParentSupports = () => {
       setSuccess("");
 
       try {
-        console.log("🎫 Creating ticket with data:", newTicket);
-        console.log("👤 User ID:", currentUser.id);
-
-        const response = await ticketApi.create(newTicket);
-        console.log("✅ Ticket creation response:", response);
-
+        console.log("Creating ticket with user ID:", currentUser.id);
+        await ticketApi.create(newTicket);
         setSuccess("Ticket created successfully!");
-
-        // Close modal first
-        handleCloseTicket();
-
-        // Then refetch both tickets and summary to ensure data is fresh
         await Promise.all([fetchTickets(), fetchSummary()]);
-
-        console.log("🔄 Data refreshed after ticket creation");
+        handleCloseTicket();
       } catch (err) {
-        console.error("❌ Ticket creation error:", err);
-        setError(err.message || "Failed to create ticket");
+        setError(err.message);
+        console.error("Ticket creation error:", err);
       } finally {
         setSubmitting(false);
       }
     },
     [currentUser, newTicket, fetchTickets, fetchSummary, handleCloseTicket]
   );
+
+ 
 
   const handleManualLogin = useCallback(() => {
     window.location.href = "/login";
@@ -400,6 +411,7 @@ const ParentSupports = () => {
                 <span className="d-none d-sm-inline">{currentUser.name}</span>
                 <span className="d-sm-none">ID: {currentUser.id}</span>
               </Badge>
+              
             </div>
           )}
         </div>
@@ -463,6 +475,7 @@ const ParentSupports = () => {
                   loading={loading}
                   currentUser={currentUser}
                   onOpenTicket={handleOpenTicket}
+                  onRefresh={handleRefresh}
                 />
               </Card.Body>
             </Card>
@@ -515,8 +528,11 @@ const ParentSupports = () => {
                       <FaPlusCircle className="me-1" />
                       Open New Ticket
                     </Button>
+                   
                   </div>
                 </div>
+
+               
               </Card.Body>
             </Card>
           </Col>
