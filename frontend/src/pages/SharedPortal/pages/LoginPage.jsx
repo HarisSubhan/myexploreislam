@@ -1,3 +1,4 @@
+// pages/Auth/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,7 +29,7 @@ function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous error
+    setError("");
     setIsLoading(true);
 
     try {
@@ -38,7 +39,7 @@ function LoginPage() {
       });
 
       const token = response.token;
-      const user = response.user;
+      const user = response.user || {};
 
       if (!token || !user) {
         throw new Error(
@@ -46,31 +47,68 @@ function LoginPage() {
         );
       }
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userRole", user.role);
+      // Ensure stable 'id' field using many common names
+      const id =
+        user.id ||
+        user.userId ||
+        user._id ||
+        user.user_id ||
+        user.email ||
+        Date.now();
 
+      const userWithId = {
+        ...user,
+        id,
+        name: user.name || user.username || user.email || "",
+        email: user.email || "",
+        role: (user.role || "user").toString(),
+      };
+
+      // Persist token + normalized user
+      localStorage.setItem("token", token);
+      localStorage.setItem("userRole", userWithId.role);
+      localStorage.setItem("user", JSON.stringify(userWithId));
+
+      // Verify storage immediately
+      const verifyUser = localStorage.getItem("user");
+      const verifyToken = localStorage.getItem("token");
+
+      if (!verifyUser || !verifyToken) {
+        throw new Error("Failed to store authentication data");
+      }
+
+      // Update context with normalized data (include id)
       login({
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar || null,
+        id: userWithId.id,
+        name: userWithId.name,
+        email: userWithId.email,
+        role: userWithId.role,
+        avatar: userWithId.avatar || null,
       });
 
       toast.success("Login successful");
 
-      const role = user.role.toLowerCase();
+      const role = (userWithId.role || "user").toLowerCase();
       const redirectPaths = {
         admin: "/admin/dashboard",
         parent: "/parent",
         child: "/child",
       };
+
       navigate(redirectPaths[role] || "/");
     } catch (err) {
+      // try to extract backend message
       const backendMessage =
-        err.response?.data?.message || err.response?.data?.error || err.message;
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message;
+      setError(backendMessage);
+      toast.error(backendMessage);
 
-      setError(backendMessage); // Show in Alert
-      toast.error(backendMessage); // Show in toast
+      // clear storage if partial
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +119,6 @@ function LoginPage() {
       <Header />
       <Container fluid className="vh-100">
         <Row className="h-100">
-          {/* Left Side with Background Image */}
           <Col
             md={6}
             className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white p-0 position-relative"
@@ -95,7 +132,6 @@ function LoginPage() {
             />
           </Col>
 
-          {/* Right Side - Login Form */}
           <Col
             md={6}
             className="d-flex align-items-center justify-content-center"
@@ -112,7 +148,6 @@ function LoginPage() {
                 <div className="text-muted">Platform for Young Minds</div>
               </div>
 
-              {/* Error Alert */}
               {error && (
                 <Alert variant="danger" className="text-center">
                   {error}
