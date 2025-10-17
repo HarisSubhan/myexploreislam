@@ -34,17 +34,17 @@ const ParentHeader = ({ toggleSidebar, darkMode, toggleTheme }) => {
 
   const handleLogout = async () => {
     try {
-      // Call the logout API
-      await authAPI.logout();
+  
+      await authAPI.logout("parent");
 
-      // Clear local storage and redirect regardless of API success
+
       localStorage.removeItem("token");
       handleCloseUserMenu();
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
 
-      // Even if API fails, clear local storage and redirect
+  
       localStorage.removeItem("token");
       handleCloseUserMenu();
       navigate("/login");

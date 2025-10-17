@@ -1,6 +1,7 @@
 import axios from "axios";
 import { baseUrl, getToken } from "../services/config";
 
+// Child Management APIs
 export const addChildApi = async (childData) => {
   const token = getToken();
 
@@ -22,16 +23,52 @@ export const addChildApi = async (childData) => {
   }
 };
 
+export const getChildrenByParentIdApi = async (parentId) => {
+  const token = getToken();
 
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.get(
+      `${baseUrl}/api/parent/${parentId}/children`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch children" };
+  }
+};
+
+export const addChildColorAPi = async (colorData) => {
+  const token = getToken();
+
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.post(`${baseUrl}/api/child/color`, colorData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to add child color" };
+  }
+};
+
+// Child Request APIs
 export const requestedChildApi = async (requested_children) => {
-  // Remove parent_id from parameter
   const token = getToken();
 
   if (!token) throw new Error("You are not logged in. Please log in first.");
 
   try {
     const response = await axios.post(
-      `${baseUrl}/api/child-requests`, // Add trailing slash to match backend
+      `${baseUrl}/api/child-requests/`,
       { requested_children },
       {
         headers: {
@@ -50,7 +87,7 @@ export const requestedChildApi = async (requested_children) => {
     );
   }
 };
-  
+
 export const updateChildRequestStatusApi = async ({ requestId, status }) => {
   const token = getToken();
 
@@ -73,54 +110,5 @@ export const updateChildRequestStatusApi = async ({ requestId, status }) => {
         error.response?.data?.message ||
         "Failed to update request status"
     );
-  }
-};
-
-
-
-
-
-
-
-
-export const addChildColorAPi = async (colorData) => {
-  const token = getToken();
-
-  if (!token) throw new Error("You are not logged in. Please log in first.");
-
-  try {
-    const response = await axios.post(
-      `${baseUrl}/api/child/color`,
-      colorData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: "Failed to add child color" };
-  }
-};
-
-
-export const getChildrenByParentIdApi = async (parentId) => {
-  const token = getToken();
-
-  if (!token) throw new Error("You are not logged in. Please log in first.");
-
-  try {
-    const response = await axios.get(
-      `${baseUrl}/api/parent/${parentId}/children`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: "Failed to fetch children" };
   }
 };
