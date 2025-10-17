@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Navbar, Button, Image } from "react-bootstrap";
 import { Outlet, useNavigate } from "react-router-dom";
-import { FaBars, FaUser, FaBook, FaEnvelope, FaHistory, FaQuestionCircle } from "react-icons/fa";
+import {
+  FaBars,
+  FaUser,
+  FaBook,
+  FaEnvelope,
+  FaHistory,
+  FaQuestionCircle,
+} from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
 import logo from "@images/logo.png";
+import { authAPI } from "../../services/api";
+
 
 const ChildApp = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -53,10 +62,26 @@ const ChildApp = () => {
     },
   ];
 
+  const handleLogout = async () => {
+    try {
+      
+      await authAPI.logout();
+
+    
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+
+     
+      localStorage.removeItem("token");
+      navigate("/login");
+    }
+  };
+
   const handleNavigation = (path, isLogout = false) => {
     if (isLogout) {
-      localStorage.removeItem("token"); 
-      navigate("/login"); 
+      handleLogout();
       return;
     }
     navigate(path);
@@ -85,9 +110,7 @@ const ChildApp = () => {
         >
           <FaBars />
         </Button>
-        <Navbar.Brand className="fw-bold">
-          Explore Islam
-        </Navbar.Brand>
+        <Navbar.Brand className="fw-bold">Explore Islam</Navbar.Brand>
       </Navbar>
 
       <Container fluid className="p-0">

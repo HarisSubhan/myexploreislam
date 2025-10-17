@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Box, useTheme, Menu, MenuItem, Divider } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink, useNavigate } from 'react-router-dom'; // For MenuItem links
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Box,
+  useTheme,
+  Menu,
+  MenuItem,
+  Divider,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import logo from "@images/logo.png";
+import { authAPI } from "../../services/api";
 
 
-import Brightness4Icon from '@mui/icons-material/Brightness4'; 
-import Brightness7Icon from '@mui/icons-material/Brightness7'; 
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-
-import logo from "@images/logo.png"; 
-
-const ParentHeader = ({
-  toggleSidebar,
-  darkMode,
-  toggleTheme
-}) => {
+const ParentHeader = ({ toggleSidebar, darkMode, toggleTheme }) => {
   const muiTheme = useTheme();
   const [anchorElUser, setAnchorElUser] = useState(null);
   const navigate = useNavigate();
@@ -27,20 +32,32 @@ const ParentHeader = ({
     setAnchorElUser(null);
   };
 
- const handleLogout = () => {
-   localStorage.removeItem("token"); 
-   handleCloseUserMenu();
-   navigate("/login");
- };
+  const handleLogout = async () => {
+    try {
+      // Call the logout API
+      await authAPI.logout();
+
+      // Clear local storage and redirect regardless of API success
+      localStorage.removeItem("token");
+      handleCloseUserMenu();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      // Even if API fails, clear local storage and redirect
+      localStorage.removeItem("token");
+      handleCloseUserMenu();
+      navigate("/login");
+    }
+  };
 
   return (
     <AppBar
       position="fixed"
       sx={{
-        width: '100%',
+        width: "100%",
         marginLeft: 0,
         zIndex: muiTheme.zIndex.drawer + 1,
-        
       }}
     >
       <Toolbar>
@@ -49,7 +66,7 @@ const ParentHeader = ({
           aria-label="open drawer"
           edge="start"
           onClick={toggleSidebar}
-          sx={{ mr: { xs: 1, sm: 2 } }} 
+          sx={{ mr: { xs: 1, sm: 2 } }}
         >
           <MenuIcon />
         </IconButton>
@@ -59,9 +76,8 @@ const ParentHeader = ({
           src={logo}
           alt="Logo"
           sx={{
-            height: { xs: 30, sm: 40, lg:60 }, 
+            height: { xs: 30, sm: 40, lg: 60 },
             mr: 2,
-          
           }}
         />
 
@@ -71,13 +87,13 @@ const ParentHeader = ({
           component="div"
           sx={{
             flexGrow: 1,
-            display: { xs: 'none', sm: 'block' } 
+            display: { xs: "none", sm: "block" },
           }}
         >
           Explore Islam
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton
             onClick={toggleTheme}
             color="inherit"
@@ -94,17 +110,17 @@ const ParentHeader = ({
             <AccountCircleIcon />
           </IconButton>
           <Menu
-            sx={{ mt: '45px' }}
+            sx={{ mt: "45px" }}
             id="menu-appbar-user"
             anchorEl={anchorElUser}
             anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             keepMounted
             transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
@@ -118,7 +134,7 @@ const ParentHeader = ({
             </MenuItem>
             <MenuItem
               component={RouterLink}
-              to="/parent/defaulttheme" 
+              to="/parent/defaulttheme"
               onClick={handleCloseUserMenu}
             >
               <Typography textAlign="center">Settings</Typography>

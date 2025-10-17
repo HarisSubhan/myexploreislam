@@ -16,13 +16,11 @@ import {
 import AdminLayout from "../../pages/AdminPortal/AdminApp";
 import ticketApi from "../../services/ticketApi";
 
-
 const AdminSupportTicket = () => {
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [priorityFilter, setPriorityFilter] = useState("all");
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [replyMessage, setReplyMessage] = useState("");
@@ -59,10 +57,8 @@ const AdminSupportTicket = () => {
               email: userInfo.email || "No email",
               type: "parent", // Assuming all tickets are from parents
             },
-            priority: ticket.priority?.toLowerCase() || "medium",
             status: ticket.status?.toLowerCase() || "open",
             category: ticket.category || "general",
-            assignedTo: ticket.assignedTo || "Not assigned",
             createdAt: ticket.createdAt
               ? new Date(ticket.createdAt).toLocaleString()
               : new Date().toLocaleString(),
@@ -153,21 +149,8 @@ const AdminSupportTicket = () => {
       result = result.filter((ticket) => ticket.status === statusFilter);
     }
 
-    if (priorityFilter !== "all") {
-      result = result.filter((ticket) => ticket.priority === priorityFilter);
-    }
-
     setFilteredTickets(result);
-  }, [searchTerm, statusFilter, priorityFilter, tickets]);
-
-  const getPriorityVariant = (priority) => {
-    const variants = {
-      low: "success",
-      medium: "warning",
-      high: "danger",
-    };
-    return variants[priority] || "secondary";
-  };
+  }, [searchTerm, statusFilter, tickets]);
 
   const getStatusVariant = (status) => {
     const variants = {
@@ -263,33 +246,6 @@ const AdminSupportTicket = () => {
     }
   };
 
-  const handleAssignTicket = async (ticketId, assignee) => {
-    try {
-      const updatedTickets = tickets.map((ticket) =>
-        ticket.id === ticketId
-          ? {
-              ...ticket,
-              assignedTo: assignee,
-              updatedAt: new Date().toISOString(),
-            }
-          : ticket
-      );
-
-      setTickets(updatedTickets);
-
-      if (selectedTicket && selectedTicket.id === ticketId) {
-        setSelectedTicket({ ...selectedTicket, assignedTo: assignee });
-      }
-
-      // TODO: Add API call to assign ticket
-      // await ticketApi.update(ticketId, { assignedTo: assignee });
-    } catch (err) {
-      setError("Failed to assign ticket: " + err.message);
-      // Revert on error
-      fetchTickets();
-    }
-  };
-
   const ticketStats = {
     total: tickets.length,
     open: tickets.filter((t) => t.status === "open").length,
@@ -376,7 +332,7 @@ const AdminSupportTicket = () => {
         <Card className="mb-4">
           <Card.Body>
             <Row className="g-3">
-              <Col md={4}>
+              <Col md={6}>
                 <Form.Group>
                   <Form.Label>Search Tickets</Form.Label>
                   <InputGroup>
@@ -388,7 +344,7 @@ const AdminSupportTicket = () => {
                   </InputGroup>
                 </Form.Group>
               </Col>
-              <Col md={3}>
+              <Col md={4}>
                 <Form.Group>
                   <Form.Label>Status</Form.Label>
                   <Form.Select
@@ -404,27 +360,12 @@ const AdminSupportTicket = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Priority</Form.Label>
-                  <Form.Select
-                    value={priorityFilter}
-                    onChange={(e) => setPriorityFilter(e.target.value)}
-                  >
-                    <option value="all">All Priorities</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
               <Col md={2} className="d-flex align-items-end">
                 <Button
                   variant="outline-secondary"
                   onClick={() => {
                     setSearchTerm("");
                     setStatusFilter("all");
-                    setPriorityFilter("all");
                   }}
                 >
                   Clear Filters
@@ -433,8 +374,6 @@ const AdminSupportTicket = () => {
             </Row>
           </Card.Body>
         </Card>
-
-      
 
         {/* Tickets Table */}
         <Card>
@@ -458,9 +397,7 @@ const AdminSupportTicket = () => {
                     <th>Ticket #</th>
                     <th>Subject</th>
                     <th>User</th>
-                    <th>Priority</th>
                     <th>Status</th>
-                    <th>Assigned To</th>
                     <th>Last Update</th>
                     <th>Actions</th>
                   </tr>
@@ -491,16 +428,10 @@ const AdminSupportTicket = () => {
                         </div>
                       </td>
                       <td>
-                        <Badge bg={getPriorityVariant(ticket.priority)}>
-                          {ticket.priority.toUpperCase()}
-                        </Badge>
-                      </td>
-                      <td>
                         <Badge bg={getStatusVariant(ticket.status)}>
                           {ticket.status.replace("-", " ").toUpperCase()}
                         </Badge>
                       </td>
-                      <td>{ticket.assignedTo}</td>
                       <td>
                         <div>
                           <div>{ticket.updatedAt.split(" ")[0]}</div>
@@ -541,17 +472,6 @@ const AdminSupportTicket = () => {
                               >
                                 Mark Resolved
                               </Dropdown.Item>
-                              <Dropdown.Divider />
-                              <Dropdown.Item
-                                onClick={() =>
-                                  handleAssignTicket(
-                                    ticket.id,
-                                    "Support Agent 1"
-                                  )
-                                }
-                              >
-                                Assign to Me
-                              </Dropdown.Item>
                             </Dropdown.Menu>
                           </Dropdown>
                         </div>
@@ -578,7 +498,6 @@ const AdminSupportTicket = () => {
                     onClick={() => {
                       setSearchTerm("");
                       setStatusFilter("all");
-                      setPriorityFilter("all");
                     }}
                   >
                     Clear Filters
@@ -605,13 +524,7 @@ const AdminSupportTicket = () => {
                     <strong>User:</strong> {selectedTicket.user.name} (
                     {selectedTicket.user.email})
                   </Col>
-                  <Col md={3}>
-                    <strong>Priority:</strong>{" "}
-                    <Badge bg={getPriorityVariant(selectedTicket.priority)}>
-                      {selectedTicket.priority.toUpperCase()}
-                    </Badge>
-                  </Col>
-                  <Col md={3}>
+                  <Col md={6}>
                     <strong>Status:</strong>{" "}
                     <Badge bg={getStatusVariant(selectedTicket.status)}>
                       {selectedTicket.status.replace("-", " ").toUpperCase()}
