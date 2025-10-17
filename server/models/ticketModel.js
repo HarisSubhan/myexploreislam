@@ -45,3 +45,14 @@ exports.getTicketSummary = (callback) => {
   `;
   db.query(sql, callback);
 };
+
+
+// ✅ Update Ticket Status
+exports.updateTicketStatus = (ticketId, status, callback) => {
+  const sql = `
+    UPDATE tickets
+    SET status = ?, updated_at = NOW()
+    WHERE id = ?
+  `;
+  db.query(sql, [status, ticketId], callback);
+};

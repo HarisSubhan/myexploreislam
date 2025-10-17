@@ -54,3 +54,29 @@ exports.getAllCoupons = (callback) => {
   `;
   db.query(sql, callback);
 };
+
+exports.updateCoupon = (id, data, callback) => {
+  const fields = [];
+  const values = [];
+
+  // Dynamically build SET clause based on provided fields
+  for (const key in data) {
+    fields.push(`${key} = ?`);
+    values.push(data[key]);
+  }
+
+  const sql = `
+    UPDATE coupons
+    SET ${fields.join(", ")}, updated_at = NOW()
+    WHERE id = ?
+  `;
+
+  values.push(id);
+  db.query(sql, values, callback);
+};
+
+// ✅ Delete Coupon
+exports.deleteCoupon = (id, callback) => {
+  const sql = `DELETE FROM coupons WHERE id = ?`;
+  db.query(sql, [id], callback);
+};

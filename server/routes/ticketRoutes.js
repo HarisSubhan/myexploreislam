@@ -9,4 +9,8 @@ router.get("/all", ticketController.getAllTickets);
 
 router.get("/summary", ticketController.getTicketSummary);
 
+router.put("/:id/in-progress", ticketController.markInProgress);
+
+router.put("/:id/resolved", ticketController.markResolved);
+
 module.exports = router;
