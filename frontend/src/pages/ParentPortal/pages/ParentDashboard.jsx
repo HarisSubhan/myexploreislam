@@ -9,9 +9,13 @@ import ChildActivityTable from "../../../components/parent/ChildActivityTable";
 import MultiChildChart from "../../../components/parent/MultiChildChart";
 import "../../../components/parent/dashboardTheme.css";
 
-
 const ParentDashboard = () => {
   const [range, setRange] = useState("7d");
+
+  // Get parentId from your authentication context or props
+  // For now, using a dynamic value - replace with actual parent ID from your auth system
+  const parentId = 2; // This should come from your authentication context
+
   const {
     loading,
     stats,
@@ -19,8 +23,8 @@ const ParentDashboard = () => {
     children,
     timeline,
     subscription,
-    error
-  } = useParentMetrics(range);
+    error,
+  } = useParentMetrics(range, parentId);
 
   return (
     <div className="parent-dashboard">

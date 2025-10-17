@@ -49,62 +49,7 @@ const StatusBadge = React.memo(({ status }) => {
   );
 });
 
-// Memoized Summary Cards Component
-const SummaryCards = React.memo(({ summary }) => {
-  const cards = useMemo(
-    () => [
-      {
-        key: "total",
-        value: summary?.total_tickets,
-        label: "Total Tickets",
-        icon: FaTicketAlt,
-        className: "bg-primary text-white",
-      },
-      {
-        key: "open",
-        value: summary?.open_tickets,
-        label: "Open",
-        icon: FaTimesCircle,
-        className: "bg-danger text-white",
-      },
-      {
-        key: "progress",
-        value: summary?.in_progress_tickets,
-        label: "In Progress",
-        icon: FaSync,
-        className: "bg-warning text-dark",
-      },
-      {
-        key: "resolved",
-        value: summary?.resolved_tickets,
-        label: "Resolved",
-        icon: FaCheckCircle,
-        className: "bg-success text-white",
-      },
-    ],
-    [summary]
-  );
 
-  return (
-    <Row className="g-3">
-      {cards.map(({ key, value, label, icon: Icon, className }) => (
-        <Col key={key} md={3} sm={6} xs={12}>
-          <Card className={`border-0 shadow-sm ${className}`}>
-            <Card.Body className="p-3">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h4 className="fw-bold mb-0">{value || 0}</h4>
-                  <small>{label}</small>
-                </div>
-                <Icon size={20} />
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      ))}
-    </Row>
-  );
-});
 
 // Memoized Ticket Row Component
 const TicketRow = React.memo(({ ticket }) => {
@@ -455,14 +400,7 @@ const ParentSupports = () => {
         <AuthRequired onManualLogin={handleManualLogin} />
       ) : (
         <Row className="g-3">
-          {/* Summary Cards */}
-          {summary && (
-            <Col xs={12}>
-              <SummaryCards summary={summary} />
-            </Col>
-          )}
 
-          {/* Main Content */}
           <Col xl={8} lg={7}>
             <Card className="shadow-sm border-0 rounded-3 h-100">
               <Card.Body>
