@@ -33,13 +33,13 @@ export const couponApi = {
 
   // Update coupon
   updateCoupon: async (id, couponData) => {
-    const response = await api.put(`/coupons/${id}`, couponData);
+    const response = await api.put(`/coupons/update/${id}`, couponData);
     return response.data;
   },
 
   // Delete coupon
   deleteCoupon: async (id) => {
-    const response = await api.delete(`/coupons/${id}`);
+    const response = await api.delete(`/coupons/delete/${id}`);
     return response.data;
   },
 
