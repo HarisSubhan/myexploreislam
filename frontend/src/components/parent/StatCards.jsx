@@ -7,26 +7,30 @@ const CONFIG = [
     key: "totalChildren",
     label: "Total Child Accounts",
     icon: <IoPeople />,
-    accent: "linear-gradient(135deg,#6366f1,#60a5fa)"
+    accent: "linear-gradient(135deg,#6366f1,#60a5fa)",
   },
   {
     key: "active",
     label: "Active Accounts",
     icon: <IoCheckmarkCircle />,
-    accent: "linear-gradient(135deg,#16a34a,#22c55e)"
+    accent: "linear-gradient(135deg,#16a34a,#22c55e)",
   },
   {
     key: "inactive",
     label: "Inactive Accounts",
     icon: <IoCloseCircle />,
-    accent: "linear-gradient(135deg,#dc2626,#f87171)"
-  }
+    accent: "linear-gradient(135deg,#dc2626,#f87171)",
+  },
 ];
 
 export default function StatCards({ stats, loading }) {
+  const formatStatValue = (value) => {
+    return String(value || 0).padStart(2, "0");
+  };
+
   return (
     <Row className="g-4 mb-2">
-      {CONFIG.map(cfg => (
+      {CONFIG.map((cfg) => (
         <Col xs={12} sm={6} md={4} key={cfg.key}>
           <Card className="pd-card h-100" aria-live="polite">
             <div className="stat-card">
@@ -40,7 +44,7 @@ export default function StatCards({ stats, loading }) {
                   />
                 ) : (
                   <p className="stat-value mb-0">
-                    {String(stats[cfg.key]).padStart(2, "0")}
+                    {formatStatValue(stats[cfg.key])}
                   </p>
                 )}
               </div>
