@@ -1,5 +1,7 @@
 const db = require('../config/db');
 
+const logUserActivity = require("../utils/activityLogger");
+
 // Upload video (single ya series ka part)
 const uploadVideoFile = (req, res) => {
   const { title, description, series_id } = req.body;
@@ -195,11 +197,26 @@ const getVideosBySeriesId = (req, res) => {
   });
 };
 
+const watchVideo = (req, res) => {
+  const { child_id, video_id } = req.body;
+
+  if (!child_id || !video_id) {
+    return res.status(400).json({ message: "child_id and video_id are required" });
+  }
+
+  // ✅ Log activity
+  logUserActivity(child_id, "Watched Video", { video_id }, "child");
+
+  res.status(200).json({ message: "Video watch logged successfully" });
+};
+
+
 module.exports = {
   uploadVideoFile,
   getAllVideos,
   getVideoById,
   updateVideoById,
   getVideosBySeriesId,
-  getUnassignedVideos
+  getUnassignedVideos,
+  watchVideo
 };
