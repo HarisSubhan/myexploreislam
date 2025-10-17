@@ -14,9 +14,11 @@ import {
   Spinner,
 } from "react-bootstrap";
 import AdminLayout from "../../pages/AdminPortal/AdminApp";
+import { useUser } from "../../context/UserContext";
 import ticketApi from "../../services/ticketApi";
 
 const AdminSupportTicket = () => {
+  const { user } = useUser();
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,23 +41,29 @@ const AdminSupportTicket = () => {
       // Transform API data to match your frontend structure
       const transformedTickets =
         response.tickets?.map((ticket) => {
-          console.log("Processing ticket:", ticket);
-
-          // Extract user info - adjust based on your actual API response structure
+          // Extract user information properly
           const userInfo = ticket.parent_id || ticket.user || {};
+
+          // Determine user name - check multiple possible fields
+          const getUserName = () => {
+            if (userInfo.name) return userInfo.name;
+            if (userInfo.username) return userInfo.username;
+            if (userInfo.firstName && userInfo.lastName)
+              return `${userInfo.firstName} ${userInfo.lastName}`;
+            if (userInfo.email) return userInfo.email.split("@")[0];
+            return "Unknown User";
+          };
 
           return {
             id: ticket.id || ticket._id,
             ticketNumber:
-              ticket.ticket_number ||
-              ticket.ticketNumber ||
-              `TKT-${ticket.id?.toString().slice(-6)}`,
+              ticket.ticket_number || `TKT-${ticket.id?.toString().slice(-6)}`,
             subject: ticket.subject || "No Subject",
             description: ticket.description || "No description provided",
             user: {
-              name: userInfo.name || userInfo.username || "Unknown User",
+              name: getUserName(),
               email: userInfo.email || "No email",
-              type: "parent", // Assuming all tickets are from parents
+              type: "parent",
             },
             status: ticket.status?.toLowerCase() || "open",
             category: ticket.category || "general",
@@ -68,10 +76,7 @@ const AdminSupportTicket = () => {
             lastReply: calculateLastReply(ticket.updatedAt || ticket.createdAt),
             messages: ticket.messages?.map((msg) => ({
               id: msg._id || msg.id,
-              sender:
-                msg.sender === "agent"
-                  ? "Support Agent"
-                  : userInfo.name || "User",
+              sender: msg.sender === "agent" ? "Support Agent" : getUserName(),
               message: msg.message || msg.content,
               timestamp: msg.timestamp
                 ? new Date(msg.timestamp).toLocaleString()
@@ -80,7 +85,7 @@ const AdminSupportTicket = () => {
             })) || [
               {
                 id: 1,
-                sender: userInfo.name || "User",
+                sender: getUserName(),
                 message: ticket.description || "No message",
                 timestamp: ticket.createdAt
                   ? new Date(ticket.createdAt).toLocaleString()
@@ -91,12 +96,10 @@ const AdminSupportTicket = () => {
           };
         }) || [];
 
-      console.log("Transformed tickets:", transformedTickets);
       setTickets(transformedTickets);
     } catch (err) {
       console.error("Error fetching tickets:", err);
       setError(err.message || "Failed to load tickets");
-      // Fallback to empty array
       setTickets([]);
     } finally {
       setLoading(false);
@@ -156,9 +159,7 @@ const AdminSupportTicket = () => {
     const variants = {
       open: "primary",
       "in-progress": "info",
-      pending: "warning",
       resolved: "success",
-      closed: "secondary",
     };
     return variants[status] || "secondary";
   };
@@ -174,24 +175,35 @@ const AdminSupportTicket = () => {
     try {
       setActionLoading(true);
 
-      // Here you would typically make an API call to add a reply
-      // For now, we'll update locally and you can add the API integration later
-
+      // Use the actual API call with the admin user info
       const newMessage = {
-        id: selectedTicket.messages.length + 1,
-        sender: "Support Agent",
+        sender: "agent",
         message: replyMessage,
         timestamp: new Date().toISOString(),
-        type: "agent",
       };
 
+      // API call to update ticket with new message
+      await ticketApi.update(selectedTicket.id, {
+        messages: [...selectedTicket.messages, newMessage],
+        status: "in-progress",
+      });
+
+      // Update local state
       const updatedTickets = tickets.map((ticket) =>
         ticket.id === selectedTicket.id
           ? {
               ...ticket,
-              messages: [...ticket.messages, newMessage],
+              messages: [
+                ...ticket.messages,
+                {
+                  ...newMessage,
+                  id: selectedTicket.messages.length + 1,
+                  sender: "Support Agent",
+                  type: "agent",
+                },
+              ],
               status: "in-progress",
-              updatedAt: new Date().toISOString(),
+              updatedAt: new Date().toLocaleString(),
               lastReply: "Just now",
             }
           : ticket
@@ -199,19 +211,23 @@ const AdminSupportTicket = () => {
 
       setTickets(updatedTickets);
       setReplyMessage("");
+
+      // Update selected ticket in modal
       setSelectedTicket({
         ...selectedTicket,
-        messages: [...selectedTicket.messages, newMessage],
+        messages: [
+          ...selectedTicket.messages,
+          {
+            ...newMessage,
+            id: selectedTicket.messages.length + 1,
+            sender: "Support Agent",
+            type: "agent",
+          },
+        ],
         status: "in-progress",
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toLocaleString(),
         lastReply: "Just now",
       });
-
-      // TODO: Add API call to update ticket with new message
-      // await ticketApi.update(selectedTicket.id, {
-      //   messages: [...selectedTicket.messages, newMessage],
-      //   status: "in-progress"
-      // });
     } catch (err) {
       setError("Failed to send reply: " + err.message);
     } finally {
@@ -219,31 +235,97 @@ const AdminSupportTicket = () => {
     }
   };
 
+  // Fixed status change handlers using the specific API methods
   const handleStatusChange = async (ticketId, newStatus) => {
     try {
+      setActionLoading(true);
+
+      // Use the specific API methods
+      if (newStatus === "resolved") {
+        await ticketApi.markAsResolved(ticketId);
+      } else if (newStatus === "in-progress") {
+        await ticketApi.markAsInProgress(ticketId);
+      } else {
+        // Fallback to generic update
+        await ticketApi.update(ticketId, { status: newStatus });
+      }
+
+      // Update local state
       const updatedTickets = tickets.map((ticket) =>
-        ticket.id === selectedTicket.id
+        ticket.id === ticketId
           ? {
               ...ticket,
               status: newStatus,
-              updatedAt: new Date().toISOString(),
+              updatedAt: new Date().toLocaleString(),
             }
           : ticket
       );
 
       setTickets(updatedTickets);
 
+      // Update selected ticket if it's the one being modified
       if (selectedTicket && selectedTicket.id === ticketId) {
-        setSelectedTicket({ ...selectedTicket, status: newStatus });
+        setSelectedTicket({
+          ...selectedTicket,
+          status: newStatus,
+          updatedAt: new Date().toLocaleString(),
+        });
       }
-
-      // TODO: Add API call to update ticket status
-      // await ticketApi.update(ticketId, { status: newStatus });
     } catch (err) {
+      console.error("Error updating ticket status:", err);
       setError("Failed to update ticket status: " + err.message);
-      // Revert on error
+      // Refresh tickets to get current state
       fetchTickets();
+    } finally {
+      setActionLoading(false);
     }
+  };
+
+  // Export CSV function
+  const exportToCSV = () => {
+    if (tickets.length === 0) return;
+
+    const headers = [
+      "Ticket Number",
+      "Subject",
+      "User Name",
+      "User Email",
+      "Status",
+      "Category",
+      "Created At",
+      "Last Updated",
+    ];
+
+    const csvData = tickets.map((ticket) => [
+      ticket.ticketNumber,
+      `"${ticket.subject.replace(/"/g, '""')}"`,
+      `"${ticket.user.name.replace(/"/g, '""')}"`,
+      `"${ticket.user.email}"`,
+      ticket.status,
+      ticket.category,
+      ticket.createdAt,
+      ticket.updatedAt,
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map((row) => row.join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `support-tickets-${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const ticketStats = {
@@ -280,8 +362,8 @@ const AdminSupportTicket = () => {
             </p>
           </Col>
           <Col xs="auto">
-            <Button variant="primary" onClick={fetchTickets}>
-              Refresh
+            <Button variant="primary" onClick={fetchTickets} disabled={loading}>
+              {loading ? <Spinner size="sm" /> : "Refresh"}
             </Button>
           </Col>
         </Row>
@@ -354,9 +436,7 @@ const AdminSupportTicket = () => {
                     <option value="all">All Statuses</option>
                     <option value="open">Open</option>
                     <option value="in-progress">In Progress</option>
-                    <option value="pending">Pending</option>
                     <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -383,7 +463,11 @@ const AdminSupportTicket = () => {
                 <Card.Title>Tickets ({filteredTickets.length})</Card.Title>
               </Col>
               <Col xs="auto">
-                <Button variant="outline-primary" size="sm">
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={exportToCSV}
+                >
                   Export CSV
                 </Button>
               </Col>
@@ -411,7 +495,10 @@ const AdminSupportTicket = () => {
                       <td>
                         <div>
                           <div className="fw-bold">{ticket.subject}</div>
-                          <small className="text-muted">
+                          <small
+                            className="text-muted text-truncate d-block"
+                            style={{ maxWidth: "200px" }}
+                          >
                             {ticket.description}
                           </small>
                         </div>
@@ -422,9 +509,6 @@ const AdminSupportTicket = () => {
                           <small className="text-muted">
                             {ticket.user.email}
                           </small>
-                          <Badge bg="secondary" className="ms-1">
-                            {ticket.user.type}
-                          </Badge>
                         </div>
                       </td>
                       <td>
@@ -434,7 +518,7 @@ const AdminSupportTicket = () => {
                       </td>
                       <td>
                         <div>
-                          <div>{ticket.updatedAt.split(" ")[0]}</div>
+                          <div>{ticket.updatedAt.split(",")[0]}</div>
                           <small className="text-muted">
                             {ticket.lastReply}
                           </small>
@@ -454,14 +538,16 @@ const AdminSupportTicket = () => {
                               variant="outline-secondary"
                               size="sm"
                               id="dropdown-basic"
+                              disabled={actionLoading}
                             >
-                              ⋮
+                              {actionLoading ? <Spinner size="sm" /> : "⋮"}
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                               <Dropdown.Item
                                 onClick={() =>
                                   handleStatusChange(ticket.id, "in-progress")
                                 }
+                                disabled={ticket.status === "in-progress"}
                               >
                                 Mark In Progress
                               </Dropdown.Item>
@@ -469,6 +555,7 @@ const AdminSupportTicket = () => {
                                 onClick={() =>
                                   handleStatusChange(ticket.id, "resolved")
                                 }
+                                disabled={ticket.status === "resolved"}
                               >
                                 Mark Resolved
                               </Dropdown.Item>
@@ -521,8 +608,11 @@ const AdminSupportTicket = () => {
                 {/* Ticket Info */}
                 <Row className="mb-4">
                   <Col md={6}>
-                    <strong>User:</strong> {selectedTicket.user.name} (
-                    {selectedTicket.user.email})
+                    <strong>User:</strong> {selectedTicket.user.name}
+                    <br />
+                    <small className="text-muted">
+                      {selectedTicket.user.email}
+                    </small>
                   </Col>
                   <Col md={6}>
                     <strong>Status:</strong>{" "}
