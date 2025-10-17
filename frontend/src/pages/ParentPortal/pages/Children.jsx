@@ -28,14 +28,6 @@ import {
   FaUndo,
 } from "react-icons/fa";
 
-/*
-  Single-file component showing:
-  - Search/Filter/Sort
-  - Cards with hover effect
-  - Add/Edit Modal (with avatar upload preview)
-  - Progress Modal (per-subject progress + certificates)
-  - Delete confirm + Undo toast
-*/
 
 const sampleChildren = [
   {

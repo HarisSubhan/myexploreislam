@@ -1,6 +1,44 @@
 import axios from "axios";
+import { baseUrl, getToken } from "../services/config";
 
-const baseUrl = "http://localhost:5000";
+
+export const authAPI = {
+  logout: async () => {
+    try {
+      const token = getToken();
+
+      if (!token) {
+        console.warn("No token found, proceeding with client-side logout");
+        return { success: true };
+      }
+
+      const response = await axios.post(
+        `${baseUrl}/api/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Logout API error:", error);
+
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        
+        return { success: true };
+      }
+
+      throw new Error(error.response?.data?.message || "Logout failed");
+    }
+  },
+};
+
+
+
 
 export const LoginApi = async (data) => {
   const res = await axios.post(`${baseUrl}/api/auth/login`, data);
