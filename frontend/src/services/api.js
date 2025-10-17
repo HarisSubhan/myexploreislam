@@ -2,8 +2,10 @@ import axios from "axios";
 import { baseUrl, getToken } from "../services/config";
 
 
+
+
 export const authAPI = {
-  logout: async () => {
+  logout: async (role = null) => {
     try {
       const token = getToken();
 
@@ -12,9 +14,15 @@ export const authAPI = {
         return { success: true };
       }
 
+      const requestData = {};
+
+      if (role) {
+        requestData.role = role;
+      }
+
       const response = await axios.post(
         `${baseUrl}/api/auth/logout`,
-        {},
+        requestData, 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -26,7 +34,6 @@ export const authAPI = {
       return response.data;
     } catch (error) {
       console.error("Logout API error:", error);
-
       if (error.response?.status === 401 || error.response?.status === 403) {
         
         return { success: true };
@@ -36,6 +43,7 @@ export const authAPI = {
     }
   },
 };
+
 
 
 

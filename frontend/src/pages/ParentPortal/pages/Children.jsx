@@ -1,4 +1,3 @@
-// Children.jsx
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -16,6 +15,7 @@ import {
   Badge,
   Placeholder,
   Dropdown,
+  Alert,
 } from "react-bootstrap";
 import {
   FaPlus,
@@ -27,55 +27,144 @@ import {
   FaSortAmountDown,
   FaUndo,
 } from "react-icons/fa";
-
-
-const sampleChildren = [
-  {
-    id: 1,
-    name: "Ali",
-    age: 8,
-    avatar: null,
-    subjects: [
-      { name: "Math", score: 88 },
-      { name: "Science", score: 82 },
-      { name: "English", score: 90 },
-    ],
-  },
-  {
-    id: 2,
-    name: "Sara",
-    age: 10,
-    avatar: null,
-    subjects: [
-      { name: "Math", score: 94 },
-      { name: "Science", score: 89 },
-      { name: "English", score: 93 },
-    ],
-  },
-];
+import {
+  addChildApi,
+  getChildrenByParentIdApi,
+} from "../../../services/parentApi";
 
 const Children = () => {
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // UI states
   const [query, setQuery] = useState("");
   const [gradeFilter, setGradeFilter] = useState("All");
-  const [sortBy, setSortBy] = useState("name"); // or "progress"
+  const [sortBy, setSortBy] = useState("name");
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState(null); // child being edited
+  const [editing, setEditing] = useState(null);
   const [showProgress, setShowProgress] = useState(false);
   const [selectedChild, setSelectedChild] = useState(null);
-  const [deletedBackup, setDeletedBackup] = useState(null); // store for undo
+  const [deletedBackup, setDeletedBackup] = useState(null);
   const [showUndoToast, setShowUndoToast] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  // load sample data (simulate API)
-  useEffect(() => {
-    setTimeout(() => {
-      setChildren(sampleChildren);
+  // Get parent ID from your auth context or localStorage
+  const getParentId = () => {
+    // Replace this with how you get the parent ID in your app
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return user.id || user.parentId;
+  };
+
+  // Load children data from API
+  const loadChildren = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const parentId = getParentId();
+
+      if (!parentId) {
+        throw new Error("Parent ID not found. Please log in again.");
+      }
+
+      const response = await getChildrenByParentIdApi(parentId);
+
+      // Transform API response to match expected format
+      const transformedChildren =
+        response.data?.map((child) => ({
+          id: child.id || child._id,
+          name: child.name || child.fullName,
+          age: child.age,
+          grade: child.grade || child.class,
+          progress: calculateOverallProgress(child),
+          avatar: child.avatar || child.profileImage,
+          subjects: child.subjects || [],
+          certificates: child.certificates || [],
+          email: child.email,
+          username: child.username,
+        })) || [];
+
+      setChildren(transformedChildren);
+    } catch (err) {
+      console.error("Failed to load children:", err);
+      setError(err.message || "Failed to load children");
+      setChildren([]);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  };
+
+  // Calculate overall progress from subjects
+  const calculateOverallProgress = (child) => {
+    if (!child.subjects || child.subjects.length === 0) return 0;
+    const total = child.subjects.reduce(
+      (sum, subject) => sum + (subject.score || 0),
+      0
+    );
+    return Math.round(total / child.subjects.length);
+  };
+
+  // Load children on component mount
+  useEffect(() => {
+    loadChildren();
   }, []);
+
+  // Add new child via API
+  const addChild = async (childData) => {
+    try {
+      setSubmitting(true);
+      const response = await addChildApi(childData);
+
+      // Transform and add new child to state
+      const newChild = {
+        id: response.data.id || response.data._id,
+        name: childData.name,
+        age: childData.age,
+        grade: childData.grade,
+        progress: 0,
+        avatar: childData.avatar,
+        subjects: [],
+        certificates: [],
+        email: childData.email,
+        username: childData.username,
+      };
+
+      setChildren((prev) => [newChild, ...prev]);
+      setShowForm(false);
+      return response;
+    } catch (err) {
+      console.error("Failed to add child:", err);
+      throw err;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Update existing child (for now, we'll handle this locally since we don't have update API)
+  const updateChild = (childData) => {
+    setChildren((prev) =>
+      prev.map((child) =>
+        child.id === childData.id ? { ...child, ...childData } : child
+      )
+    );
+    setShowForm(false);
+    setEditing(null);
+  };
+
+  // Combined upsert function
+  const upsertChild = async (childData) => {
+    try {
+      if (childData.id) {
+        // Update existing child (local for now)
+        updateChild(childData);
+      } else {
+        // Add new child via API
+        await addChild(childData);
+      }
+    } catch (err) {
+      throw err; // Re-throw to handle in form
+    }
+  };
 
   // Helpers: search/filter/sort
   const filtered = children
@@ -90,19 +179,7 @@ const Children = () => {
       return 0;
     });
 
-  // Add or update child (optimistic local update)
-  const upsertChild = (child) => {
-    if (child.id) {
-      setChildren((prev) => prev.map((c) => (c.id === child.id ? child : c)));
-    } else {
-      child.id = Date.now();
-      setChildren((prev) => [child, ...prev]);
-    }
-    setShowForm(false);
-    setEditing(null);
-  };
-
-  // remove with undo support
+  // Remove child (local state only for now)
   const removeChild = (id) => {
     const toDelete = children.find((c) => c.id === id);
     if (!toDelete) return;
@@ -110,7 +187,6 @@ const Children = () => {
     setChildren((prev) => prev.filter((c) => c.id !== id));
     setShowUndoToast(true);
 
-    // optional: auto-clear backup after 10s (undo window)
     setTimeout(() => {
       setShowUndoToast(false);
       setDeletedBackup(null);
@@ -125,20 +201,32 @@ const Children = () => {
     }
   };
 
-  // open progress modal
+  // Open progress modal
   const openProgress = (child) => {
     setSelectedChild(child);
     setShowProgress(true);
   };
 
-  // UI for available grades (for filter dropdown)
+  // UI for available grades
   const gradeOptions = [
     "All",
-    ...Array.from(new Set(children.map((c) => c.grade))),
+    ...Array.from(new Set(children.map((c) => c.grade).filter(Boolean))),
   ];
 
   return (
     <Container fluid className="py-4">
+      {/* Error Alert */}
+      {error && (
+        <Alert
+          variant="danger"
+          className="mb-3"
+          dismissible
+          onClose={() => setError(null)}
+        >
+          {error}
+        </Alert>
+      )}
+
       {/* Header + Controls */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
         <div className="d-flex gap-5 align-items-center">
@@ -198,8 +286,10 @@ const Children = () => {
               setEditing(null);
               setShowForm(true);
             }}
+            disabled={submitting}
           >
-            <FaPlus className="me-1" /> Add Child
+            <FaPlus className="me-1" />
+            {submitting ? "Adding..." : "Add Child"}
           </Button>
         </div>
       </div>
@@ -239,7 +329,9 @@ const Children = () => {
                 <FaUserCircle size={48} className="text-muted mb-2" />
                 <h5>No children found</h5>
                 <p className="text-muted">
-                  Add a child to get started. You can also import or sync later.
+                  {children.length === 0
+                    ? "Add a child to get started. You can also import or sync later."
+                    : "No children match your search criteria."}
                 </p>
                 <Button
                   onClick={() => {
@@ -301,7 +393,7 @@ const Children = () => {
                         </Badge>
                       </div>
                       <small className="text-muted">
-                        {child.age} yrs • {child.grade}
+                        {child.age} yrs {child.grade && `• ${child.grade}`}
                       </small>
                     </div>
                   </div>
@@ -371,6 +463,7 @@ const Children = () => {
           }}
           onSave={upsertChild}
           editing={editing}
+          submitting={submitting}
         />
       )}
 
@@ -406,20 +499,22 @@ const Children = () => {
   );
 };
 
-/* ChildFormModal: Add/Edit child with avatar preview & simple validation */
-const ChildFormModal = ({ show, onHide, onSave, editing }) => {
+/* ChildFormModal: Add/Edit child with API integration */
+const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
   const [form, setForm] = useState({
     id: editing?.id ?? null,
     name: editing?.name ?? "",
     age: editing?.age ?? "",
     grade: editing?.grade ?? "",
+    email: editing?.email ?? "",
+    username: editing?.username ?? "",
+    password: "",
     progress: editing?.progress ?? 0,
     avatar: editing?.avatar ?? null,
-    subjects: editing?.subjects ?? [],
-    certificates: editing?.certificates ?? [],
   });
   const [avatarPreview, setAvatarPreview] = useState(editing?.avatar ?? null);
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
 
   useEffect(() => {
     setForm({
@@ -427,13 +522,15 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
       name: editing?.name ?? "",
       age: editing?.age ?? "",
       grade: editing?.grade ?? "",
+      email: editing?.email ?? "",
+      username: editing?.username ?? "",
+      password: "",
       progress: editing?.progress ?? 0,
       avatar: editing?.avatar ?? null,
-      subjects: editing?.subjects ?? [],
-      certificates: editing?.certificates ?? [],
     });
     setAvatarPreview(editing?.avatar ?? null);
     setErrors({});
+    setApiError(null);
   }, [editing]);
 
   const handleFile = (e) => {
@@ -441,9 +538,7 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
     if (!file) return;
     const url = URL.createObjectURL(file);
     setAvatarPreview(url);
-    setForm((f) => ({ ...f, avatar: url })); // for demo: store preview url
-    // NOTE: in real app upload the file to server and store returned URL
-    // Remember to revokeObjectURL when appropriate
+    setForm((f) => ({ ...f, avatar: url }));
   };
 
   const validate = () => {
@@ -451,15 +546,37 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
     if (!form.name.trim()) err.name = "Name required";
     if (!form.age || isNaN(Number(form.age))) err.age = "Valid age required";
     if (!form.grade) err.grade = "Grade required";
+    if (!form.email) err.email = "Email required";
+    if (!form.username) err.username = "Username required";
+    if (!editing && !form.password) err.password = "Password required";
+
     setErrors(err);
     return Object.keys(err).length === 0;
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    setApiError(null);
+
     if (!validate()) return;
-    // cast progress to number
-    onSave({ ...form, progress: Number(form.progress) });
+
+    try {
+      // Prepare data for API
+      const submitData = {
+        name: form.name,
+        age: Number(form.age),
+        grade: form.grade,
+        email: form.email,
+        username: form.username,
+        ...(form.password && { password: form.password }),
+        ...(form.avatar && { avatar: form.avatar }),
+      };
+
+      await onSave(editing ? { ...form, ...submitData } : submitData);
+    } catch (err) {
+      console.error("Form submission error:", err);
+      setApiError(err.message || "Failed to save child. Please try again.");
+    }
   };
 
   return (
@@ -476,6 +593,12 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {apiError && (
+            <Alert variant="danger" className="mb-3">
+              {apiError}
+            </Alert>
+          )}
+
           <div className="d-flex gap-3 align-items-center mb-3">
             {avatarPreview ? (
               <Image src={avatarPreview} roundedCircle width={64} height={64} />
@@ -484,7 +607,7 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
                 className="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center"
                 style={{ width: 64, height: 64, fontWeight: 700 }}
               >
-                {form.name?.charAt(0) ?? <FaUserCircle />}
+                {form.name?.charAt(0) || <FaUserCircle />}
               </div>
             )}
 
@@ -504,36 +627,74 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
           <Row>
             <Col xs={6}>
               <Form.Group className="mb-2">
-                <Form.Label>Child Full Name</Form.Label>
+                <Form.Label>Child Full Name *</Form.Label>
                 <Form.Control
-                  value={form.age}
-                  onChange={(e) => setForm({ ...form, age: e.target.value })}
-                  isInvalid={!!errors.age}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  isInvalid={!!errors.name}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.age}
+                  {errors.name}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col xs={6}>
               <Form.Group className="mb-2">
-                <Form.Label>Child's User Name</Form.Label>
+                <Form.Label>Child's User Name *</Form.Label>
                 <Form.Control
-                  value={form.grade}
-                  onChange={(e) => setForm({ ...form, grade: e.target.value })}
-                  isInvalid={!!errors.grade}
+                  value={form.username}
+                  onChange={(e) =>
+                    setForm({ ...form, username: e.target.value })
+                  }
+                  isInvalid={!!errors.username}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.grade}
+                  {errors.username}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
+
           <Row>
             <Col xs={6}>
               <Form.Group className="mb-2">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>Email *</Form.Label>
                 <Form.Control
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  isInvalid={!!errors.email}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.email}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Password {!editing && "*"}</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  isInvalid={!!errors.password}
+                  placeholder={editing ? "Leave blank to keep current" : ""}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.password}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Age *</Form.Label>
+                <Form.Control
+                  type="number"
                   value={form.age}
                   onChange={(e) => setForm({ ...form, age: e.target.value })}
                   isInvalid={!!errors.age}
@@ -545,7 +706,7 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
             </Col>
             <Col xs={6}>
               <Form.Group className="mb-2">
-                <Form.Label>Password</Form.Label>
+                <Form.Label>Grade *</Form.Label>
                 <Form.Control
                   value={form.grade}
                   onChange={(e) => setForm({ ...form, grade: e.target.value })}
@@ -557,27 +718,14 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
               </Form.Group>
             </Col>
           </Row>
-
-          <Form.Group className="mb-2">
-            <Form.Label>Age</Form.Label>
-            <Form.Control
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              isInvalid={!!errors.name}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.name}
-            </Form.Control.Feedback>
-          </Form.Group>
-
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
+          <Button variant="secondary" onClick={onHide} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary">
-            {form.id ? "Update" : "Create"}
+          <Button type="submit" variant="primary" disabled={submitting}>
+            {submitting ? "Saving..." : form.id ? "Update" : "Create"}
           </Button>
         </Modal.Footer>
       </Form>
@@ -585,7 +733,7 @@ const ChildFormModal = ({ show, onHide, onSave, editing }) => {
   );
 };
 
-/* ProgressModal: detailed view for a child (subjects, recent quizzes, certificates) */
+/* ProgressModal: detailed view for a child */
 const ProgressModal = ({ show, onHide, child }) => {
   if (!child) return null;
 
@@ -620,7 +768,7 @@ const ProgressModal = ({ show, onHide, child }) => {
             )}
             <h5 className="mt-2">{child.name}</h5>
             <small className="text-muted">
-              {child.age} yrs • {child.grade}
+              {child.age} yrs {child.grade && `• ${child.grade}`}
             </small>
             <div className="mt-2">
               <Badge bg={child.progress > 75 ? "success" : "warning"}>
@@ -630,19 +778,22 @@ const ProgressModal = ({ show, onHide, child }) => {
           </Col>
 
           <Col md={8}>
-            <h6>Video Watch Time</h6>
-            {child.subjects?.map((s) => (
-              <div key={s.name} className="mb-2">
-                <div className="d-flex justify-content-between">
-                  <small>{s.name}</small>
-                  <small>{s.score}%</small>
+            <h6>Subject Progress</h6>
+            {child.subjects?.length > 0 ? (
+              child.subjects.map((s) => (
+                <div key={s.name} className="mb-2">
+                  <div className="d-flex justify-content-between">
+                    <small>{s.name}</small>
+                    <small>{s.score}%</small>
+                  </div>
+                  <ProgressBar now={s.score} />
                 </div>
-                <ProgressBar now={s.score} />
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-muted">No subject data available.</p>
+            )}
           </Col>
         </Row>
-        
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
