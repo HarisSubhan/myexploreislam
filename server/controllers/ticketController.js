@@ -91,3 +91,52 @@ exports.getTicketSummary = (req, res) => {
     });
   });
 };
+
+
+// ✅ Mark Ticket as IN_PROGRESS
+exports.markInProgress = (req, res) => {
+  const ticketId = req.params.id;
+
+  if (!ticketId) {
+    return res.status(400).json({ message: "Ticket ID is required." });
+  }
+
+  Ticket.updateTicketStatus(ticketId, "IN_PROGRESS", (err, result) => {
+    if (err) {
+      console.error("Error updating ticket to IN_PROGRESS:", err.message);
+      return res.status(500).json({ message: "Database error." });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Ticket not found." });
+    }
+
+    res.status(200).json({
+      message: "Ticket marked as IN_PROGRESS successfully.",
+    });
+  });
+};
+
+// ✅ Mark Ticket as RESOLVED
+exports.markResolved = (req, res) => {
+  const ticketId = req.params.id;
+
+  if (!ticketId) {
+    return res.status(400).json({ message: "Ticket ID is required." });
+  }
+
+  Ticket.updateTicketStatus(ticketId, "RESOLVED", (err, result) => {
+    if (err) {
+      console.error("Error updating ticket to RESOLVED:", err.message);
+      return res.status(500).json({ message: "Database error." });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Ticket not found." });
+    }
+
+    res.status(200).json({
+      message: "Ticket marked as RESOLVED successfully.",
+    });
+  });
+};
