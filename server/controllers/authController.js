@@ -154,8 +154,9 @@ const login = (req, res) => {
 
 const logout = (req, res) => {
   const userId = req.user.id;
+  const role = req.role;
 
-  logUserActivity(userId, 'Logged Out');
+  logUserActivity(userId, role, 'Logged Out');
 
   res.json({ message: 'Logout successful' });
 };
