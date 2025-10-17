@@ -27,8 +27,7 @@ exports.getAllTickets = (callback) => {
       t.status, 
       t.created_at, 
       t.updated_at,
-      u.name AS parent_name,
-      u.email AS parent_email
+      u.name AS name
     FROM tickets t
     LEFT JOIN users u ON t.parent_id = u.id
     ORDER BY t.created_at DESC
