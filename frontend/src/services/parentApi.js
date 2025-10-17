@@ -1,7 +1,7 @@
 import axios from "axios";
 import { baseUrl, getToken } from "../services/config";
 
-export const addChild = async (childData) => {
+export const addChildApi = async (childData) => {
   const token = getToken();
 
   if (!token) throw new Error("You are not logged in. Please log in first.");
@@ -105,3 +105,22 @@ export const addChildColorAPi = async (colorData) => {
 };
 
 
+export const getChildrenByParentIdApi = async (parentId) => {
+  const token = getToken();
+
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.get(
+      `${baseUrl}/api/parent/${parentId}/children`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch children" };
+  }
+};

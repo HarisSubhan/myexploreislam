@@ -1,91 +1,114 @@
-import { useEffect, useState } from "react";
+// components/parent/useParentMetrics.js
+import { useState, useEffect } from "react";
+import { dashboardApi, mockData } from "../../services/dashboardApi";
 
-export function useParentMetrics(range = "7d") {
+export const useParentMetrics = (range, parentId) => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ totalChildren: 0, active: 0, inactive: 0 });
+  const [stats, setStats] = useState({
+    totalChildren: 0,
+    active: 0,
+    inactive: 0,
+  });
+  const [combinedActivity, setCombinedActivity] = useState([]);
   const [children, setChildren] = useState([]);
   const [timeline, setTimeline] = useState([]);
-  const [subscription, setSubscription] = useState(null);
-  const [combinedActivity, setCombinedActivity] = useState([]);
+  const [subscription, setSubscription] = useState({});
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    const timer = setTimeout(() => {
-      if (cancelled) return;
+    const fetchParentMetrics = async () => {
+      if (!parentId) return;
 
       try {
-        const baseDays = range === "30d" ? 30 : 7;
-        const now = Date.now();
+        setLoading(true);
+        setError(null);
 
-        const makeSeries = () =>
-          Array.from({ length: baseDays }, (_, i) => {
-            const dayTs = now - (baseDays - 1 - i) * 86400000;
-            return {
-              dateLabel: new Date(dayTs).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-              weekday: new Date(dayTs).toLocaleDateString(undefined, { weekday: "short" }),
-              minutes: Math.round(10 + Math.random() * 50)
-            };
+        // Use Promise.all to fetch multiple endpoints in parallel
+        const [
+          statsResponse,
+          activityResponse,
+          childrenResponse,
+          timelineResponse,
+          subscriptionResponse,
+        ] = await Promise.allSettled([
+          dashboardApi.getChildrenStats(parentId),
+          dashboardApi.getCombinedActivity(parentId, range),
+          dashboardApi.getChildren(parentId),
+          dashboardApi.getTimeline(parentId),
+          dashboardApi.getSubscription(parentId),
+        ]);
+
+        // Process stats response
+        if (
+          statsResponse.status === "fulfilled" &&
+          statsResponse.value.data?.data
+        ) {
+          const statsData = statsResponse.value.data.data;
+          setStats({
+            totalChildren: statsData.total_children || 0,
+            active: statsData.active_children || 0,
+            inactive: statsData.inactive_children || 0,
           });
+        } else {
+          // Fallback to mock data or handle error
+          console.warn("Stats API failed, using mock data");
+          setStats({
+            totalChildren: 3,
+            active: 2,
+            inactive: 1,
+          });
+        }
 
-        /** --- Demo Children --- */
-        const childRows = [
-          { id: 1, name: "John", video: "Math Basics", status: "Watching", lastActive: "2 min ago" },
-          { id: 2, name: "Sarah", video: "Cartoon Story", status: "Idle", lastActive: "10 min ago" },
-          { id: 3, name: "Adam", video: "Science Experiment", status: "Watching", lastActive: "5 min ago" }
-        ];
+        // Process activity response
+        if (activityResponse.status === "fulfilled") {
+          setCombinedActivity(activityResponse.value.data?.data || []);
+        } else {
+          setCombinedActivity(mockData.generateActivityData(range));
+        }
 
-        /** --- Demo Series --- */
-        const childSeries = {
-          John: makeSeries(),
-          Sarah: makeSeries(),
-          Adam: makeSeries()
-        };
+        // Process children response
+        if (childrenResponse.status === "fulfilled") {
+          setChildren(childrenResponse.value.data?.data || []);
+        } else {
+          setChildren(mockData.generateChildrenData());
+        }
 
-       const combined = Array.from({ length: baseDays }, (_, i) => ({
-  date: childSeries.John[i].weekday,
-  John: childSeries.John[i].minutes,
-  Sarah: childSeries.Sarah[i].minutes,
-  Adam: childSeries.Adam[i].minutes
-}));
+        // Process timeline response
+        if (timelineResponse.status === "fulfilled") {
+          setTimeline(timelineResponse.value.data?.data || []);
+        } else {
+          setTimeline(mockData.generateTimelineData());
+        }
 
+        // Process subscription response
+        if (subscriptionResponse.status === "fulfilled") {
+          setSubscription(subscriptionResponse.value.data?.data || {});
+        } else {
+          setSubscription(mockData.generateSubscriptionData());
+        }
+      } catch (err) {
+        console.error("Error fetching parent metrics:", err);
+        setError(
+          err.response?.data?.message || "Failed to load dashboard data"
+        );
 
-        /** --- Demo Timeline --- */
-        const timeEvents = [
-          { type: "watch", text: "John started Math Basics", time: "5 mins ago" },
-          { type: "login", text: "Sarah logged in", time: "15 mins ago" },
-          { type: "logout", text: "Adam logged out", time: "20 mins ago" },
-          { type: "watch", text: "Adam resumed Science Experiment", time: "25 mins ago" }
-        ];
-
-        /** --- Demo Subscription --- */
-        const subscriptionMeta = {
-          plan: "Premium",
-          daysUsed: 18,
-          totalDays: 30,
-          renewalDate: new Date(now + 12 * 86400000).toLocaleDateString()
-        };
-
-        setStats({ totalChildren: 3, active: 2, inactive: 1 });
-        setChildren(childRows);
-        setCombinedActivity(combined);
-        setTimeline(timeEvents);
-        setSubscription(subscriptionMeta);
-        setLoading(false);
-      } catch (e) {
-        setError(e.message || "Unknown error");
+        // Fallback to mock data on complete failure
+        setStats({
+          totalChildren: 3,
+          active: 2,
+          inactive: 1,
+        });
+        setCombinedActivity(mockData.generateActivityData(range));
+        setChildren(mockData.generateChildrenData());
+        setTimeline(mockData.generateTimelineData());
+        setSubscription(mockData.generateSubscriptionData());
+      } finally {
         setLoading(false);
       }
-    }, 500);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
     };
-  }, [range]);
+
+    fetchParentMetrics();
+  }, [range, parentId]);
 
   return {
     loading,
@@ -94,6 +117,6 @@ export function useParentMetrics(range = "7d") {
     children,
     timeline,
     subscription,
-    error
+    error,
   };
-}
+};
