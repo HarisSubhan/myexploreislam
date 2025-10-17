@@ -17,8 +17,10 @@ export const addChildApi = async (childData) => {
         },
       }
     );
+    console.log("Add Child Response:", response.data);
     return response.data;
   } catch (error) {
+    console.error("Add Child Error:", error.response?.data || error.message);
     throw error.response?.data || { message: "Failed to add child" };
   }
 };
@@ -37,13 +39,16 @@ export const getChildrenByParentIdApi = async (parentId) => {
         },
       }
     );
+    console.log("Get Children Response:", response.data);
     return response.data;
   } catch (error) {
+    console.error("Get Children Error:", error.response?.data || error.message);
     throw error.response?.data || { message: "Failed to fetch children" };
   }
 };
 
-export const addChildColorAPi = async (colorData) => {
+export const addChildColorApi = async (colorData) => {
+  // Fixed typo: APi -> Api
   const token = getToken();
 
   if (!token) throw new Error("You are not logged in. Please log in first.");
@@ -54,9 +59,42 @@ export const addChildColorAPi = async (colorData) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log("Add Child Color Response:", response.data);
     return response.data;
   } catch (error) {
+    console.error(
+      "Add Child Color Error:",
+      error.response?.data || error.message
+    );
     throw error.response?.data || { message: "Failed to add child color" };
+  }
+};
+
+// Update Child Status API
+export const updateChildStatusApi = async (childId, isActive) => {
+  const token = getToken();
+
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.put(
+      `${baseUrl}/api/children/${childId}/status`,
+      { is_active: isActive }, // Ensure this matches your backend expectation
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Update Child Status Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Update Child Status Error:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || { message: "Failed to update child status" };
   }
 };
 
@@ -77,9 +115,13 @@ export const requestedChildApi = async (requested_children) => {
         },
       }
     );
-
+    console.log("Request Child Response:", response.data);
     return response.data;
   } catch (error) {
+    console.error(
+      "Request Child Error:",
+      error.response?.data || error.message
+    );
     throw new Error(
       error?.response?.data?.error ||
         error?.response?.data?.message ||
@@ -94,7 +136,7 @@ export const updateChildRequestStatusApi = async ({ requestId, status }) => {
   if (!token) throw new Error("You are not logged in.");
 
   try {
-    const res = await axios.put(
+    const response = await axios.put(
       `${baseUrl}/api/child-requests/${requestId}`,
       { status },
       {
@@ -103,12 +145,42 @@ export const updateChildRequestStatusApi = async ({ requestId, status }) => {
         },
       }
     );
-    return res.data;
+    console.log("Update Request Status Response:", response.data);
+    return response.data;
   } catch (error) {
+    console.error(
+      "Update Request Status Error:",
+      error.response?.data || error.message
+    );
     throw new Error(
       error.response?.data?.error ||
         error.response?.data?.message ||
         "Failed to update request status"
     );
+  }
+};
+
+// Delete Child API
+export const deleteChildApi = async (childId, parentId) => {
+  const token = getToken();
+
+  if (!token) throw new Error("You are not logged in. Please log in first.");
+
+  try {
+    const response = await axios.delete(
+      `${baseUrl}/api/parent/child/${childId}`,
+      {
+        data: { parent_id: parentId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Delete Child Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Delete Child Error:", error.response?.data || error.message);
+    throw error.response?.data || { message: "Failed to delete child" };
   }
 };

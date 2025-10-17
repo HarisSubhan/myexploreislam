@@ -30,6 +30,7 @@ import {
 import {
   addChildApi,
   getChildrenByParentIdApi,
+  deleteChildApi, // Import the delete API
 } from "../../../services/parentApi";
 
 const Children = () => {
@@ -48,6 +49,7 @@ const Children = () => {
   const [deletedBackup, setDeletedBackup] = useState(null);
   const [showUndoToast, setShowUndoToast] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   // Get parent ID from your auth context or localStorage
   const getParentId = () => {
@@ -75,7 +77,6 @@ const Children = () => {
           id: child.id || child._id,
           name: child.name || child.fullName,
           age: child.age,
-          grade: child.grade || child.class,
           progress: calculateOverallProgress(child),
           avatar: child.avatar || child.profileImage,
           subjects: child.subjects || [],
@@ -120,7 +121,6 @@ const Children = () => {
         id: response.data.id || response.data._id,
         name: childData.name,
         age: childData.age,
-        grade: childData.grade,
         progress: 0,
         avatar: childData.avatar,
         subjects: [],
@@ -166,31 +166,35 @@ const Children = () => {
     }
   };
 
-  // Helpers: search/filter/sort
-  const filtered = children
-    .filter((c) => {
-      if (!query) return true;
-      return c.name.toLowerCase().includes(query.toLowerCase());
-    })
-    .filter((c) => (gradeFilter === "All" ? true : c.grade === gradeFilter))
-    .sort((a, b) => {
-      if (sortBy === "name") return a.name.localeCompare(b.name);
-      if (sortBy === "progress") return b.progress - a.progress;
-      return 0;
-    });
-
-  // Remove child (local state only for now)
-  const removeChild = (id) => {
+  // Remove child with API integration
+  const removeChild = async (id) => {
     const toDelete = children.find((c) => c.id === id);
     if (!toDelete) return;
-    setDeletedBackup(toDelete);
-    setChildren((prev) => prev.filter((c) => c.id !== id));
-    setShowUndoToast(true);
 
-    setTimeout(() => {
-      setShowUndoToast(false);
-      setDeletedBackup(null);
-    }, 10000);
+    try {
+      setDeletingId(id);
+      const parentId = getParentId();
+
+      // Call the delete API
+      await deleteChildApi(id, parentId);
+
+      // Remove from local state on success
+      setChildren((prev) => prev.filter((c) => c.id !== id));
+
+      // Show undo toast
+      setDeletedBackup(toDelete);
+      setShowUndoToast(true);
+
+      setTimeout(() => {
+        setShowUndoToast(false);
+        setDeletedBackup(null);
+      }, 10000);
+    } catch (err) {
+      console.error("Failed to delete child:", err);
+      setError(err.message || "Failed to delete child");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const undoDelete = () => {
@@ -207,11 +211,17 @@ const Children = () => {
     setShowProgress(true);
   };
 
-  // UI for available grades
-  const gradeOptions = [
-    "All",
-    ...Array.from(new Set(children.map((c) => c.grade).filter(Boolean))),
-  ];
+  // Helpers: search/filter/sort
+  const filtered = children
+    .filter((c) => {
+      if (!query) return true;
+      return c.name.toLowerCase().includes(query.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      if (sortBy === "progress") return b.progress - a.progress;
+      return 0;
+    });
 
   return (
     <Container fluid className="py-4">
@@ -252,19 +262,6 @@ const Children = () => {
         </div>
 
         <div className="d-flex gap-2 align-items-center">
-          <Dropdown>
-            <Dropdown.Toggle variant="outline-secondary" id="dropdown-grade">
-              {gradeFilter}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {gradeOptions.map((g) => (
-                <Dropdown.Item key={g} onClick={() => setGradeFilter(g)}>
-                  {g}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-
           <Dropdown>
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-sort">
               <FaSortAmountDown className="me-2" />
@@ -392,9 +389,7 @@ const Children = () => {
                           {child.progress}%
                         </Badge>
                       </div>
-                      <small className="text-muted">
-                        {child.age} yrs {child.grade && `• ${child.grade}`}
-                      </small>
+                      <small className="text-muted">{child.age} yrs</small>
                     </div>
                   </div>
 
@@ -442,8 +437,15 @@ const Children = () => {
                       size="sm"
                       variant="outline-danger"
                       onClick={() => removeChild(child.id)}
+                      disabled={deletingId === child.id}
                     >
-                      <FaTrash className="me-1" /> Remove
+                      {deletingId === child.id ? (
+                        "Deleting..."
+                      ) : (
+                        <>
+                          <FaTrash className="me-1" /> Remove
+                        </>
+                      )}
                     </Button>
                   </div>
                 </Card.Body>
@@ -505,7 +507,6 @@ const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
     id: editing?.id ?? null,
     name: editing?.name ?? "",
     age: editing?.age ?? "",
-    grade: editing?.grade ?? "",
     email: editing?.email ?? "",
     username: editing?.username ?? "",
     password: "",
@@ -521,7 +522,6 @@ const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
       id: editing?.id ?? null,
       name: editing?.name ?? "",
       age: editing?.age ?? "",
-      grade: editing?.grade ?? "",
       email: editing?.email ?? "",
       username: editing?.username ?? "",
       password: "",
@@ -545,7 +545,6 @@ const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
     const err = {};
     if (!form.name.trim()) err.name = "Name required";
     if (!form.age || isNaN(Number(form.age))) err.age = "Valid age required";
-    if (!form.grade) err.grade = "Grade required";
     if (!form.email) err.email = "Email required";
     if (!form.username) err.username = "Username required";
     if (!editing && !form.password) err.password = "Password required";
@@ -565,7 +564,6 @@ const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
       const submitData = {
         name: form.name,
         age: Number(form.age),
-        grade: form.grade,
         email: form.email,
         username: form.username,
         ...(form.password && { password: form.password }),
@@ -704,19 +702,6 @@ const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col xs={6}>
-              <Form.Group className="mb-2">
-                <Form.Label>Grade *</Form.Label>
-                <Form.Control
-                  value={form.grade}
-                  onChange={(e) => setForm({ ...form, grade: e.target.value })}
-                  isInvalid={!!errors.grade}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.grade}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
           </Row>
         </Modal.Body>
 
@@ -767,9 +752,7 @@ const ProgressModal = ({ show, onHide, child }) => {
               </div>
             )}
             <h5 className="mt-2">{child.name}</h5>
-            <small className="text-muted">
-              {child.age} yrs {child.grade && `• ${child.grade}`}
-            </small>
+            <small className="text-muted">{child.age} yrs</small>
             <div className="mt-2">
               <Badge bg={child.progress > 75 ? "success" : "warning"}>
                 {child.progress}%
