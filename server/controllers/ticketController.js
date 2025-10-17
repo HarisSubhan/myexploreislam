@@ -5,51 +5,29 @@ exports.createTicket = (req, res) => {
   const { subject, description, parent_id } = req.body;
 
   if (!subject || !description || !parent_id) {
-    return res.status(400).json({ message: "Subject, description, and parent_id are required." });
+    return res.status(400).json({ message: "Subject, description, and parent_id are required" });
   }
 
-  Ticket.getLastTicketNumber((err, result) => {
+  const ticketNumber = `TKT-${Date.now()}`;
+
+  const ticketData = {
+    ticket_number: ticketNumber,
+    subject,
+    description,
+    status: 'OPEN',
+    parent_id,
+  };
+
+  Ticket.createTicket(ticketData, (err, result) => {
     if (err) {
-      console.error("Error fetching last ticket:", err.message);
-      return res.status(500).json({ message: "Database error." });
+      console.error("Error creating ticket:", err);
+      return res.status(500).json({ message: "Error creating ticket", error: err });
     }
 
-    // 🔹 Generate New Ticket Number
-    let newNumber = "001";
-    if (result.length > 0) {
-      const lastTicket = result[0].ticket_number;
-      const lastNum = parseInt(lastTicket.split("-")[2]);
-      newNumber = String(lastNum + 1).padStart(3, "0");
-    }
-
-    const ticketNumber = `TKT-2024-${newNumber}`;
-    const status = "OPEN";
-
-    const ticketData = {
+    res.status(201).json({
+      message: "Ticket created successfully",
+      ticket_id: result.insertId,
       ticket_number: ticketNumber,
-      subject,
-      description,
-      status,
-    };
-
-    // 🔹 Save to Database
-    Ticket.createTicket(ticketData, (err, result) => {
-      if (err) {
-        console.error("Error inserting ticket:", err.message);
-        return res.status(500).json({ message: "Failed to create ticket." });
-      }
-
-      res.status(201).json({
-        message: "Ticket created successfully.",
-        ticket: {
-          id: result.insertId,
-          ticket_number: ticketNumber,
-          subject,
-          description,
-          status,
-          created_at: new Date(),
-        },
-      });
     });
   });
 };
