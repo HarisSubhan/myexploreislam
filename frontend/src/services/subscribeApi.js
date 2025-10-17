@@ -12,3 +12,27 @@ export const getsubscriptionsAllActiveApi = async () => {
 
   return response.data;
 };
+
+export const getsubscriptionsParentByidApi = async (id) => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response = await axios.get(
+      `${baseUrl}/api/parent-dashboard/${id}/subscription`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching subscription:", error);
+    throw error;
+  }
+};
