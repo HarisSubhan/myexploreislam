@@ -8,7 +8,8 @@ const {
   getVideoById,
   updateVideoById,
   getVideosBySeriesId,
-  getUnassignedVideos 
+  getUnassignedVideos,
+  watchVideo
 } = require('../controllers/videoController');
 
 // Setup multer
@@ -80,5 +81,7 @@ router.get('/stream/:filename', (req, res) => {
 router.get('/series/:seriesId', getVideosBySeriesId);
 
 router.get("/unassigned/videos", getUnassignedVideos);
+
+router.post("/watch", watchVideo);
 
 module.exports = router;
