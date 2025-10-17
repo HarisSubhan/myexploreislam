@@ -39,6 +39,8 @@ const parentDashboardRoutes = require("./routes/parentDashboardRoutes");
 
 const parentChildrenRoutes = require("./routes/parentChildrenRoutes");
 
+const childActivityRoutes = require("./routes/childActivityRoutes");
+
 
 initDB();
 dotenv.config();
@@ -106,6 +108,8 @@ app.use("/api/parent-dashboard", parentDashboardRoutes);
 app.use("/api/parent", parentChildrenRoutes);
 
 app.use("/api/children", parentChildrenRoutes);
+
+app.use("/api/activity", childActivityRoutes);
 
 // Test route
 app.get('/', (req, res) => {
