@@ -15,8 +15,11 @@ import {
 } from "react-bootstrap";
 import AdminLayout from "../../pages/AdminPortal/AdminApp";
 import ticketApi from "../../services/ticketApi";
+import { useUser } from "../../context/UserContext";
+
 
 const AdminSupportTicket = () => {
+  const { user } = useUser(); // Get current user from context
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,23 +42,18 @@ const AdminSupportTicket = () => {
       // Transform API data to match your frontend structure
       const transformedTickets =
         response.tickets?.map((ticket) => {
-          console.log("Processing ticket:", ticket);
-
-          // Extract user info - adjust based on your actual API response structure
           const userInfo = ticket.parent_id || ticket.user || {};
 
           return {
             id: ticket.id || ticket._id,
             ticketNumber:
-              ticket.ticket_number ||
-              ticket.ticketNumber ||
-              `TKT-${ticket.id?.toString().slice(-6)}`,
+              ticket.ticket_number || `TKT-${ticket.id?.toString().slice(-6)}`,
             subject: ticket.subject || "No Subject",
             description: ticket.description || "No description provided",
             user: {
               name: userInfo.name || userInfo.username || "Unknown User",
               email: userInfo.email || "No email",
-              type: "parent", // Assuming all tickets are from parents
+              type: "parent",
             },
             status: ticket.status?.toLowerCase() || "open",
             category: ticket.category || "general",
@@ -91,12 +89,10 @@ const AdminSupportTicket = () => {
           };
         }) || [];
 
-      console.log("Transformed tickets:", transformedTickets);
       setTickets(transformedTickets);
     } catch (err) {
       console.error("Error fetching tickets:", err);
       setError(err.message || "Failed to load tickets");
-      // Fallback to empty array
       setTickets([]);
     } finally {
       setLoading(false);
@@ -174,22 +170,32 @@ const AdminSupportTicket = () => {
     try {
       setActionLoading(true);
 
-      // Here you would typically make an API call to add a reply
-      // For now, we'll update locally and you can add the API integration later
-
+      // Use the actual API call with the admin user info
       const newMessage = {
-        id: selectedTicket.messages.length + 1,
-        sender: "Support Agent",
+        sender: "agent", // Admin is always agent
         message: replyMessage,
         timestamp: new Date().toISOString(),
-        type: "agent",
       };
 
+      // API call to update ticket with new message
+      await ticketApi.update(selectedTicket.id, {
+        messages: [...selectedTicket.messages, newMessage],
+        status: "in-progress",
+      });
+
+      // Update local state
       const updatedTickets = tickets.map((ticket) =>
         ticket.id === selectedTicket.id
           ? {
               ...ticket,
-              messages: [...ticket.messages, newMessage],
+              messages: [
+                ...ticket.messages,
+                {
+                  ...newMessage,
+                  id: selectedTicket.messages.length + 1,
+                  type: "agent",
+                },
+              ],
               status: "in-progress",
               updatedAt: new Date().toISOString(),
               lastReply: "Just now",
@@ -201,17 +207,18 @@ const AdminSupportTicket = () => {
       setReplyMessage("");
       setSelectedTicket({
         ...selectedTicket,
-        messages: [...selectedTicket.messages, newMessage],
+        messages: [
+          ...selectedTicket.messages,
+          {
+            ...newMessage,
+            id: selectedTicket.messages.length + 1,
+            type: "agent",
+          },
+        ],
         status: "in-progress",
         updatedAt: new Date().toISOString(),
         lastReply: "Just now",
       });
-
-      // TODO: Add API call to update ticket with new message
-      // await ticketApi.update(selectedTicket.id, {
-      //   messages: [...selectedTicket.messages, newMessage],
-      //   status: "in-progress"
-      // });
     } catch (err) {
       setError("Failed to send reply: " + err.message);
     } finally {
@@ -221,8 +228,12 @@ const AdminSupportTicket = () => {
 
   const handleStatusChange = async (ticketId, newStatus) => {
     try {
+      // API call to update ticket status
+      await ticketApi.update(ticketId, { status: newStatus });
+
+      // Update local state
       const updatedTickets = tickets.map((ticket) =>
-        ticket.id === selectedTicket.id
+        ticket.id === ticketId
           ? {
               ...ticket,
               status: newStatus,
@@ -236,9 +247,6 @@ const AdminSupportTicket = () => {
       if (selectedTicket && selectedTicket.id === ticketId) {
         setSelectedTicket({ ...selectedTicket, status: newStatus });
       }
-
-      // TODO: Add API call to update ticket status
-      // await ticketApi.update(ticketId, { status: newStatus });
     } catch (err) {
       setError("Failed to update ticket status: " + err.message);
       // Revert on error
@@ -246,6 +254,7 @@ const AdminSupportTicket = () => {
     }
   };
 
+  // ... rest of your component remains the same
   const ticketStats = {
     total: tickets.length,
     open: tickets.filter((t) => t.status === "open").length,
