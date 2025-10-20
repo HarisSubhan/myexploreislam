@@ -166,13 +166,6 @@ const Dashboard = () => {
       </Container>
 
       <Container fluid className="dashboard-container">
-        <Row className="mb-4 p-5">
-          <Col>
-            <h1 className="dashboard-title">
-              Real-time business metrics at a glance
-            </h1>
-          </Col>
-        </Row>
 
         <Row className="g-3 mb-4">
           {/* Active Subscriptions - Dynamic from API */}
@@ -234,7 +227,7 @@ const Dashboard = () => {
         <UsersTable />
       </Container>
 
-      <LearningEngagementSection />
+      {/* <LearningEngagementSection /> */}
     </AdminLayout>
   );
 };
