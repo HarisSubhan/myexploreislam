@@ -79,7 +79,7 @@ export const updateChildStatusApi = async (childId, isActive) => {
   try {
     const response = await axios.put(
       `${baseUrl}/api/children/${childId}/status`,
-      { is_active: isActive }, // Ensure this matches your backend expectation
+      { is_active: isActive }, 
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -99,7 +99,7 @@ export const updateChildStatusApi = async (childId, isActive) => {
 };
 
 // Child Request APIs
-export const requestedChildApi = async (requested_children) => {
+export const requestedChildApi = async (requestData) => {
   const token = getToken();
 
   if (!token) throw new Error("You are not logged in. Please log in first.");
@@ -107,7 +107,7 @@ export const requestedChildApi = async (requested_children) => {
   try {
     const response = await axios.post(
       `${baseUrl}/api/child-requests/`,
-      { requested_children },
+      requestData, // Send the complete object
       {
         headers: {
           Authorization: `Bearer ${token}`,
