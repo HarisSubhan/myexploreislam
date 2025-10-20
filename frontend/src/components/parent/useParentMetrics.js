@@ -1,6 +1,7 @@
-// components/parent/useParentMetrics.js
+// useParentMetrics.js
 import { useState, useEffect } from "react";
-import { dashboardApi, mockData } from "../../services/dashboardApi";
+import { dashboardApi } from "../../services/childActivity";
+import { transformChildrenActivityToChartData } from "../../utils/activityDataTransformer";
 
 export const useParentMetrics = (range, parentId) => {
   const [loading, setLoading] = useState(true);
@@ -17,91 +18,92 @@ export const useParentMetrics = (range, parentId) => {
 
   useEffect(() => {
     const fetchParentMetrics = async () => {
-      if (!parentId) return;
+      // Don't fetch if no parentId
+      if (!parentId) {
+        setLoading(false);
+        setError("No parent ID provided");
+        return;
+      }
 
       try {
         setLoading(true);
         setError(null);
 
-        // Use Promise.all to fetch multiple endpoints in parallel
-        const [
-          statsResponse,
-          activityResponse,
-          childrenResponse,
-          timelineResponse,
-          subscriptionResponse,
-        ] = await Promise.allSettled([
-          dashboardApi.getChildrenStats(parentId),
-          dashboardApi.getCombinedActivity(parentId, range),
-          dashboardApi.getChildren(parentId),
-          dashboardApi.getTimeline(parentId),
-          dashboardApi.getSubscription(parentId),
-        ]);
+        // Fetch data with error handling for each request
+        let childrenActivityResponse = null;
+        let recentActivityResponse = null;
 
-        // Process stats response
-        if (
-          statsResponse.status === "fulfilled" &&
-          statsResponse.value.data?.data
-        ) {
-          const statsData = statsResponse.value.data.data;
+        try {
+          childrenActivityResponse =
+            await dashboardApi.getChildrenActivity(parentId);
+        } catch (err) {
+          console.warn("Could not fetch children activity:", err.message);
+          childrenActivityResponse = { data: { data: [] } };
+        }
+
+        try {
+          recentActivityResponse =
+            await dashboardApi.getRecentActivity(parentId);
+        } catch (err) {
+          console.warn("Could not fetch recent activity:", err.message);
+          recentActivityResponse = { data: { data: [] } };
+        }
+
+        // Process children activity data
+        const childrenData = childrenActivityResponse?.data?.data || [];
+
+        if (childrenData.length > 0) {
+          // Transform the data for the chart
+          const chartData = transformChildrenActivityToChartData(childrenData);
+          setCombinedActivity(chartData);
+
+          // Set children data
+          setChildren(childrenData);
+
+          // Update stats from children data
+          const totalChildren = childrenData.length;
+          const active = childrenData.filter(
+            (child) => (child.total_active_minutes || 0) > 0
+          ).length;
+
           setStats({
-            totalChildren: statsData.total_children || 0,
-            active: statsData.active_children || 0,
-            inactive: statsData.inactive_children || 0,
+            totalChildren,
+            active,
+            inactive: totalChildren - active,
           });
         } else {
-          // Fallback to mock data or handle error
-          console.warn("Stats API failed, using mock data");
+          // No children data
+          setCombinedActivity([]);
+          setChildren([]);
           setStats({
-            totalChildren: 3,
-            active: 2,
-            inactive: 1,
+            totalChildren: 0,
+            active: 0,
+            inactive: 0,
           });
         }
 
-        // Process activity response
-        if (activityResponse.status === "fulfilled") {
-          setCombinedActivity(activityResponse.value.data?.data || []);
-        } else {
-          setCombinedActivity(mockData.generateActivityData(range));
-        }
+        // Process recent activity data
+        const timelineData = recentActivityResponse?.data?.data || [];
+        setTimeline(timelineData);
 
-        // Process children response
-        if (childrenResponse.status === "fulfilled") {
-          setChildren(childrenResponse.value.data?.data || []);
-        } else {
-          setChildren(mockData.generateChildrenData());
-        }
-
-        // Process timeline response
-        if (timelineResponse.status === "fulfilled") {
-          setTimeline(timelineResponse.value.data?.data || []);
-        } else {
-          setTimeline(mockData.generateTimelineData());
-        }
-
-        // Process subscription response
-        if (subscriptionResponse.status === "fulfilled") {
-          setSubscription(subscriptionResponse.value.data?.data || {});
-        } else {
-          setSubscription(mockData.generateSubscriptionData());
-        }
+        // For subscription, set empty object since we don't have API
+        setSubscription({});
       } catch (err) {
-        console.error("Error fetching parent metrics:", err);
+        console.error("Error in fetchParentMetrics:", err);
         setError(
           err.response?.data?.message || "Failed to load dashboard data"
         );
 
-        // Fallback to mock data on complete failure
+        // Set empty states on error
         setStats({
-          totalChildren: 3,
-          active: 2,
-          inactive: 1,
+          totalChildren: 0,
+          active: 0,
+          inactive: 0,
         });
-        setCombinedActivity(mockData.generateActivityData(range));
-        setChildren(mockData.generateChildrenData());
-        setTimeline(mockData.generateTimelineData());
-        setSubscription(mockData.generateSubscriptionData());
+        setCombinedActivity([]);
+        setChildren([]);
+        setTimeline([]);
+        setSubscription({});
       } finally {
         setLoading(false);
       }
