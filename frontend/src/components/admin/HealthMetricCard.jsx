@@ -4,17 +4,11 @@ import { Card, Badge } from "react-bootstrap";
 const HealthMetricCard = ({
   title,
   value,
-  change,
-  changeLabel,
   icon,
-  variant = "primary",
   clickable = false,
   onClick,
-  isPercentage = false,
+  
 }) => {
-  const changePositive = change > 0;
-  const changeColor = changePositive ? "success" : "danger";
-  const changeIcon = changePositive ? "↗️" : "↘️";
 
   return (
     <Card
@@ -27,23 +21,10 @@ const HealthMetricCard = ({
           <span className="metric-icon">{icon}</span>
         </div>
 
-        <div className="metric-value">{value}</div>
+        <div className="metric-value fs-4">{value}</div>
 
-        <div className="metric-change">
-          <Badge bg={changeColor} className="me-2">
-            {changeIcon} {Math.abs(change)}%
-          </Badge>
-          <small className="text-muted">{changeLabel}</small>
-        </div>
+        
 
-        {isPercentage && (
-          <div className="progress mt-3" style={{ height: "8px" }}>
-            <div
-              className={`progress-bar bg-${variant}`}
-              style={{ width: `${parseFloat(value)}%` }}
-            ></div>
-          </div>
-        )}
       </Card.Body>
     </Card>
   );

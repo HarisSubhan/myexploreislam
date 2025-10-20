@@ -24,10 +24,12 @@ const RequestChild = () => {
     }
 
     try {
-      const newRequest = await requestedChildApi({
+      const requestData = {
         parent_id: parentId,
         requested_children: Number(requestedChildren),
-      });
+      };
+
+      const newRequest = await requestedChildApi(requestData);
 
       setRequests((prev) => [...prev, newRequest]);
       setRequestedChildren("");
