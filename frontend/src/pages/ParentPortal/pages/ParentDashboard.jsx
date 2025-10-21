@@ -21,13 +21,12 @@ const ParentDashboard = () => {
     loading,
     stats,
     combinedActivity,
-    children,
     timeline,
     subscription,
     error,
   } = useParentMetrics(range, parentId);
 
-  // Show loading or error if no user
+
   if (!user) {
     return (
       <div className="parent-dashboard">
@@ -56,7 +55,7 @@ const ParentDashboard = () => {
             Could not load metrics: {error}
           </div>
         )}
-        
+
         {/* Empty State */}
         {!loading && !error && stats.totalChildren === 0 && (
           <div className="alert alert-info my-3" role="alert">
@@ -83,16 +82,10 @@ const ParentDashboard = () => {
         {/* Widgets Row */}
         <Row className="g-4 mt-1">
           <Col xl={4} lg={6} md={6}>
-            <SubscriptionWidget data={subscription} loading={loading} />
+            <SubscriptionWidget parentId={parentId} loading={loading} />
           </Col>
           <Col xl={8} lg={6} md={6}>
             <ActivityTimeline data={timeline} loading={loading} />
-          </Col>
-        </Row>
-        {/* Children Activity Table */}
-        <Row className="g-4 mt-1">
-          <Col xs={12}>
-            <ChildActivityTable data={children} loading={loading} />
           </Col>
         </Row>
       </Container>

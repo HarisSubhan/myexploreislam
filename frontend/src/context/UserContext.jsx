@@ -20,8 +20,11 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
+  // Get parentId from user object
+  const parentId = user?.id || user?.parentId || user?.userId;
+
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, parentId, login, logout }}>
       {children}
     </UserContext.Provider>
   );

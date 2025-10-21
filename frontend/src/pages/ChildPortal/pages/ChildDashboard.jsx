@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { FaSignInAlt, FaVideo, FaListUl } from "react-icons/fa";
 import "../../../components/child/ChildProfilePage.css";
 import { getModuleApi } from "../../../services/moduleApi";
+import { createSlug } from "../../../utils/slugify";
 
 const ChildDashboard = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const ChildDashboard = () => {
 
         const data = await getModuleApi();
 
-        if (!data || data.length === 0) {
+        if (!data || !Array.isArray(data) || data.length === 0) {
           setModules([]);
           return;
         }
@@ -39,25 +40,29 @@ const ChildDashboard = () => {
           import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
         const formattedModules = data.map((module) => {
-          const name = module.name || "";
-          const isSeries = name.toLowerCase().includes("series");
+          const name = module.name || module.title || `Module ${module.id}`;
+          const isSeries =
+            name.toLowerCase().includes("series") ||
+            module.type === "series" ||
+            module.video_count > 1 ||
+            (module.videos && module.videos.length > 1);
 
           const thumbnail = module.thumbnail_url
             ? module.thumbnail_url.startsWith("http")
               ? module.thumbnail_url
-              : module.thumbnail_url.startsWith("/")
-                ? `${baseUrl}${module.thumbnail_url}`
-                : `${baseUrl}/${module.thumbnail_url}`
+              : `${baseUrl}${module.thumbnail_url.startsWith("/") ? "" : "/"}${module.thumbnail_url}`
             : null;
 
           return {
             id: module.id,
-            title: module.name || module.title || `Module ${module.id}`,
+            title: name,
             description: module.description || "Explore learning content",
             thumbnail,
             type: isSeries ? "series" : "single",
-            videoCount: module.video_count || 0,
+            videoCount: module.video_count || module.videos?.length || 0,
             seriesId: module.series_id,
+            videos: module.videos || [],
+            slug: createSlug(name),
           };
         });
 
@@ -68,9 +73,7 @@ const ChildDashboard = () => {
 
         if (
           err.message?.includes("401") ||
-          err.message?.includes("unauthorized") ||
-          err.message?.includes("authentication") ||
-          err.message?.includes("token")
+          err.message?.includes("unauthorized")
         ) {
           setUnauthorized(true);
         }
@@ -83,10 +86,32 @@ const ChildDashboard = () => {
   }, []);
 
   const handleCardClick = (module) => {
-    if (module.type === "series") {
-      navigate("/child/series");
+    if (module.title.toLowerCase() === "module") {
+      navigate(`/child/module`, {
+        state: {
+          moduleData: module,
+          moduleId: module.id,
+        },
+      });
+    } else if (module.title.toLowerCase() === "cartoon") {
+      navigate(`/child/browse/singles`, {
+        state: {
+          moduleData: module,
+          moduleId: module.id,
+        },
+      });
     } else {
-      navigate("/child/singles");
+      if (module.type === "series") {
+        const moduleSlug = createSlug(module.title);
+        navigate(`/child/series/${moduleSlug}`);
+      } else {
+        navigate(`/child/browse/singles`, {
+          state: {
+            moduleId: module.id,
+            moduleName: module.title,
+          },
+        });
+      }
     }
   };
 
@@ -98,7 +123,6 @@ const ChildDashboard = () => {
     window.location.reload();
   };
 
-  // Loading State
   if (loading) {
     return (
       <Container
@@ -121,7 +145,6 @@ const ChildDashboard = () => {
     );
   }
 
-  // Unauthorized State
   if (unauthorized) {
     return (
       <Container
@@ -161,7 +184,6 @@ const ChildDashboard = () => {
     );
   }
 
-  // Error State
   if (error) {
     return (
       <Container
@@ -290,18 +312,18 @@ const ChildDashboard = () => {
                     )}
                   </Badge>
 
-                  {/* Video Count Badge for Series */}
-                  {module.type === "series" && (
-                    <Badge
-                      bg="dark"
-                      className="position-absolute bottom-0 start-0 m-3"
-                      style={{ fontSize: "0.7rem" }}
-                    >
-                      {module.videoCount > 0
-                        ? `${module.videoCount} videos`
-                        : "Series"}
-                    </Badge>
-                  )}
+                  {/* Video Count Badge */}
+                  <Badge
+                    bg="dark"
+                    className="position-absolute bottom-0 start-0 m-3"
+                    style={{ fontSize: "0.7rem" }}
+                  >
+                    {module.videoCount > 0
+                      ? `${module.videoCount} ${module.videoCount === 1 ? "video" : "videos"}`
+                      : module.type === "series"
+                        ? "Series"
+                        : "Video"}
+                  </Badge>
                 </div>
 
                 {/* Card Body */}
@@ -330,10 +352,7 @@ const ChildDashboard = () => {
                         fontWeight: "600",
                       }}
                     >
-                      {module.type === "series"
-                        ? "Browse Series"
-                        : "Browse Videos"}{" "}
-                      →
+                      {module.type === "series" ? "View Series" : "Watch Now"} →
                     </Button>
                   </div>
                 </Card.Body>
@@ -355,8 +374,8 @@ const ChildDashboard = () => {
         <div className="text-center mt-5">
           <div className="text-white-50">
             <small>
-              {modules.length} {modules.length === 1 ? "module" : "modules"} •{" "}
-              {modules.filter((m) => m.type === "series").length} series •{" "}
+              📊 {modules.length} {modules.length === 1 ? "module" : "modules"}{" "}
+              • {modules.filter((m) => m.type === "series").length} series •{" "}
               {modules.filter((m) => m.type === "single").length} single videos
             </small>
           </div>

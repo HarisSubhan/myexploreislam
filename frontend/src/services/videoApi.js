@@ -33,17 +33,7 @@ export const getAllVideosApi = async () => {
   }));
 };
 
-// export const getVideoByIdApi = async (id) => {
-//   const token = getToken();
 
-//   const response = await axios.get(`${baseUrl}/api/videos/${id}`, {
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   });
-
-//   return response.data;
-// };
 
 export const getVideosByCategoryApi = async (categorySlug) => {
   const token = getToken();
@@ -55,23 +45,9 @@ export const getVideosByCategoryApi = async (categorySlug) => {
     },
   });
 
-  return response.data; // probably an array of videos
+  return response.data; 
 };
 
-// export const getVideosByCategoryApi = async (categorySlug) => {
-//   const token = getToken();
-
-//   const response = await axios.get(
-//     `${baseUrl}/api/videos/category/${categorySlug}`,
-//     {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     }
-//   );
-
-//   return response.data;
-// };
 
 export const getVideosBySeriesApi = async (seriesId) => {
   const token = getToken();
