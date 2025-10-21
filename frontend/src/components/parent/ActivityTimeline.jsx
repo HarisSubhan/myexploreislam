@@ -1,7 +1,11 @@
 import React from "react";
 import { Card, Spinner, Badge } from "react-bootstrap";
+import { useUser } from "../../context/UserContext";
+
 
 const ActivityTimeline = ({ data, loading }) => {
+  const { parentId, user } = useUser();
+
   const getActivityConfig = (action) => {
     const configs = {
       "Logged In": {
@@ -92,6 +96,24 @@ const ActivityTimeline = ({ data, loading }) => {
     }
   };
 
+  // Filter activities to show only parent's children
+  const getFilteredActivities = () => {
+    if (!data || !Array.isArray(data)) return [];
+
+    // If user has children data in context, filter by child IDs
+    if (user?.children && Array.isArray(user.children)) {
+      const childIds = user.children.map((child) => child.id || child.childId);
+      return data.filter(
+        (activity) => activity.child_id && childIds.includes(activity.child_id)
+      );
+    }
+
+    // If no children data, return all activities (fallback)
+    return data;
+  };
+
+  const filteredActivities = getFilteredActivities();
+
   if (loading) {
     return (
       <Card className="shadow-sm border-0 h-100">
@@ -105,7 +127,7 @@ const ActivityTimeline = ({ data, loading }) => {
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!data || data.length === 0 || filteredActivities.length === 0) {
     return (
       <Card className="shadow-sm border-0 h-100">
         <Card.Header className="border-bottom bg-white py-3">
@@ -115,7 +137,11 @@ const ActivityTimeline = ({ data, loading }) => {
           <div className="text-center text-muted">
             <div className="mb-2">📊</div>
             <p className="mb-1 small fw-medium">No activity yet</p>
-            <small>Activities will appear here</small>
+            <small>
+              {!data || data.length === 0
+                ? "Activities will appear here"
+                : "No activities from your children"}
+            </small>
           </div>
         </Card.Body>
       </Card>
@@ -126,19 +152,19 @@ const ActivityTimeline = ({ data, loading }) => {
     <Card className="shadow-sm border-0 h-100">
       <Card.Header className="border-bottom bg-white py-3">
         <div className="d-flex justify-content-between align-items-center">
-          <h6 className="mb-0 fw-semibold">Recent Activity</h6>
+          <h6 className="mb-0 fw-semibold">Children's Activity</h6>
           <Badge bg="light" text="dark" className="rounded-pill">
-            {data.length}
+            {filteredActivities.length}
           </Badge>
         </div>
       </Card.Header>
 
       <Card.Body className="p-0">
         <div className="activity-list">
-          {data.map((activity, index) => {
+          {filteredActivities.map((activity, index) => {
             const config = getActivityConfig(activity.action);
             const metadata = parseMetadata(activity.metadata);
-            const isLast = index === data.length - 1;
+            const isLast = index === filteredActivities.length - 1;
 
             return (
               <div
@@ -225,11 +251,11 @@ const ActivityTimeline = ({ data, loading }) => {
           })}
         </div>
 
-        {data.length > 5 && (
+        {filteredActivities.length > 5 && (
           <div className="text-center py-3 border-top">
             <small className="text-muted">
-              Showing latest {Math.min(data.length, 10)} of {data.length}{" "}
-              activities
+              Showing latest {Math.min(filteredActivities.length, 10)} of{" "}
+              {filteredActivities.length} activities
             </small>
           </div>
         )}

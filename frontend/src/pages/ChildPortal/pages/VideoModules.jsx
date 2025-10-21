@@ -4,40 +4,60 @@ import {
   Row,
   Col,
   Card,
+  Button,
+  Badge,
+  Tabs,
+  Tab,
   Spinner,
   Alert,
-  Badge,
-  Button,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { getSeriesApi } from "../../../services/seriesApi"; // Changed to getSeriesApi
+import {
+  FaVideo,
+  FaListUl,
+  FaPlay,
+  FaArrowLeft,
+  FaBook,
+  FaGraduationCap,
+  FaTrophy,
+} from "react-icons/fa";
+import { getSeriesApi } from "../../../services/seriesApi";
+import { getAllVideosApi } from "../../../services/videoApi"; // Add this import
+import { createSlug } from "../../../utils/slugify";
 
 const VideoModules = () => {
   const navigate = useNavigate();
   const [series, setSeries] = useState([]);
+  const [singleVideos, setSingleVideos] = useState([]);
+  const [allContent, setAllContent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
-    const fetchSeries = async () => {
+    const fetchContent = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // FIXED: Use getSeriesApi instead of getVideosBySeriesApi
-        const data = await getSeriesApi();
-        console.log("Series API Response:", data);
+        // Fetch both series and single videos
+        const [seriesData, videosData] = await Promise.all([
+          getSeriesApi(),
+          getAllVideosApi(),
+        ]);
+
+        console.log("Series API Response:", seriesData);
+        console.log("Videos API Response:", videosData);
 
         const baseUrl =
           import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
-        const formattedSeries = data.map((seriesItem) => ({
+        // Process Series
+        const formattedSeries = seriesData.map((seriesItem) => ({
           id: seriesItem.id,
-          title: seriesItem.title || seriesItem.name || "Untitled Series",
-          description:
-            seriesItem.description ||
-            seriesItem.series_description ||
-            "No description available",
+          title:
+            seriesItem.name || seriesItem.title || `Series ${seriesItem.id}`,
+          description: seriesItem.description || "Explore this learning series",
           thumbnail: seriesItem.thumbnail_url
             ? seriesItem.thumbnail_url.startsWith("http")
               ? seriesItem.thumbnail_url
@@ -46,225 +66,431 @@ const VideoModules = () => {
                 : `${baseUrl}/${seriesItem.thumbnail_url}`
             : "https://via.placeholder.com/300x200?text=No+Thumbnail",
           videoCount: seriesItem.video_count || 0,
+          type: "series",
+          slug: createSlug(
+            seriesItem.name || seriesItem.title || `series-${seriesItem.id}`
+          ),
+          created_at: seriesItem.created_at,
+          progress: seriesItem.progress || 0,
         }));
 
+        // Process Single Videos (videos without series_id)
+        const formattedSingleVideos = videosData
+          .filter((video) => !video.series_id)
+          .map((video) => ({
+            id: video.id,
+            title: video.title || `Video ${video.id}`,
+            description: video.description || "Watch this video",
+            thumbnail: video.thumbnail_url
+              ? video.thumbnail_url.startsWith("http")
+                ? video.thumbnail_url
+                : video.thumbnail_url.startsWith("/")
+                  ? `${baseUrl}${video.thumbnail_url}`
+                  : `${baseUrl}/${video.thumbnail_url}`
+              : "https://via.placeholder.com/300x200?text=No+Thumbnail",
+            videoCount: 1, // Single videos always have 1 video
+            type: "single",
+            slug: createSlug(video.title || `video-${video.id}`),
+            created_at: video.created_at,
+            progress: video.progress || 0,
+            video_url: video.video_url,
+          }));
+
         setSeries(formattedSeries);
+        setSingleVideos(formattedSingleVideos);
+        setAllContent([...formattedSeries, ...formattedSingleVideos]);
       } catch (err) {
-        console.error("Series API Error:", err);
-        setError(err.message || "Failed to load series");
+        console.error("Content API Error:", err);
+        setError("Failed to load content. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSeries();
+    fetchContent();
   }, []);
-
-  const handleSeriesClick = (seriesId) => {
-    navigate(`/child/series/${seriesId}`);
-  };
 
   const handleBackToDashboard = () => {
     navigate("/child");
   };
 
-  if (loading) {
-    return (
-      <Container
-        fluid
-        className="py-5 d-flex justify-content-center align-items-center"
-        style={{ minHeight: "100vh" }}
+  // Handle module click - Different behavior for series vs single
+  const handleModuleClick = (item) => {
+    if (item.type === "series") {
+      // ✅ Series ke liye SeriesDetail page par jayein
+      console.log("🎬 Navigating to SeriesDetail:", item.slug);
+      navigate(`/child/series/${item.slug}`);
+    } else {
+      // ✅ Single video ke liye ModuleIntroduction par jayein
+      console.log("🎥 Navigating to ModuleIntroduction");
+      navigate(`/child/module/single/${item.id}/introduction`);
+    }
+  };
+
+  // Handle view details - Navigate to content browsing (SIRF EK BAAR)
+  const handleViewDetails = (item, e) => {
+    e.stopPropagation(); // Prevent card click
+
+    if (item.type === "series") {
+      // Navigate to series detail page
+      navigate(`/child/series/${item.slug}`);
+    } else {
+      // Navigate to single video player
+      navigate(`/child/browse/singles/${item.slug}`);
+    }
+  };
+
+
+
+  const clearCache = () => {
+    window.location.reload();
+  };
+
+  // Filter content based on active tab
+  const getFilteredContent = () => {
+    const content =
+      activeTab === "series"
+        ? series
+        : activeTab === "singles"
+          ? singleVideos
+          : allContent;
+
+    switch (activeTab) {
+      case "in-progress":
+        return content.filter(
+          (item) => item.progress > 0 && item.progress < 100
+        );
+      case "completed":
+        return content.filter((item) => item.progress === 100);
+      case "new":
+        return content
+          .filter((item) => item.created_at)
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      default:
+        return content;
+    }
+  };
+
+  // Get progress badge color
+  const getProgressColor = (progress) => {
+    if (progress === 0) return "secondary";
+    if (progress < 50) return "warning";
+    if (progress < 100) return "info";
+    return "success";
+  };
+
+  // Get progress text
+  const getProgressText = (progress) => {
+    if (progress === 0) return "Not Started";
+    if (progress === 100) return "Completed";
+    return `${progress}% Complete`;
+  };
+
+  // Render loading skeleton
+  const renderSkeleton = (count) => {
+    return Array(count)
+      .fill({})
+      .map((_, index) => (
+        <Col xs={12} sm={6} md={4} lg={3} key={index}>
+          <Card className="h-100 border-0" style={{ borderRadius: "20px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "200px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "20px 20px 0 0",
+              }}
+            />
+            <Card.Body>
+              <div
+                style={{
+                  width: "80%",
+                  height: "20px",
+                  backgroundColor: "#f8f9fa",
+                  marginBottom: "8px",
+                  borderRadius: "4px",
+                }}
+              />
+              <div
+                style={{
+                  width: "60%",
+                  height: "15px",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "4px",
+                }}
+              />
+            </Card.Body>
+          </Card>
+        </Col>
+      ));
+  };
+
+  // Render content card
+  const renderContentCard = (item) => (
+    <Col xs={12} sm={6} md={4} lg={3} key={`${item.type}-${item.id}`}>
+      <Card
+        className="h-100 border-0"
+        style={{
+          cursor: "pointer",
+          borderRadius: "20px",
+          overflow: "hidden",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+          transition: "transform 0.25s, box-shadow 0.25s",
+        }}
+        onClick={() => handleModuleClick(item)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translateY(-5px)";
+          e.currentTarget.style.boxShadow = "0 10px 32px rgba(0,0,0,0.18)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.1)";
+        }}
       >
-        <div className="text-center">
-          <Spinner
-            animation="border"
-            role="status"
-            variant="primary"
-            size="lg"
+        <div style={{ position: "relative" }}>
+          <img
+            src={item.thumbnail}
+            alt={item.title}
+            style={{
+              width: "100%",
+              height: "200px",
+              objectFit: "cover",
+              backgroundColor: "#f8f9fa",
+            }}
+            onError={(e) => {
+              e.target.src =
+                "https://via.placeholder.com/300x200?text=No+Thumbnail";
+              e.target.style.backgroundColor = "#f8f9fa";
+            }}
           />
-          <div className="mt-3">
-            <p className="text-muted">Loading learning series...</p>
+
+          {/* Type Badge */}
+          <Badge
+            bg={item.type === "series" ? "primary" : "success"}
+            className="position-absolute top-0 start-0 m-2"
+          >
+            {item.type === "series" ? (
+              <>
+                <FaListUl className="me-1" /> Series
+              </>
+            ) : (
+              <>
+                <FaVideo className="me-1" /> Single
+              </>
+            )}
+          </Badge>
+
+          {/* Video Count Badge */}
+          {item.videoCount > 0 && (
+            <Badge bg="dark" className="position-absolute top-0 end-0 m-2">
+              {item.videoCount} {item.videoCount === 1 ? "video" : "videos"}
+            </Badge>
+          )}
+
+          {/* Progress Badge */}
+          <Badge
+            bg={getProgressColor(item.progress)}
+            className="position-absolute bottom-0 start-0 m-2"
+          >
+            {getProgressText(item.progress)}
+          </Badge>
+        </div>
+
+        {/* ✅ YAHAN PAR ADD KARNA HAI - Card Body */}
+        <Card.Body className="d-flex flex-column">
+          <h6 className="fw-bold mb-2" style={{ fontSize: "1rem" }}>
+            {item.title}
+          </h6>
+          <p
+            className="small text-muted flex-grow-1"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {item.description}
+          </p>
+
+          {/* ✅ ACTION BUTTONS YAHAN ADD KAREN */}
+          <div className="mt-auto d-flex gap-2">
+            <Button
+              variant={item.progress === 0 ? "primary" : "outline-primary"}
+              size="sm"
+              className="flex-grow-1"
+              onClick={() => handleModuleClick(item)}
+            >
+              {item.type === "series"
+                ? "View Series" // Series ke liye
+                : item.progress === 0
+                  ? "Start Learning" // Single video ke liye
+                  : item.progress === 100
+                    ? "Review"
+                    : "Continue"}
+            </Button>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={(e) => handleViewDetails(item, e)}
+              title={`View ${item.type === "series" ? "Series" : "Video"} Details`}
+            >
+              <FaListUl />
+            </Button>
           </div>
-        </div>
-      </Container>
-    );
-  }
+        </Card.Body>
+      </Card>
+    </Col>
+  );
 
-  if (error) {
-    return (
-      <Container fluid className="py-5">
-        <div className="text-center">
-          <Alert
-            variant="danger"
-            className="mx-auto"
-            style={{ maxWidth: "500px" }}
-          >
-            <h5>Error Loading Series</h5>
-            <p>{error}</p>
-            <Button
-              variant="outline-danger"
-              onClick={() => window.location.reload()}
-            >
-              Try Again
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleBackToDashboard}
-              className="ms-2"
-            >
-              Back to Dashboard
-            </Button>
-          </Alert>
-        </div>
-      </Container>
-    );
-  }
-
-  if (series.length === 0) {
-    return (
-      <Container fluid className="py-5">
-        <div className="text-center">
-          <Alert
-            variant="info"
-            className="mx-auto"
-            style={{ maxWidth: "500px" }}
-          >
-            <h5>No Series Available</h5>
-            <p>There are no learning series available at the moment.</p>
-            <Button variant="primary" onClick={handleBackToDashboard}>
-              Back to Dashboard
-            </Button>
-          </Alert>
-        </div>
-      </Container>
-    );
-  }
+  const filteredContent = getFilteredContent();
 
   return (
-    <Container
-      fluid
-      className="py-5"
-      style={{ minHeight: "100vh", background: "#f8f9fa" }}
-    >
-      {/* Header Section */}
-      <div className="text-center mb-5">
-        <div className="mb-3">
+    <Container fluid className="py-4" style={{ minHeight: "100vh" }}>
+      {/* Header */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
           <Button
-            variant="outline-primary"
+            variant="outline-secondary"
             onClick={handleBackToDashboard}
-            className="mb-3"
+            className="me-3"
           >
-            ← Back to Dashboard
+            <FaArrowLeft className="me-2" />
+            Back to Dashboard
+          </Button>
+          <h2 className="fw-bold d-inline-block" style={{ color: "#0d6efd" }}>
+            Learning Modules
+          </h2>
+        </div>
+        <Button
+          onClick={clearCache}
+          variant="outline-secondary"
+          size="sm"
+          title="Clear cache and reload"
+        >
+          Refresh
+        </Button>
+      </div>
+
+      {error && (
+        <div className="alert alert-danger text-center">
+          {error}
+          <Button
+            onClick={() => window.location.reload()}
+            className="btn btn-sm btn-outline-danger ms-3"
+          >
+            Retry
           </Button>
         </div>
-        <h1 className="fw-bold mb-3" style={{ color: "#0d6efd" }}>
-          Learning Series
-        </h1>
-        <p className="text-muted lead">
-          Choose a series to start your learning journey
-        </p>
-        <Badge bg="primary" className="fs-6 px-3 py-2">
-          {series.length} {series.length === 1 ? "Series" : "Series"} Available
-        </Badge>
-      </div>
+      )}
 
-      {/* Series Grid */}
-      <Row className="g-4 justify-content-center">
-        {series.map((seriesItem) => (
-          <Col key={seriesItem.id} xs={12} sm={6} md={4} lg={3}>
-            <Card
-              className="h-100 border-0"
-              style={{
-                cursor: "pointer",
-                borderRadius: "16px",
-                overflow: "hidden",
-                boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-                transition: "transform 0.25s, box-shadow 0.25s",
-                background: "white",
-              }}
-              onClick={() => handleSeriesClick(seriesItem.id)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-6px)";
-                e.currentTarget.style.boxShadow =
-                  "0 12px 24px rgba(0,0,0,0.15)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.1)";
-              }}
-            >
-              {/* Thumbnail Section */}
-              <div style={{ position: "relative" }}>
-                <img
-                  src={seriesItem.thumbnail}
-                  alt={seriesItem.title}
-                  style={{
-                    width: "100%",
-                    height: "200px",
-                    objectFit: "cover",
-                  }}
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/300x200/667eea/ffffff?text=No+Thumbnail";
-                    e.target.style.backgroundColor = "#667eea";
-                  }}
-                />
-                {/* Video Count Badge */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    background: "rgba(0,0,0,0.7)",
-                    color: "white",
-                    padding: "4px 8px",
-                    borderRadius: "12px",
-                    fontSize: "0.8rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  {seriesItem.videoCount}{" "}
-                  {seriesItem.videoCount === 1 ? "video" : "videos"}
+      {/* Tabs */}
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(tab) => setActiveTab(tab)}
+        className="mb-4"
+        fill
+      >
+        <Tab
+          eventKey="all"
+          title={
+            <span>
+              <FaListUl className="me-2" />
+              All Content
+              {!loading && (
+                <Badge bg="primary" className="ms-2">
+                  {allContent.length}
+                </Badge>
+              )}
+            </span>
+          }
+        >
+          <Row className="g-4 justify-content-center mt-3">
+            {loading
+              ? renderSkeleton(8)
+              : filteredContent.map(renderContentCard)}
+            {!loading && filteredContent.length === 0 && (
+              <Col xs={12} className="text-center py-5">
+                <div className="text-muted">
+                  <FaListUl size={48} className="mb-3" />
+                  <h5>No content available</h5>
+                  <p>Check back later for new learning content</p>
                 </div>
-              </div>
+              </Col>
+            )}
+          </Row>
+        </Tab>
 
-              {/* Card Body */}
-              <Card.Body className="d-flex flex-column">
-                <h5 className="fw-bold mb-2 text-dark">{seriesItem.title}</h5>
-                <p
-                  className="text-muted small flex-grow-1"
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                    lineHeight: "1.4",
-                  }}
-                >
-                  {seriesItem.description}
-                </p>
-
-                {/* Action Section */}
-                <div className="mt-auto pt-2">
-                  <div className="text-primary small fw-semibold d-flex align-items-center justify-content-between">
-                    <span>Start Learning</span>
-                    <span>→</span>
-                  </div>
+        <Tab
+          eventKey="series"
+          title={
+            <span>
+              <FaListUl className="me-2" />
+              Series Only
+              {!loading && (
+                <Badge bg="info" className="ms-2">
+                  {series.length}
+                </Badge>
+              )}
+            </span>
+          }
+        >
+          <Row className="g-4 justify-content-center mt-3">
+            {loading
+              ? renderSkeleton(8)
+              : filteredContent.map(renderContentCard)}
+            {!loading && filteredContent.length === 0 && (
+              <Col xs={12} className="text-center py-5">
+                <div className="text-muted">
+                  <FaListUl size={48} className="mb-3" />
+                  <h5>No series available</h5>
+                  <p>Check back later for new learning series</p>
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+              </Col>
+            )}
+          </Row>
+        </Tab>
 
-      {/* Footer Stats */}
-      <div className="text-center mt-5">
-        <div className="text-muted">
-          <small>
-            Showing {series.length} of {series.length} series
+        <Tab
+          eventKey="singles"
+          title={
+            <span>
+              <FaVideo className="me-2" />
+              Single Videos
+              {!loading && (
+                <Badge bg="success" className="ms-2">
+                  {singleVideos.length}
+                </Badge>
+              )}
+            </span>
+          }
+        >
+          <Row className="g-4 justify-content-center mt-3">
+            {loading
+              ? renderSkeleton(8)
+              : filteredContent.map(renderContentCard)}
+            {!loading && filteredContent.length === 0 && (
+              <Col xs={12} className="text-center py-5">
+                <div className="text-muted">
+                  <FaVideo size={48} className="mb-3" />
+                  <h5>No single videos available</h5>
+                  <p>Check back later for new single videos</p>
+                </div>
+              </Col>
+            )}
+          </Row>
+        </Tab>
+      </Tabs>
+
+      {/* Stats */}
+      {!loading && !error && (
+        <div className="text-center mt-5 pt-4 border-top">
+          <small className="text-muted">
+            Showing {filteredContent.length} of {allContent.length} items •
+            {series.length} series • {singleVideos.length} single videos
           </small>
         </div>
-      </div>
+      )}
     </Container>
   );
 };
