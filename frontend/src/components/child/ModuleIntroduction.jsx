@@ -9,46 +9,56 @@ import {
   Alert,
   Badge,
 } from "react-bootstrap";
-import { getVideoByIdApi } from "../../services/videoApi";
+import { getSeriesApi } from "../../services/seriesApi"; // ✅ Add this import
+import { createSlug } from "../../utils/slugify";
+
 
 const ModuleIntroduction = () => {
   const navigate = useNavigate();
-  const { seriesId, videoId } = useParams();
-  const [videoData, setVideoData] = useState(null);
+  const { seriesSlug } = useParams();
+  const [series, setSeries] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch video data when component mounts
+  // Fetch series data
   useEffect(() => {
-    const fetchVideoData = async () => {
+    const fetchSeriesData = async () => {
       try {
         setLoading(true);
-        const data = await getVideoByIdApi(videoId);
-        setVideoData(data);
+
+        if (seriesSlug) {
+          const allSeries = await getSeriesApi();
+          const foundSeries = allSeries.find((seriesItem) => {
+            const seriesSlugFromName = createSlug(
+              seriesItem.name || seriesItem.title
+            );
+            return seriesSlugFromName === seriesSlug;
+          });
+
+          if (foundSeries) {
+            setSeries(foundSeries);
+          }
+        }
       } catch (err) {
-        setError(err.message || "Failed to fetch video data");
+        setError("Failed to load series data");
       } finally {
         setLoading(false);
       }
     };
 
-    if (videoId) {
-      fetchVideoData();
-    }
-  }, [videoId]);
+    fetchSeriesData();
+  }, [seriesSlug]);
 
   const handleNext = () => {
-    // Navigate to the quiz page
-    navigate(`/child/series/${seriesId}/quiz/${videoId}`);
+    navigate(`/child/module/${seriesSlug}/page1`);
   };
 
   const handleBack = () => {
-    navigate(`/child/series/${seriesId}`);
+    navigate("/child/module");
   };
 
   const handlePlayAudio = () => {
-    // Implement audio playback logic here
-    console.log("Play audio for:", videoData?.title);
+    console.log("Play audio for series:", series?.name);
   };
 
   if (loading) {
@@ -93,25 +103,23 @@ const ModuleIntroduction = () => {
           className="d-flex align-items-center"
         >
           <FaArrowLeft className="me-2" />
-          Back to Series
+          Back to Modules
         </Button>
       </div>
 
-      {/* Series and Episode Info */}
+      {/* Series Info */}
       <div className="text-center mb-4">
         <Badge bg="primary" className="fs-6 mb-2 px-3 py-2">
-          {videoData?.series_title || "Series"}
+          {series?.name || "Learning Series"}
         </Badge>
         <h2 className="fw-bold mb-3" style={{ color: "#0d6efd" }}>
-          Episode Introduction
+          Series Introduction
         </h2>
       </div>
 
-      {/* Episode Title */}
+      {/* Series Title */}
       <h4 className="fw-bold mb-4 text-center" style={{ color: "#3a86ff" }}>
-        {videoData?.title
-          ? videoData.title.toUpperCase()
-          : "EPISODE INTRODUCTION"}
+        {series?.name ? series.name.toUpperCase() : "INTRODUCTION"}
       </h4>
 
       {/* Lesson Content */}
@@ -119,22 +127,20 @@ const ModuleIntroduction = () => {
         className="p-4 border-0 shadow-sm mx-auto"
         style={{ borderRadius: "15px", background: "#fff", maxWidth: "800px" }}
       >
-        {videoData?.description ? (
+        {series?.description ? (
           <div
             style={{ color: "#333", fontSize: "1.1rem", lineHeight: "1.7" }}
             dangerouslySetInnerHTML={{
-              __html: videoData.description.replace(/\n/g, "<br />"),
+              __html: series.description.replace(/\n/g, "<br />"),
             }}
           />
         ) : (
           <p style={{ color: "#666", fontSize: "1.1rem", lineHeight: "1.7" }}>
-            Welcome to this episode! Get ready to learn something amazing. This
-            introduction will prepare you for the video lesson ahead.
+            Welcome to this learning series! Get ready to explore amazing
+            content and enhance your knowledge. This introduction will prepare
+            you for the learning journey ahead.
           </p>
         )}
-
-        
-        
 
         {/* Voice Note */}
         <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
@@ -147,7 +153,7 @@ const ModuleIntroduction = () => {
             Listen to Introduction
           </Button>
 
-          {/* NEXT BUTTON ADDED HERE */}
+          {/* NEXT BUTTON */}
           <Button
             onClick={handleNext}
             className="d-flex align-items-center px-4"
@@ -159,7 +165,7 @@ const ModuleIntroduction = () => {
               color: "white",
             }}
           >
-            Continue to Quiz
+            Continue to Next
             <FaPlay className="ms-2" />
           </Button>
         </div>
@@ -168,7 +174,7 @@ const ModuleIntroduction = () => {
       {/* Progress Indicator */}
       <div className="text-center mt-4">
         <small className="text-muted">
-          Step 1 of 4: Introduction → Video → Practice → Quiz
+          Step 1 of 4: Introduction → Content → Practice → Quiz
         </small>
       </div>
     </Container>
