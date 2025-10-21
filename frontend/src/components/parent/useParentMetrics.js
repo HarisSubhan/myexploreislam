@@ -13,7 +13,6 @@ export const useParentMetrics = (range, parentId) => {
   const [combinedActivity, setCombinedActivity] = useState([]);
   const [children, setChildren] = useState([]);
   const [timeline, setTimeline] = useState([]);
-  const [subscription, setSubscription] = useState({});
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -85,9 +84,6 @@ export const useParentMetrics = (range, parentId) => {
         // Process recent activity data
         const timelineData = recentActivityResponse?.data?.data || [];
         setTimeline(timelineData);
-
-        // For subscription, set empty object since we don't have API
-        setSubscription({});
       } catch (err) {
         console.error("Error in fetchParentMetrics:", err);
         setError(
@@ -103,7 +99,6 @@ export const useParentMetrics = (range, parentId) => {
         setCombinedActivity([]);
         setChildren([]);
         setTimeline([]);
-        setSubscription({});
       } finally {
         setLoading(false);
       }
@@ -118,7 +113,6 @@ export const useParentMetrics = (range, parentId) => {
     combinedActivity,
     children,
     timeline,
-    subscription,
     error,
   };
 };
