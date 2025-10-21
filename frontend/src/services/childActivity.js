@@ -39,4 +39,29 @@ export const dashboardApi = {
       throw error;
     }
   },
+
+  // Log video watch activity
+  logVideoWatch: async (childId, videoId, videoTitle) => {
+    try {
+      const token = getToken();
+      const response = await axios.post(
+        `${baseUrl}/api/videos/watch`,
+        {
+          child_id: childId,
+          video_id: videoId,
+          video_title: videoTitle,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error logging video watch:", error);
+      throw error;
+    }
+  },
 };

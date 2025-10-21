@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import ModulePage1 from "../components/child/ModulePage1";
 import ModuleQuiz from "../components/child/ModuleQuiz";
 import ModuleCompletion from "../components/child/ModuleCompletion";
+import SeriesDetail from "../components/child/SeriesDetail";
 
 const ChildApp = lazy(() => import("../pages/ChildPortal/ChildApp"));
 const ChildDashboard = lazy(
@@ -26,7 +27,6 @@ const HistoryPageChild = lazy(
 const HelpPageChild = lazy(
   () => import("../pages/ChildPortal/pages/HelpPageChild")
 );
-const VideoSeries = lazy(() => import("../components/child/VideoSeries"));
 const VideoWatch = lazy(() => import("../components/child/VideoWatch"));
 const ModuleIntroduction = lazy(
   () => import("../components/child/ModuleIntroduction")
@@ -43,38 +43,46 @@ const ChildRoutes = () => {
     >
       <Routes>
         <Route path="/" element={<ChildApp />}>
-          {/* DASHBOARD & PROFILE */}
           <Route index element={<ChildDashboard />} />
           <Route path="profile" element={<ChildProfilePage />} />
+          <Route path="browse/:type" element={<CartoonModules />} />
+          <Route path="series/:seriesSlug" element={<SeriesDetail />} />
+          <Route path="browse/singles/:videoSlug" element={<VideoWatch />} />
+          <Route
+            path="series/:seriesSlug/video/:videoSlug"
+            element={<VideoWatch />}
+          />
 
-          {/* SINGLE MODEL (Standalone videos) */}
+          <Route path="module">
+            <Route index element={<VideoModules />} />
+
+            {/* SERIES MODULE FLOW */}
+            <Route path="series/:seriesId">
+              <Route index element={<ModuleIntroduction />} />
+              <Route path="introduction" element={<ModuleIntroduction />} />
+              <Route path="page1" element={<ModulePage1 />} />
+              <Route path="quiz" element={<ModuleQuiz />} />
+              <Route path="completion" element={<ModuleCompletion />} />
+            </Route>
+
+            {/* ✅ ADD SINGLE VIDEO MODULE FLOW */}
+            <Route path="single/:videoId">
+              <Route index element={<ModuleIntroduction />} />
+              <Route path="introduction" element={<ModuleIntroduction />} />
+              <Route path="page1" element={<ModulePage1 />} />
+              <Route path="quiz" element={<ModuleQuiz />} />
+              <Route path="completion" element={<ModuleCompletion />} />
+            </Route>
+          </Route>
+
+          {/* BACKWARD COMPATIBLE ROUTES */}
           <Route path="singles" element={<CartoonModules />} />
           <Route path="singles/:videoId" element={<VideoWatch />} />
-
-          {/* SERIES MODEL (Structured learning path) */}
-          <Route path="series" element={<VideoModules />} />
-          <Route path="series/:seriesId" element={<VideoSeries />} />
-          <Route
-            path="series/:seriesId/introduction/:videoId"
-            element={<ModuleIntroduction />}
-          />
-          <Route
-            path="series/:seriesId/page1/:videoId"
-            element={<ModulePage1 />}
-          />
-          <Route
-            path="series/:seriesId/quiz/:videoId"
-            element={<ModuleQuiz />}
-          />
-          <Route
-            path="series/:seriesId/completion/:videoId"
-            element={<ModuleCompletion />}
-          />
 
           {/* OTHER PAGES */}
           <Route path="notifications" element={<NotificationPageChild />} />
           <Route path="history" element={<HistoryPageChild />} />
-          <Route path="help-Support" element={<HelpPageChild />} />
+          <Route path="help-support" element={<HelpPageChild />} />
         </Route>
       </Routes>
     </Suspense>
