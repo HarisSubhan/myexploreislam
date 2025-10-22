@@ -46,11 +46,6 @@ const NAVIGATION = [
     icon: <ChangePasswordIcon />,
   },
   {
-    path: "/parent/learning-reports",
-    title: "Learning Reports",
-    icon: <FaDatabase />,
-  },
-  {
     path: "/parent/Subscriptions-Billing",
     title: "Subscriptions & Billing",
     icon: <ArticleIcon />,

@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import Children from "../pages/ParentPortal/pages/Children";
-import LearningReports from "../pages/ParentPortal/pages/LearningReports";
+// import LearningReports from "../pages/ParentPortal/pages/LearningReports";
 import ParentalControls from "../pages/ParentPortal/pages/ParentalControls";
 import ParentNotifications from "../pages/ParentPortal/pages/ParentNotifications";
 import ParentSupports from "../pages/ParentPortal/pages/ParentSupports";
@@ -26,7 +26,7 @@ const ParentRoutes = () => {
           <Route index element={<ParentDashboard />} />
           <Route path="children" element={<Children />} />
           <Route path="requests-child" element={<RequestChild />} />
-          <Route path="learning-reports" element={<LearningReports />} />
+          {/* <Route path="learning-reports" element={<LearningReports />} /> */}
           <Route path="subscriptions-billing" element={<Subscription />} />
           <Route path="parental-controls" element={<ParentalControls />} />
           <Route path="notifications" element={<ParentNotifications />} />
