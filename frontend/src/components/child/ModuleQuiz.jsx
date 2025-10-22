@@ -9,11 +9,14 @@ import {
 } from "react-bootstrap";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { getQuizBySeriesVideoApi, submitQuizApi } from "../../services/quizApi";
+import {
+  getQuizBySeriesVideoApi,
+  submitQuizApi,
+} from "./../../services/quizApi";
 
 const ModuleQuiz = () => {
   const navigate = useNavigate();
-  const { seriesSlug } = useParams();
+  const { seriesSlug, videoId } = useParams(); // ✅ Get videoId from URL
   const location = useLocation();
 
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -27,69 +30,75 @@ const ModuleQuiz = () => {
   const [quizId, setQuizId] = useState(null);
   const [childId] = useState(1);
 
-  // Get video data from location state
-  const videoData = location.state?.videoData;
+  // ✅ Get video data from multiple sources (priority order)
+  const videoData = location.state?.currentVideo || location.state?.videoData;
   const seriesData = location.state?.seriesData;
-  const videoId = location.state?.videoId;
 
-  console.log("🔍 ModuleQuiz - Location State:", location.state);
-  console.log("🔍 ModuleQuiz - Video ID:", videoId);
-  console.log("🔍 ModuleQuiz - Series Slug:", seriesSlug);
+  // ✅ Use videoId from URL as primary source, fallback to state
+  const finalVideoId = videoId || location.state?.videoId;
+
+  console.log("🔍 ModuleQuiz - Debug Info:");
+  console.log("📍 URL Parameters:", { seriesSlug, videoId });
+  console.log("📍 Location State:", location.state);
+  console.log("📍 Final Video ID:", finalVideoId);
+  console.log("📍 Video Data:", videoData);
 
   useEffect(() => {
-    if (videoId) {
+    if (finalVideoId) {
       fetchQuizData();
     } else {
       setError("No video selected for quiz");
       setLoading(false);
     }
-  }, [videoId]);
+  }, [finalVideoId]);
 
   const fetchQuizData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      console.log("🎯 Fetching quiz for videoId:", videoId);
+      console.log("🎯 Fetching quiz for videoId:", finalVideoId);
 
       let quizData;
 
       // Try actual API first
       try {
-        quizData = await getQuizBySeriesVideoApi(videoId);
+        // If you have seriesData, use both seriesId and videoId
+        if (seriesData?.id) {
+          quizData = await getQuizBySeriesVideoApi(seriesData.id, finalVideoId);
+        } else {
+          // Fallback: try with videoId only
+          quizData = await getQuizBySeriesVideoApi(finalVideoId);
+        }
         console.log("🎯 Quiz API Response:", quizData);
       } catch (apiError) {
         console.warn("⚠️ API failed, using mock data");
         console.error("API Error:", apiError);
         // Fallback to mock data
-        quizData = getMockQuizData();
+        quizData = getMockQuizData(finalVideoId);
       }
 
-      if (!quizData) {
-        setError("No quiz data available");
-        return;
+      // Process quiz data
+      if (quizData && quizData.questions && quizData.questions.length > 0) {
+        const processedQuestions = quizData.questions.map((q) => ({
+          id: q.id,
+          question: q.question,
+          options: [q.option_a, q.option_b, q.option_c, q.option_d].filter(
+            (opt) => opt !== null && opt !== undefined
+          ),
+          correctAnswer: getCorrectAnswerIndex(q.correct_option),
+        }));
+
+        setQuestions(processedQuestions);
+        setQuizId(quizData.id || 1);
+        console.log(
+          "✅ Quiz loaded successfully:",
+          processedQuestions.length,
+          "questions"
+        );
+      } else {
+        setError("No quiz questions available for this video");
       }
-
-      if (!quizData.questions || quizData.questions.length === 0) {
-        setError("No questions available for this lesson.");
-        return;
-      }
-
-      setQuizId(quizData.id || 1);
-
-      // Transform API data to match our component structure
-      const transformedQuestions = quizData.questions.map((q, index) => ({
-        id: q.id || index + 1,
-        question: q.question,
-        options: [q.option_a, q.option_b, q.option_c, q.option_d].filter(
-          (opt) => opt !== null && opt !== ""
-        ),
-        correctAnswer: getCorrectAnswerIndex(q.correct_option),
-        correctOption: q.correct_option,
-      }));
-
-      console.log("🎯 Transformed Questions:", transformedQuestions);
-      setQuestions(transformedQuestions);
     } catch (err) {
       console.error("❌ Error fetching quiz:", err);
       setError("Failed to load quiz. Please try again.");
@@ -98,49 +107,81 @@ const ModuleQuiz = () => {
     }
   };
 
-  // Mock data for testing
-  const getMockQuizData = () => {
-    return {
-      id: 1,
-      questions: [
-        {
-          id: 1,
-          question: "What is the capital of France?",
-          option_a: "London",
-          option_b: "Paris",
-          option_c: "Berlin",
-          option_d: "Madrid",
-          correct_option: "b",
-        },
-        {
-          id: 2,
-          question: "Which planet is known as the Red Planet?",
-          option_a: "Earth",
-          option_b: "Mars",
-          option_c: "Jupiter",
-          option_d: "Saturn",
-          correct_option: "b",
-        },
-        {
-          id: 3,
-          question: "What is 2 + 2?",
-          option_a: "3",
-          option_b: "4",
-          option_c: "5",
-          option_d: "6",
-          correct_option: "b",
-        },
-        {
-          id: 4,
-          question: "Which animal is known as the King of the Jungle?",
-          option_a: "Elephant",
-          option_b: "Lion",
-          option_c: "Tiger",
-          option_d: "Giraffe",
-          correct_option: "b",
-        },
-      ],
+  // Mock data for testing - make it video-specific
+  const getMockQuizData = (videoId) => {
+    const mockQuizzes = {
+      14: {
+        // ahmed Ep-1
+        id: 1,
+        questions: [
+          {
+            id: 1,
+            question: "What was the main topic in Ahmed Episode 1?",
+            option_a: "Introduction to series",
+            option_b: "Basic concepts",
+            option_c: "Advanced techniques",
+            option_d: "Practical examples",
+            correct_option: "a",
+          },
+          {
+            id: 2,
+            question: "Which concept was introduced first?",
+            option_a: "Advanced topics",
+            option_b: "Basic fundamentals",
+            option_c: "Complex theories",
+            option_d: "Practical applications",
+            correct_option: "b",
+          },
+        ],
+      },
+      15: {
+        // Ahmed Ep-2
+        id: 2,
+        questions: [
+          {
+            id: 1,
+            question: "What did you learn in Episode 2?",
+            option_a: "Basic introduction",
+            option_b: "Intermediate concepts",
+            option_c: "Advanced techniques",
+            option_d: "All of the above",
+            correct_option: "b",
+          },
+        ],
+      },
+      16: {
+        // Ahmed Ep-3
+        id: 3,
+        questions: [
+          {
+            id: 1,
+            question: "Episode 3 focused on which area?",
+            option_a: "Theoretical knowledge",
+            option_b: "Practical implementation",
+            option_c: "Basic concepts",
+            option_d: "Introduction",
+            correct_option: "b",
+          },
+        ],
+      },
+      18: {
+        // ahmed 4
+        id: 4,
+        questions: [
+          {
+            id: 1,
+            question: "What is the key takeaway from Episode 4?",
+            option_a: "Basic principles",
+            option_b: "Advanced applications",
+            option_c: "Intermediate skills",
+            option_d: "Fundamental concepts",
+            correct_option: "b",
+          },
+        ],
+      },
     };
+
+    return mockQuizzes[videoId] || mockQuizzes[14]; // Default to first video's quiz
   };
 
   const getCorrectAnswerIndex = (correctOption) => {
@@ -176,7 +217,7 @@ const ModuleQuiz = () => {
         score: finalScore,
         answers: answers,
         series_id: seriesData?.id,
-        video_id: videoId,
+        video_id: finalVideoId,
       });
       console.log("✅ Quiz results submitted successfully");
     } catch (err) {
@@ -216,14 +257,16 @@ const ModuleQuiz = () => {
 
       setTimeout(async () => {
         await submitQuizResults(finalScore, allAnswers);
-        navigate(`/child/module/${seriesSlug}/completion`, {
+
+        // ✅ Navigate to completion with videoId in URL
+        navigate(`/child/module/${seriesSlug}/completion/${finalVideoId}`, {
           state: {
             score: finalScore,
             totalQuestions: questions.length,
             quizId: quizId,
             seriesData: seriesData,
             videoData: videoData,
-            videoId: videoId,
+            videoId: finalVideoId,
           },
         });
       }, 2000);
@@ -236,11 +279,12 @@ const ModuleQuiz = () => {
       setSelectedAnswer(null);
       setShowFeedback(false);
     } else {
-      navigate(`/child/module/${seriesSlug}/page1`, {
+      // ✅ Go back to ModulePage1 with videoId in URL
+      navigate(`/child/module/${seriesSlug}/page1/${finalVideoId}`, {
         state: {
-          videoData: videoData,
+          currentVideo: videoData,
           seriesData: seriesData,
-          videoId: videoId,
+          videoId: finalVideoId,
         },
       });
     }
@@ -348,8 +392,9 @@ const ModuleQuiz = () => {
       {/* Debug Info - Remove in production */}
       <Alert variant="info" className="text-center mb-3">
         <small>
-          <strong>Debug Info:</strong> Video: {videoData?.title} | Questions:{" "}
-          {questions.length} | Video ID: {videoId}
+          <strong>Debug Info:</strong> Video ID: {finalVideoId} | Questions:{" "}
+          {questions.length} | Series: {seriesSlug} | Source:{" "}
+          {videoId ? "URL" : location.state?.videoId ? "State" : "Unknown"}
         </small>
       </Alert>
 

@@ -54,18 +54,23 @@ const ChildRoutes = () => {
             element={<VideoWatch />}
           />
 
+          {/* ✅ FIXED: MODULE ROUTES */}
           <Route path="module">
             <Route index element={<VideoModules />} />
 
+            {/* ✅ SERIES MODULE FLOW */}
             <Route path=":seriesSlug" element={<SeriesQuizDetail />} />
             <Route
               path=":seriesSlug/introduction"
               element={<ModuleIntroduction />}
             />
-            <Route path=":seriesSlug/page1" element={<ModulePage1 />} />
-            <Route path=":seriesSlug/quiz" element={<ModuleQuiz />} />
             <Route
-              path=":seriesSlug/completion"
+              path=":seriesSlug/page1/:videoId?"
+              element={<ModulePage1 />}
+            />
+            <Route path=":seriesSlug/quiz/:videoId?" element={<ModuleQuiz />} />
+            <Route
+              path=":seriesSlug/completion/:videoId?"
               element={<ModuleCompletion />}
             />
 
