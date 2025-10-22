@@ -1,79 +1,81 @@
+// src/pages/BlogDetail.jsx
 import React from "react";
-import { Container, Card, Button } from "react-bootstrap";
+import { Container, Card, Button, Spinner, Alert } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
+import { useBlog, useBlogs } from "../../hooks/useBlogs";
+
 
 const BlogDetail = () => {
   const { titleSlug } = useParams();
   const navigate = useNavigate();
 
-  // Sample blog data - in a real app, you'd fetch this based on the ID
-  const blogs = [
-    {
-      id: "1",
-      title: "5 Fun Ways Kids Learn Faster",
-      image:
-        "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1697583910i/195096793.jpg",
-      content: `
-        <h3>Discover engaging learning techniques for children</h3>
-        <p>Research shows that children learn best when they're having fun. Here are 5 proven methods:</p>
-        <ol>
-          <li><strong>Story-based learning:</strong> Children retain information better when it's wrapped in a narrative.</li>
-          <li><strong>Colorful visuals:</strong> Using bright colors stimulates memory and engagement.</li>
-          <li><strong>Interactive games:</strong> Hands-on activities reinforce concepts through play.</li>
-          <li><strong>Musical mnemonics:</strong> Setting information to music improves recall.</li>
-          <li><strong>Movement breaks:</strong> Physical activity boosts cognitive function.</li>
-        </ol>
-        <p>Implementing these techniques can make learning more effective and enjoyable for children of all ages.</p>
-      `,
-    },
-    {
-      id: "2",
-      title: "Creative Learning Ideas",
-      image:
-        "https://m.media-amazon.com/images/I/61rtOGLC0EL._AC_UF1000,1000_QL80_.jpg",
-      content: `
-          <h3>Discover engaging learning techniques for children</h3>
-          <p>Research shows that children learn best when they're having fun. Here are 5 proven methods:</p>
-          <ol>
-            <li><strong>Story-based learning:</strong> Children retain information better when it's wrapped in a narrative.</li>
-            <li><strong>Colorful visuals:</strong> Using bright colors stimulates memory and engagement.</li>
-            <li><strong>Interactive games:</strong> Hands-on activities reinforce concepts through play.</li>
-            <li><strong>Musical mnemonics:</strong> Setting information to music improves recall.</li>
-            <li><strong>Movement breaks:</strong> Physical activity boosts cognitive function.</li>
-          </ol>
-          <p>Implementing these techniques can make learning more effective and enjoyable for children of all ages.</p>
-        `,
-    },
-    {
-      id: "3",
-      title: "Kids and Technology",
-      image:
-        "https://images.unsplash.com/photo-1607746882042-944635dfe10e?fit=crop&w=800&q=80",
-      content: `
-          <h3>Discover engaging learning techniques for children</h3>
-          <p>Research shows that children learn best when they're having fun. Here are 5 proven methods:</p>
-          <ol>
-            <li><strong>Story-based learning:</strong> Children retain information better when it's wrapped in a narrative.</li>
-            <li><strong>Colorful visuals:</strong> Using bright colors stimulates memory and engagement.</li>
-            <li><strong>Interactive games:</strong> Hands-on activities reinforce concepts through play.</li>
-            <li><strong>Musical mnemonics:</strong> Setting information to music improves recall.</li>
-            <li><strong>Movement breaks:</strong> Physical activity boosts cognitive function.</li>
-          </ol>
-          <p>Implementing these techniques can make learning more effective and enjoyable for children of all ages.</p>
-        `,
-    },
-  ];
+  // Since we don't have direct ID from slug, we need to get all blogs and find the matching one
+  const {
+    blogs: allBlogs,
+    loading: blogsLoading,
+    error: blogsError,
+  } = useBlogs();
 
-  const blog = blogs.find(
-    (blog) =>
-      blog.slug === titleSlug ||
-      blog.title
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-") === titleSlug
-  );
+  // Find the blog by matching the slugified title
+  const blog = allBlogs.find((blog) => {
+    const blogSlug = blog.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-");
+    return blogSlug === titleSlug;
+  });
 
-  if (!blog) {
+  // If we found a blog, get its full details
+  const {
+    blog: fullBlog,
+    loading: blogLoading,
+    error: blogError,
+  } = useBlog(blog?.id);
+
+  const displayBlog = fullBlog || blog;
+
+  // Default image
+  const getImageUrl = (bannerImage) => {
+    return (
+      bannerImage ||
+      "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&auto=format&fit=crop&q=60"
+    );
+  };
+
+  // Get content from description field
+  const getContent = (blog) => {
+    if (blog.description) return blog.description;
+
+    return `
+      <p>This blog post explores the topic of "${blog.title}" in detail.</p>
+      <p>Our team has put together comprehensive insights and analysis on this subject.</p>
+      <p>Stay tuned for the full content coming soon!</p>
+    `;
+  };
+
+  if (blogsLoading || blogLoading) {
+    return (
+      <Container className="py-5 text-center">
+        <Spinner animation="border" style={{ color: "#F1066C" }} />
+        <p className="mt-2">Loading blog...</p>
+      </Container>
+    );
+  }
+
+  if (blogsError || blogError) {
+    return (
+      <Container className="py-5">
+        <Alert variant="danger">
+          Error loading blog: {blogsError || blogError}
+        </Alert>
+        <Button variant="primary" onClick={() => navigate("/blog")}>
+          Back to Blog
+        </Button>
+      </Container>
+    );
+  }
+
+  if (!displayBlog) {
     return (
       <Container className="py-5 text-center">
         <h2>Blog post not found</h2>
@@ -97,17 +99,25 @@ const BlogDetail = () => {
       <Card className="shadow-sm border-0">
         <Card.Img
           variant="top"
-          src={blog.image}
-          alt={blog.title}
+          src={getImageUrl(displayBlog.banner_image)}
+          alt={displayBlog.title}
           style={{ height: "400px", objectFit: "cover" }}
         />
         <Card.Body>
           <Card.Title style={{ color: "#F1066C", fontSize: "2rem" }}>
-            {blog.title}
+            {displayBlog.title}
           </Card.Title>
+
+          <div className="mb-4">
+            <small className="text-muted">
+              Published:{" "}
+              {new Date(displayBlog.publish_date).toLocaleDateString()}
+            </small>
+          </div>
+
           <div
             className="blog-content"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
+            dangerouslySetInnerHTML={{ __html: getContent(displayBlog) }}
           />
         </Card.Body>
       </Card>
