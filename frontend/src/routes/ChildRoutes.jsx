@@ -4,6 +4,7 @@ import ModulePage1 from "../components/child/ModulePage1";
 import ModuleQuiz from "../components/child/ModuleQuiz";
 import ModuleCompletion from "../components/child/ModuleCompletion";
 import SeriesDetail from "../components/child/SeriesDetail";
+import SeriesQuizDetail from "../components/child/SeriesQuizDetail";
 
 const ChildApp = lazy(() => import("../pages/ChildPortal/ChildApp"));
 const ChildDashboard = lazy(
@@ -56,23 +57,29 @@ const ChildRoutes = () => {
           <Route path="module">
             <Route index element={<VideoModules />} />
 
-            {/* SERIES MODULE FLOW */}
-            <Route path="series/:seriesId">
-              <Route index element={<ModuleIntroduction />} />
-              <Route path="introduction" element={<ModuleIntroduction />} />
-              <Route path="page1" element={<ModulePage1 />} />
-              <Route path="quiz" element={<ModuleQuiz />} />
-              <Route path="completion" element={<ModuleCompletion />} />
-            </Route>
+            <Route path=":seriesSlug" element={<SeriesQuizDetail />} />
+            <Route
+              path=":seriesSlug/introduction"
+              element={<ModuleIntroduction />}
+            />
+            <Route path=":seriesSlug/page1" element={<ModulePage1 />} />
+            <Route path=":seriesSlug/quiz" element={<ModuleQuiz />} />
+            <Route
+              path=":seriesSlug/completion"
+              element={<ModuleCompletion />}
+            />
 
-            {/* ✅ ADD SINGLE VIDEO MODULE FLOW */}
-            <Route path="single/:videoId">
-              <Route index element={<ModuleIntroduction />} />
-              <Route path="introduction" element={<ModuleIntroduction />} />
-              <Route path="page1" element={<ModulePage1 />} />
-              <Route path="quiz" element={<ModuleQuiz />} />
-              <Route path="completion" element={<ModuleCompletion />} />
-            </Route>
+            {/* ✅ SINGLE VIDEO MODULE FLOW */}
+            <Route
+              path="single/:videoId/introduction"
+              element={<ModuleIntroduction />}
+            />
+            <Route path="single/:videoId/page1" element={<ModulePage1 />} />
+            <Route path="single/:videoId/quiz" element={<ModuleQuiz />} />
+            <Route
+              path="single/:videoId/completion"
+              element={<ModuleCompletion />}
+            />
           </Route>
 
           {/* BACKWARD COMPATIBLE ROUTES */}

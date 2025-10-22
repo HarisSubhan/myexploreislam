@@ -7,14 +7,15 @@ import {
   Button,
   Spinner,
 } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { getQuizBySeriesVideoApi, submitQuizApi } from "../../services/quizApi";
 
-
 const ModuleQuiz = () => {
   const navigate = useNavigate();
-  const { seriesId, videoId } = useParams();
+  const { seriesSlug } = useParams();
+  const location = useLocation();
+
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -24,26 +25,57 @@ const ModuleQuiz = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quizId, setQuizId] = useState(null);
-  const [childId] = useState(1); // In a real app, this would come from auth context
+  const [childId] = useState(1);
+
+  // Get video data from location state
+  const videoData = location.state?.videoData;
+  const seriesData = location.state?.seriesData;
+  const videoId = location.state?.videoId;
+
+  console.log("🔍 ModuleQuiz - Location State:", location.state);
+  console.log("🔍 ModuleQuiz - Video ID:", videoId);
+  console.log("🔍 ModuleQuiz - Series Slug:", seriesSlug);
 
   useEffect(() => {
-    fetchQuizData();
-  }, [seriesId, videoId]);
+    if (videoId) {
+      fetchQuizData();
+    } else {
+      setError("No video selected for quiz");
+      setLoading(false);
+    }
+  }, [videoId]);
 
   const fetchQuizData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch quiz based on seriesId and videoId
-      const quizData = await getQuizBySeriesVideoApi(seriesId, videoId);
+      console.log("🎯 Fetching quiz for videoId:", videoId);
 
-      if (!quizData || !quizData.questions || quizData.questions.length === 0) {
-        setError("No quiz available for this lesson.");
+      let quizData;
+
+      // Try actual API first
+      try {
+        quizData = await getQuizBySeriesVideoApi(videoId);
+        console.log("🎯 Quiz API Response:", quizData);
+      } catch (apiError) {
+        console.warn("⚠️ API failed, using mock data");
+        console.error("API Error:", apiError);
+        // Fallback to mock data
+        quizData = getMockQuizData();
+      }
+
+      if (!quizData) {
+        setError("No quiz data available");
         return;
       }
 
-      setQuizId(quizData.id);
+      if (!quizData.questions || quizData.questions.length === 0) {
+        setError("No questions available for this lesson.");
+        return;
+      }
+
+      setQuizId(quizData.id || 1);
 
       // Transform API data to match our component structure
       const transformedQuestions = quizData.questions.map((q, index) => ({
@@ -56,13 +88,59 @@ const ModuleQuiz = () => {
         correctOption: q.correct_option,
       }));
 
+      console.log("🎯 Transformed Questions:", transformedQuestions);
       setQuestions(transformedQuestions);
     } catch (err) {
+      console.error("❌ Error fetching quiz:", err);
       setError("Failed to load quiz. Please try again.");
-      console.error("Error fetching quiz:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Mock data for testing
+  const getMockQuizData = () => {
+    return {
+      id: 1,
+      questions: [
+        {
+          id: 1,
+          question: "What is the capital of France?",
+          option_a: "London",
+          option_b: "Paris",
+          option_c: "Berlin",
+          option_d: "Madrid",
+          correct_option: "b",
+        },
+        {
+          id: 2,
+          question: "Which planet is known as the Red Planet?",
+          option_a: "Earth",
+          option_b: "Mars",
+          option_c: "Jupiter",
+          option_d: "Saturn",
+          correct_option: "b",
+        },
+        {
+          id: 3,
+          question: "What is 2 + 2?",
+          option_a: "3",
+          option_b: "4",
+          option_c: "5",
+          option_d: "6",
+          correct_option: "b",
+        },
+        {
+          id: 4,
+          question: "Which animal is known as the King of the Jungle?",
+          option_a: "Elephant",
+          option_b: "Lion",
+          option_c: "Tiger",
+          option_d: "Giraffe",
+          correct_option: "b",
+        },
+      ],
+    };
   };
 
   const getCorrectAnswerIndex = (correctOption) => {
@@ -81,7 +159,7 @@ const ModuleQuiz = () => {
   };
 
   const getOptionLetter = (index) => {
-    return String.fromCharCode(97 + index); // a, b, c, d
+    return String.fromCharCode(97 + index);
   };
 
   const handleAnswerSelect = (index) => {
@@ -97,12 +175,12 @@ const ModuleQuiz = () => {
         child_id: childId,
         score: finalScore,
         answers: answers,
-        series_id: seriesId,
+        series_id: seriesData?.id,
         video_id: videoId,
       });
+      console.log("✅ Quiz results submitted successfully");
     } catch (err) {
-      console.error("Error submitting quiz results:", err);
-      // Continue navigation even if submission fails
+      console.error("❌ Error submitting quiz results:", err);
     }
   };
 
@@ -138,12 +216,13 @@ const ModuleQuiz = () => {
 
       setTimeout(async () => {
         await submitQuizResults(finalScore, allAnswers);
-        navigate(`/child/series/${seriesId}/completion/${videoId}`, {
+        navigate(`/child/module/${seriesSlug}/completion`, {
           state: {
             score: finalScore,
             totalQuestions: questions.length,
             quizId: quizId,
-            seriesId: seriesId,
+            seriesData: seriesData,
+            videoData: videoData,
             videoId: videoId,
           },
         });
@@ -157,7 +236,13 @@ const ModuleQuiz = () => {
       setSelectedAnswer(null);
       setShowFeedback(false);
     } else {
-      navigate(`/child/series/${seriesId}/page1/${videoId}`);
+      navigate(`/child/module/${seriesSlug}/page1`, {
+        state: {
+          videoData: videoData,
+          seriesData: seriesData,
+          videoId: videoId,
+        },
+      });
     }
   };
 
@@ -188,7 +273,8 @@ const ModuleQuiz = () => {
         }}
       >
         <Alert variant="danger" className="text-center">
-          {error}
+          <h5>Quiz Loading Error</h5>
+          <p>{error}</p>
           <div className="mt-3">
             <Button variant="primary" onClick={fetchQuizData}>
               Try Again
@@ -197,7 +283,13 @@ const ModuleQuiz = () => {
               variant="outline-primary"
               className="ms-2"
               onClick={() =>
-                navigate(`/child/series/${seriesId}/page1/${videoId}`)
+                navigate(`/child/module/${seriesSlug}/page1`, {
+                  state: {
+                    videoData: videoData,
+                    seriesData: seriesData,
+                    videoId: videoId,
+                  },
+                })
               }
             >
               Back to Lesson
@@ -219,12 +311,19 @@ const ModuleQuiz = () => {
         }}
       >
         <Alert variant="warning" className="text-center">
-          No questions available for this quiz.
+          <h5>No Quiz Available</h5>
+          <p>No questions available for this lesson.</p>
           <div className="mt-3">
             <Button
               variant="primary"
               onClick={() =>
-                navigate(`/child/series/${seriesId}/page1/${videoId}`)
+                navigate(`/child/module/${seriesSlug}/page1`, {
+                  state: {
+                    videoData: videoData,
+                    seriesData: seriesData,
+                    videoId: videoId,
+                  },
+                })
               }
             >
               Back to Lesson
@@ -246,11 +345,24 @@ const ModuleQuiz = () => {
         minHeight: "100vh",
       }}
     >
+      {/* Debug Info - Remove in production */}
+      <Alert variant="info" className="text-center mb-3">
+        <small>
+          <strong>Debug Info:</strong> Video: {videoData?.title} | Questions:{" "}
+          {questions.length} | Video ID: {videoId}
+        </small>
+      </Alert>
+
       <div className="text-center mb-4">
         <h4 className="fw-bold" style={{ color: "#3a86ff" }}>
           KNOWLEDGE CHECK
         </h4>
         <p className="text-muted">Test your understanding of the lesson</p>
+        {videoData && (
+          <p className="text-muted small">
+            Video: <strong>{videoData.title}</strong>
+          </p>
+        )}
       </div>
 
       <Card
@@ -278,7 +390,7 @@ const ModuleQuiz = () => {
         {/* Score indicator */}
         <div className="text-center mb-3">
           <small className="text-muted">
-            Score: {score} / {currentQuestion}
+            Current Score: {score} / {currentQuestion}
           </small>
         </div>
 
@@ -393,7 +505,7 @@ const ModuleQuiz = () => {
             onClick={handleSubmit}
             disabled={selectedAnswer === null || showFeedback}
             variant={selectedAnswer === null ? "outline-secondary" : "primary"}
-            className="d-flex align-items-center"
+            className="d-flex align-items-center px-4"
           >
             {currentQuestion < questions.length - 1
               ? "Next Question"
