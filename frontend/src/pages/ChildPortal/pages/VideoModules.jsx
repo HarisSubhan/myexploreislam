@@ -114,33 +114,30 @@ const VideoModules = () => {
     navigate("/child");
   };
 
-  // Handle module click - Different behavior for series vs single
+
   const handleModuleClick = (item) => {
     if (item.type === "series") {
-      // ✅ Series ke liye SeriesDetail page par jayein
-      console.log("🎬 Navigating to SeriesDetail:", item.slug);
-      navigate(`/child/series/${item.slug}`);
+      
+      console.log("🎬 Navigating to SeriesQuizDetail:", item.slug);
+      navigate(`/child/module/${item.slug}`);
     } else {
-      // ✅ Single video ke liye ModuleIntroduction par jayein
+      
       console.log("🎥 Navigating to ModuleIntroduction");
       navigate(`/child/module/single/${item.id}/introduction`);
     }
   };
-
-  // Handle view details - Navigate to content browsing (SIRF EK BAAR)
+  
   const handleViewDetails = (item, e) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation(); 
 
     if (item.type === "series") {
-      // Navigate to series detail page
+      
       navigate(`/child/series/${item.slug}`);
     } else {
-      // Navigate to single video player
+     
       navigate(`/child/browse/singles/${item.slug}`);
     }
   };
-
-
 
   const clearCache = () => {
     window.location.reload();
