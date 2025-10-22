@@ -114,27 +114,28 @@ const VideoModules = () => {
     navigate("/child");
   };
 
-
+  // In VideoModules component - Update handleModuleClick
   const handleModuleClick = (item) => {
     if (item.type === "series") {
-      
-      console.log("🎬 Navigating to SeriesQuizDetail:", item.slug);
+      console.log("🎬 Navigating to Series Introduction:", item.slug);
       navigate(`/child/module/${item.slug}`);
     } else {
-      
-      console.log("🎥 Navigating to ModuleIntroduction");
-      navigate(`/child/module/single/${item.id}/introduction`);
+      console.log("🎥 Navigating to ModuleIntroduction for single video");
+      navigate(`/child/module/single/${item.id}/introduction`, {
+        state: {
+          currentVideo: item,
+          videoId: item.id,
+        },
+      });
     }
   };
-  
+
   const handleViewDetails = (item, e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
 
     if (item.type === "series") {
-      
       navigate(`/child/series/${item.slug}`);
     } else {
-     
       navigate(`/child/browse/singles/${item.slug}`);
     }
   };

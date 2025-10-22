@@ -147,30 +147,40 @@ const SeriesQuizDetail = () => {
     fetchSeriesData();
   }, [seriesSlug]);
 
-  // Handle video click - Navigate to ModuleIntroduction with video data
+  // In SeriesQuizDetail component - Fix handleVideoClick for specific episodes
   const handleVideoClick = (video) => {
-    console.log("🎬 Starting module for video:", video.title);
+    console.log("🎬 Starting specific episode:", video.title);
 
+    // ✅ For specific episodes, go DIRECTLY to the video page
+    // navigate(`/child/module/${seriesSlug}/page1/${video.id}`, {
     navigate(`/child/module/${seriesSlug}/introduction`, {
       state: {
-        videoData: video,
-        seriesData: series,
         currentVideo: video,
+        seriesData: series,
         videoId: video.id,
+        seriesSlug: seriesSlug,
       },
+      replace: false,
     });
   };
 
-  // Handle start series - Navigate to ModuleIntroduction without specific video
+  // Keep handleStartSeries for introduction
   const handleStartSeries = () => {
-    console.log("🎬 Starting series:", series.name);
+    console.log("🎬 Starting series from beginning:", series.name);
 
-    navigate(`/child/module/${seriesSlug}/introduction`, {
-      state: {
-        seriesData: series,
-        videoId: videos.length > 0 ? videos[0].id : null,
-      },
-    });
+    if (videos.length > 0) {
+      const firstVideo = videos[0];
+      navigate(`/child/module/${seriesSlug}/introduction`, {
+        state: {
+          currentVideo: firstVideo,
+          seriesData: series,
+          videoId: firstVideo.id,
+          seriesSlug: seriesSlug,
+        },
+      });
+    } else {
+      console.error("❌ No videos available in this series");
+    }
   };
 
   const handleBackToBrowse = () => {
