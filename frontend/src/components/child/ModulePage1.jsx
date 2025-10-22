@@ -7,8 +7,9 @@ import {
   FaPlay,
   FaVideo,
   FaPause,
+  FaHome,
 } from "react-icons/fa";
-import {  getAllVideosApi } from "../../services/videoApi";
+import { getAllVideosApi, getVideoByIdApi } from "../../services/videoApi";
 import { getSeriesApi } from "../../services/seriesApi";
 import { createSlug } from "../../utils/slugify";
 import { baseUrl } from "../../services/config";
@@ -27,17 +28,61 @@ const ModulePage1 = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isSingleVideo, setIsSingleVideo] = useState(false);
+
+  // Get data from location state
+  const videoDataFromState = location.state?.currentVideo;
+  const isSingleVideoFromState = location.state?.isSingleVideo;
 
   useEffect(() => {
     const initializeData = async () => {
       try {
         setLoading(true);
-        console.log("📍 ModulePage1 - Full Location:", location);
-        console.log("📍 ModulePage1 - Location State:", location.state);
-        console.log("📍 ModulePage1 - Series Slug:", seriesSlug);
-        console.log("📍 ModulePage1 - Video ID from URL:", videoId); // Add this
 
-        // Step 1: Get series data
+        // ✅ CHECK IF SINGLE VIDEO FLOW
+        const isSingleVideoFlow =
+          isSingleVideoFromState ||
+          (location.pathname.includes("/module/single/") && videoId);
+
+        if (isSingleVideoFlow) {
+          console.log("🎥 SINGLE VIDEO FLOW DETECTED in ModulePage1");
+          setIsSingleVideo(true);
+
+          let videoData = null;
+
+          // Try to get video from location state first
+          if (videoDataFromState) {
+            videoData = videoDataFromState;
+            console.log("✅ Using video from location state:", videoData.title);
+          }
+          // If not in state, fetch from API
+          else if (videoId) {
+            console.log("🔄 Fetching video from API with ID:", videoId);
+            videoData = await getVideoByIdApi(videoId);
+            if (videoData) {
+              console.log("✅ Single video loaded from API:", videoData.title);
+            }
+          }
+
+          if (videoData) {
+            setSelectedVideo(videoData);
+          } else {
+            setError("Single video not found");
+          }
+
+          setLoading(false);
+          return;
+        }
+
+        // ✅ SERIES FLOW
+        console.log("🔄 SERIES FLOW DETECTED in ModulePage1");
+        if (!seriesSlug) {
+          setError("No series selected");
+          setLoading(false);
+          return;
+        }
+
+        // Get series data
         const allSeries = await getSeriesApi();
         const foundSeries = allSeries.find((series) => {
           const seriesSlugFromName = createSlug(series.name || series.title);
@@ -51,56 +96,31 @@ const ModulePage1 = () => {
         }
 
         setSeriesData(foundSeries);
-        console.log(
-          "🎬 Found series:",
-          foundSeries.name,
-          "ID:",
-          foundSeries.id
-        );
 
-        // Step 2: Get all videos for this series
+        // Get all videos for this series
         const allVideosData = await getAllVideosApi();
         const seriesVideos = allVideosData.filter(
           (video) => video.series_id == foundSeries.id
         );
 
         setAllVideos(seriesVideos);
-        console.log("🎥 All videos in series:", seriesVideos);
 
-        // Step 3: Determine which video to play (UPDATED PRIORITY)
+        // Determine which video to play
         let videoToPlay = null;
 
-        // ✅ PRIORITY 1: Check URL parameter first (most reliable)
         if (videoId) {
           videoToPlay = seriesVideos.find((v) => v.id == videoId);
-          console.log("🎯 Using video from URL parameter:", videoToPlay?.title);
-        }
-        // ✅ PRIORITY 2: Check location state
-        else if (location.state?.currentVideo) {
-          videoToPlay = location.state.currentVideo;
-          console.log("🎯 Using video from location state:", videoToPlay.title);
+        } else if (videoDataFromState) {
+          videoToPlay = videoDataFromState;
         } else if (location.state?.videoId) {
           const stateVideoId = location.state.videoId;
           videoToPlay = seriesVideos.find((v) => v.id == stateVideoId);
-          console.log("🎯 Using video from state videoId:", videoToPlay?.title);
-        }
-        // ✅ PRIORITY 3: Fallback to first video
-        else if (seriesVideos.length > 0) {
+        } else if (seriesVideos.length > 0) {
           videoToPlay = seriesVideos[0];
-          console.log(
-            "🔄 No specific video selected, using first video:",
-            videoToPlay.title
-          );
         }
 
         if (videoToPlay) {
           setSelectedVideo(videoToPlay);
-          console.log(
-            "✅ Final selected video:",
-            videoToPlay.title,
-            "ID:",
-            videoToPlay.id
-          );
         } else {
           setError("No videos available in this series");
         }
@@ -113,7 +133,14 @@ const ModulePage1 = () => {
     };
 
     initializeData();
-  }, [location.state, seriesSlug, location, videoId]); // ✅ Add videoId to dependencies
+  }, [
+    location.state,
+    seriesSlug,
+    videoId,
+    isSingleVideoFromState,
+    location.pathname,
+    videoDataFromState,
+  ]);
 
   // Build correct video URL
   const buildVideoUrl = (videoUrl) => {
@@ -123,7 +150,7 @@ const ModulePage1 = () => {
     return `${baseUrl}/${videoUrl}`;
   };
 
-  // Video controls functions...
+  // Video controls functions
   const handlePlayPause = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -161,21 +188,34 @@ const ModulePage1 = () => {
       return;
     }
 
-    console.log("➡️ Navigating to quiz with video:", selectedVideo.title);
-
-    // ✅ Option 1: Pass videoId in URL (Recommended)
-    navigate(`/child/module/${seriesSlug}/quiz/${selectedVideo.id}`, {
-      state: {
-        currentVideo: selectedVideo,
-        seriesData: seriesData,
-        videoId: selectedVideo.id,
-      },
-      replace: false,
-    });
+    // ✅ SINGLE VIDEO FLOW
+    if (isSingleVideo) {
+      navigate(`/child/module/single/${selectedVideo.id}/quiz`, {
+        state: {
+          currentVideo: selectedVideo,
+          videoId: selectedVideo.id,
+          isSingleVideo: true,
+        },
+      });
+    }
+    // ✅ SERIES FLOW
+    else if (seriesSlug) {
+      navigate(`/child/module/${seriesSlug}/quiz/${selectedVideo.id}`, {
+        state: {
+          currentVideo: selectedVideo,
+          seriesData: seriesData,
+          videoId: selectedVideo.id,
+        },
+      });
+    }
   };
 
   const handleBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
+  };
+
+  const handleBackToModule = () => {
+    navigate("/child/module");
   };
 
   if (loading) {
@@ -203,9 +243,19 @@ const ModulePage1 = () => {
         <Alert variant="danger" className="text-center">
           <h5>Error Loading Video</h5>
           <p>{error}</p>
-          <Button variant="primary" onClick={() => window.location.reload()}>
-            Try Again
-          </Button>
+          <div className="mt-3">
+            <Button variant="primary" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+            <Button
+              variant="outline-primary"
+              onClick={handleBackToModule}
+              className="ms-2"
+            >
+              <FaHome className="me-2" />
+              Back to Modules
+            </Button>
+          </div>
         </Alert>
       </Container>
     );
@@ -217,6 +267,18 @@ const ModulePage1 = () => {
       className="py-5"
       style={{ background: "#f8fbff", minHeight: "100vh" }}
     >
+      {/* Header with Back to Module Button */}
+      <div className="mb-4">
+        <Button
+          variant="outline-primary"
+          onClick={handleBackToModule}
+          className="d-flex align-items-center"
+        >
+          <FaHome className="me-2" />
+          Back to Modules
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="fw-bold" style={{ color: "#0d6efd" }}>
@@ -330,14 +392,6 @@ const ModulePage1 = () => {
           CONTINUE TO QUIZ
           <FaArrowRight className="ms-2" />
         </Button>
-      </div>
-
-      {/* Debug Info */}
-      <div className="text-center mt-4">
-        <small className="text-muted">
-          Current Video: {selectedVideo?.title} (ID: {selectedVideo?.id}) |
-          Series: {seriesData?.name} | Total Videos: {allVideos.length}
-        </small>
       </div>
     </Container>
   );

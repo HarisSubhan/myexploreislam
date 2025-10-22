@@ -22,7 +22,7 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { getSeriesApi } from "../../../services/seriesApi";
-import { getAllVideosApi } from "../../../services/videoApi"; // Add this import
+import { getAllVideosApi } from "../../../services/videoApi";
 import { createSlug } from "../../../utils/slugify";
 
 const VideoModules = () => {
@@ -34,20 +34,22 @@ const VideoModules = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
 
+  // Capitalize first word of title
+  const capitalizeFirstWord = (title) => {
+    if (!title) return "";
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  };
+
   useEffect(() => {
     const fetchContent = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch both series and single videos
         const [seriesData, videosData] = await Promise.all([
           getSeriesApi(),
           getAllVideosApi(),
         ]);
-
-        console.log("Series API Response:", seriesData);
-        console.log("Videos API Response:", videosData);
 
         const baseUrl =
           import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -55,8 +57,9 @@ const VideoModules = () => {
         // Process Series
         const formattedSeries = seriesData.map((seriesItem) => ({
           id: seriesItem.id,
-          title:
-            seriesItem.name || seriesItem.title || `Series ${seriesItem.id}`,
+          title: capitalizeFirstWord(
+            seriesItem.name || seriesItem.title || `Series ${seriesItem.id}`
+          ),
           description: seriesItem.description || "Explore this learning series",
           thumbnail: seriesItem.thumbnail_url
             ? seriesItem.thumbnail_url.startsWith("http")
@@ -79,7 +82,7 @@ const VideoModules = () => {
           .filter((video) => !video.series_id)
           .map((video) => ({
             id: video.id,
-            title: video.title || `Video ${video.id}`,
+            title: capitalizeFirstWord(video.title || `Video ${video.id}`),
             description: video.description || "Watch this video",
             thumbnail: video.thumbnail_url
               ? video.thumbnail_url.startsWith("http")
@@ -88,7 +91,7 @@ const VideoModules = () => {
                   ? `${baseUrl}${video.thumbnail_url}`
                   : `${baseUrl}/${video.thumbnail_url}`
               : "https://via.placeholder.com/300x200?text=No+Thumbnail",
-            videoCount: 1, // Single videos always have 1 video
+            videoCount: 1,
             type: "single",
             slug: createSlug(video.title || `video-${video.id}`),
             created_at: video.created_at,
@@ -100,7 +103,6 @@ const VideoModules = () => {
         setSingleVideos(formattedSingleVideos);
         setAllContent([...formattedSeries, ...formattedSingleVideos]);
       } catch (err) {
-        console.error("Content API Error:", err);
         setError("Failed to load content. Please try again.");
       } finally {
         setLoading(false);
@@ -114,17 +116,15 @@ const VideoModules = () => {
     navigate("/child");
   };
 
-  // In VideoModules component - Update handleModuleClick
   const handleModuleClick = (item) => {
     if (item.type === "series") {
-      console.log("🎬 Navigating to Series Introduction:", item.slug);
       navigate(`/child/module/${item.slug}`);
     } else {
-      console.log("🎥 Navigating to ModuleIntroduction for single video");
       navigate(`/child/module/single/${item.id}/introduction`, {
         state: {
           currentVideo: item,
           videoId: item.id,
+          isSingleVideo: true,
         },
       });
     }
@@ -294,7 +294,6 @@ const VideoModules = () => {
           </Badge>
         </div>
 
-        {/* ✅ YAHAN PAR ADD KARNA HAI - Card Body */}
         <Card.Body className="d-flex flex-column">
           <h6 className="fw-bold mb-2" style={{ fontSize: "1rem" }}>
             {item.title}
@@ -311,7 +310,6 @@ const VideoModules = () => {
             {item.description}
           </p>
 
-          {/* ✅ ACTION BUTTONS YAHAN ADD KAREN */}
           <div className="mt-auto d-flex gap-2">
             <Button
               variant={item.progress === 0 ? "primary" : "outline-primary"}
@@ -320,9 +318,9 @@ const VideoModules = () => {
               onClick={() => handleModuleClick(item)}
             >
               {item.type === "series"
-                ? "View Series" // Series ke liye
+                ? "View Series"
                 : item.progress === 0
-                  ? "Start Learning" // Single video ke liye
+                  ? "Start Learning"
                   : item.progress === 100
                     ? "Review"
                     : "Continue"}
@@ -371,15 +369,17 @@ const VideoModules = () => {
       </div>
 
       {error && (
-        <div className="alert alert-danger text-center">
+        <Alert variant="danger" className="text-center">
           {error}
           <Button
             onClick={() => window.location.reload()}
-            className="btn btn-sm btn-outline-danger ms-3"
+            variant="outline-danger"
+            size="sm"
+            className="ms-3"
           >
             Retry
           </Button>
-        </div>
+        </Alert>
       )}
 
       {/* Tabs */}

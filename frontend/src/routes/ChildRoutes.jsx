@@ -53,8 +53,8 @@ const ChildRoutes = () => {
             path="series/:seriesSlug/video/:videoSlug"
             element={<VideoWatch />}
           />
-
           {/* ✅ FIXED: MODULE ROUTES */}
+          // In ChildRoutes.js - Fix the single video routes
           <Route path="module">
             <Route index element={<VideoModules />} />
 
@@ -74,23 +74,23 @@ const ChildRoutes = () => {
               element={<ModuleCompletion />}
             />
 
-            {/* ✅ SINGLE VIDEO MODULE FLOW */}
-            <Route
-              path="single/:videoId/introduction"
-              element={<ModuleIntroduction />}
-            />
-            <Route path="single/:videoId/page1" element={<ModulePage1 />} />
-            <Route path="single/:videoId/quiz" element={<ModuleQuiz />} />
-            <Route
-              path="single/:videoId/completion"
-              element={<ModuleCompletion />}
-            />
+            {/* ✅ SINGLE VIDEO MODULE FLOW - FIXED ROUTES */}
+            <Route path="single">
+              <Route
+                path=":videoId/introduction"
+                element={<ModuleIntroduction />}
+              />
+              <Route path=":videoId/page1" element={<ModulePage1 />} />
+              <Route path=":videoId/quiz" element={<ModuleQuiz />} />
+              <Route
+                path=":videoId/completion"
+                element={<ModuleCompletion />}
+              />
+            </Route>
           </Route>
-
           {/* BACKWARD COMPATIBLE ROUTES */}
           <Route path="singles" element={<CartoonModules />} />
           <Route path="singles/:videoId" element={<VideoWatch />} />
-
           {/* OTHER PAGES */}
           <Route path="notifications" element={<NotificationPageChild />} />
           <Route path="history" element={<HistoryPageChild />} />

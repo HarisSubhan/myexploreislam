@@ -13,18 +13,24 @@ import { useNavigate, useParams } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { getAllVideosApi } from "../../../services/videoApi";
-import { getSeriesApi } from "../../../services/seriesApi"; // Import series API
+import { getSeriesApi } from "../../../services/seriesApi";
 import { createSlug } from "../../../utils/slugify";
 import { FaVideo, FaListUl, FaPlay } from "react-icons/fa";
 
 const CartoonModules = () => {
   const navigate = useNavigate();
-  const { type } = useParams(); // 'singles' or 'series'
+  const { type } = useParams();
   const [activeTab, setActiveTab] = useState(type || "singles");
   const [singleVideos, setSingleVideos] = useState([]);
   const [seriesModules, setSeriesModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Capitalize first word of title
+  const capitalizeFirstWord = (title) => {
+    if (!title) return "";
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  };
 
   useEffect(() => {
     const fetchAllContent = async () => {
@@ -48,24 +54,21 @@ const CartoonModules = () => {
           }
         }
 
-        // Fetch all videos and series using dedicated APIs
+        // Fetch all videos and series
         const [videosData, seriesData] = await Promise.all([
           getAllVideosApi(),
-          getSeriesApi(), // Use dedicated series API
+          getSeriesApi(),
         ]);
 
         const baseUrl =
           import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
-        console.log("Series API Response:", seriesData); // Debug log
-        console.log("Videos API Response:", videosData); // Debug log
-
-        // Process Single Videos - videos without series_id
+        // Process Single Videos
         const singleVideosData = videosData
           .filter((video) => !video.series_id)
           .map((item) => ({
             id: item.id,
-            title: item.title || "Untitled Video",
+            title: capitalizeFirstWord(item.title || "Untitled Video"),
             description: item.description || "No description available",
             thumbnail: item.thumbnail_url
               ? item.thumbnail_url.startsWith("http")
@@ -79,22 +82,21 @@ const CartoonModules = () => {
             slug: createSlug(item.title || `video-${item.id}`),
           }));
 
-        // In CartoonModules.jsx - Update the series processing part
+        // Process Series
         const seriesModulesData = seriesData.map((series) => ({
           id: series.id,
-          title: series.name || series.title || `Series ${series.id}`,
+          title: capitalizeFirstWord(
+            series.name || series.title || `Series ${series.id}`
+          ),
           description: series.description || "Explore learning series",
           thumbnail: series.thumbnail_url,
           videoCount: series.video_count || series.videos?.length || 0,
           type: "series",
           slug: createSlug(
             series.name || series.title || `series-${series.id}`
-          ), // Use series.name
+          ),
           videos: series.videos || [],
         }));
-
-        console.log("Processed Single Videos:", singleVideosData);
-        console.log("Processed Series Modules:", seriesModulesData);
 
         setSingleVideos(singleVideosData);
         setSeriesModules(seriesModulesData);
@@ -108,7 +110,6 @@ const CartoonModules = () => {
         localStorage.setItem("allContentCache", JSON.stringify(cacheData));
         localStorage.setItem("allContentCacheTimestamp", Date.now().toString());
       } catch (err) {
-        console.error("Content API Error:", err);
         setError("Failed to load content. Please try again.");
       } finally {
         setLoading(false);
@@ -118,24 +119,19 @@ const CartoonModules = () => {
     fetchAllContent();
   }, []);
 
-  // Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     navigate(`/child/browse/${tab}`);
   };
 
-  // In CartoonModules.jsx - Update the handleItemClick function
   const handleItemClick = (item) => {
     if (item.type === "single") {
-      // Direct video play with slug
       navigate(`/child/browse/singles/${item.slug}`);
     } else {
-      // Navigate to series detail page
       navigate(`/child/series/${item.slug}`);
     }
   };
 
-  // Handle back to dashboard
   const handleBackToDashboard = () => {
     navigate("/child");
   };
@@ -363,19 +359,6 @@ const CartoonModules = () => {
                   <FaListUl size={48} className="mb-3" />
                   <h5>No series available</h5>
                   <p>Check back later for new series content</p>
-                  {seriesModules.length === 0 && (
-                    <div className="mt-3">
-                      <small className="text-info">
-                        If you expected to see series here, please check:
-                        <br />
-                        1. Series API endpoint is working
-                        <br />
-                        2. Series data is returned from backend
-                        <br />
-                        3. Check browser console for API response
-                      </small>
-                    </div>
-                  )}
                 </div>
               </Col>
             )}

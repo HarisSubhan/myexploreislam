@@ -46,25 +46,26 @@ const SeriesQuizDetail = () => {
     return `${baseUrl}/${videoUrl}`;
   };
 
+  // Capitalize first word of title
+  const capitalizeFirstWord = (title) => {
+    if (!title) return "";
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  };
+
   useEffect(() => {
     const fetchSeriesData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        console.log("Series Slug:", seriesSlug);
-
         // Get all series to find the matching one
         const allSeries = await getSeriesApi();
-        console.log("All series:", allSeries);
 
         // Find series by slug match
         const foundSeries = allSeries.find((series) => {
           const seriesSlugFromName = createSlug(series.name || series.title);
           return seriesSlugFromName === seriesSlug;
         });
-
-        console.log("Found series:", foundSeries);
 
         if (!foundSeries) {
           setError("Series not found");
@@ -79,30 +80,25 @@ const SeriesQuizDetail = () => {
         };
         setSeries(seriesWithThumbnail);
 
-        // Now fetch videos for this series
+        // Fetch videos for this series
         try {
-          console.log("Fetching videos for series ID:", foundSeries.id);
           const seriesVideos = await getVideosBySeriesApi(foundSeries.id);
-          console.log("Videos from series API:", seriesVideos);
 
           let processedVideos = [];
 
           if (seriesVideos && seriesVideos.length > 0) {
-            // Process videos to ensure proper thumbnail URLs
             processedVideos = seriesVideos.map((video) => ({
               ...video,
               thumbnail_url: buildThumbnailUrl(video.thumbnail_url),
               video_url: buildVideoUrl(video.video_url),
             }));
           } else {
-            // Alternative: get all videos and filter by series_id
+            // Fallback: get all videos and filter by series_id
             const allVideos = await getAllVideosApi();
             const filteredVideos = allVideos.filter(
               (video) => video.series_id == foundSeries.id
             );
-            console.log("Filtered videos:", filteredVideos);
 
-            // Process videos to ensure proper thumbnail URLs
             processedVideos = filteredVideos.map((video) => ({
               ...video,
               thumbnail_url: buildThumbnailUrl(video.thumbnail_url),
@@ -116,14 +112,12 @@ const SeriesQuizDetail = () => {
             setError("No videos available in this series");
           }
         } catch (videoError) {
-          console.error("Video fetch error:", videoError);
-          // Fallback: get all videos and filter
+          // Final fallback: get all videos and filter
           const allVideos = await getAllVideosApi();
           const filteredVideos = allVideos.filter(
             (video) => video.series_id == foundSeries.id
           );
 
-          // Process videos to ensure proper thumbnail URLs
           const processedVideos = filteredVideos.map((video) => ({
             ...video,
             thumbnail_url: buildThumbnailUrl(video.thumbnail_url),
@@ -137,7 +131,6 @@ const SeriesQuizDetail = () => {
           }
         }
       } catch (err) {
-        console.error("Series fetch error:", err);
         setError("Failed to load series data: " + err.message);
       } finally {
         setLoading(false);
@@ -147,12 +140,7 @@ const SeriesQuizDetail = () => {
     fetchSeriesData();
   }, [seriesSlug]);
 
-  // In SeriesQuizDetail component - Fix handleVideoClick for specific episodes
   const handleVideoClick = (video) => {
-    console.log("🎬 Starting specific episode:", video.title);
-
-    // ✅ For specific episodes, go DIRECTLY to the video page
-    // navigate(`/child/module/${seriesSlug}/page1/${video.id}`, {
     navigate(`/child/module/${seriesSlug}/introduction`, {
       state: {
         currentVideo: video,
@@ -160,14 +148,10 @@ const SeriesQuizDetail = () => {
         videoId: video.id,
         seriesSlug: seriesSlug,
       },
-      replace: false,
     });
   };
 
-  // Keep handleStartSeries for introduction
   const handleStartSeries = () => {
-    console.log("🎬 Starting series from beginning:", series.name);
-
     if (videos.length > 0) {
       const firstVideo = videos[0];
       navigate(`/child/module/${seriesSlug}/introduction`, {
@@ -178,13 +162,11 @@ const SeriesQuizDetail = () => {
           seriesSlug: seriesSlug,
         },
       });
-    } else {
-      console.error("❌ No videos available in this series");
     }
   };
 
   const handleBackToBrowse = () => {
-    navigate("/child/browse/series");
+    navigate("/child/module");
   };
 
   const handleBackToDashboard = () => {
@@ -308,7 +290,9 @@ const SeriesQuizDetail = () => {
             <div className="flex-grow-1">
               <div className="d-flex align-items-center gap-3 mb-2">
                 <h1 className="fw-bold mb-0">
-                  {series?.name || series?.title || `Series ${series?.id}`}
+                  {capitalizeFirstWord(
+                    series?.name || series?.title || `Series ${series?.id}`
+                  )}
                 </h1>
                 <Badge bg="primary" className="fs-6">
                   <FaListUl className="me-1" />
@@ -322,12 +306,6 @@ const SeriesQuizDetail = () => {
                 <span className="text-muted">
                   {videos.length} {videos.length === 1 ? "episode" : "episodes"}
                 </span>
-                {series?.video_count && (
-                  <span className="text-muted">
-                    Total: {series.video_count} videos
-                  </span>
-                )}
-                {/* Start Series Button */}
                 <Button
                   variant="success"
                   size="lg"
@@ -398,7 +376,9 @@ const SeriesQuizDetail = () => {
                       </div>
                     </div>
                     <Card.Body>
-                      <h6 className="fw-bold">{video.title}</h6>
+                      <h6 className="fw-bold">
+                        {capitalizeFirstWord(video.title)}
+                      </h6>
                       <p className="text-muted small mb-2">
                         {video.description || "No description available"}
                       </p>
