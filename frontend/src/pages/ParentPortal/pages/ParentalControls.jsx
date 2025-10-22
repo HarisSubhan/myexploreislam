@@ -24,6 +24,7 @@ import {
 } from "react-icons/fa";
 import { getChildrenByParentIdApi, updateChildStatusApi } from "../../../services/parentApi";
 import { useUser } from "../../../context/UserContext";
+import VideoControler from "../../../components/parent/VideoControler";
 
 
 const ParentalControls = () => {
@@ -417,6 +418,7 @@ const ParentalControls = () => {
             </Card.Body>
           </Card>
         </Col>
+        <VideoControler />
       </Row>
 
       {/* Confirmation Modal */}

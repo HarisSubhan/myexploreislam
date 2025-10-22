@@ -22,6 +22,11 @@ const ChildDashboard = () => {
   const [error, setError] = useState(null);
   const [unauthorized, setUnauthorized] = useState(false);
 
+   const capitalizeFirst = (str) => {
+     if (!str) return "";
+     return str.charAt(0).toUpperCase() + str.slice(1);
+   };
+
   useEffect(() => {
     const fetchModules = async () => {
       try {
@@ -55,7 +60,7 @@ const ChildDashboard = () => {
 
           return {
             id: module.id,
-            title: name,
+            title: capitalizeFirst(name),
             description: module.description || "Explore learning content",
             thumbnail,
             type: isSeries ? "series" : "single",
@@ -223,16 +228,16 @@ const ChildDashboard = () => {
       fluid
       className="d-flex flex-column justify-content-center py-5"
       style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        
         minHeight: "100vh",
       }}
     >
       {/* Header Section */}
       <div className="text-center mb-5">
-        <h1 className="fw-bold text-white mb-3 display-5">
+        <h1 className="fw-bold  mb-3 display-5">
           Welcome to Your Learning World!
         </h1>
-        <p className="text-white-50 lead mb-0">
+        <p className="lead mb-0">
           Choose your learning path and start your journey
         </p>
       </div>
