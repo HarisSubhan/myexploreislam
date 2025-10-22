@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import {
-  Container,
-  Button,
-  Alert,
-  Spinner,
-  Card,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { Container, Button, Alert, Spinner, Card } from "react-bootstrap";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -16,92 +8,112 @@ import {
   FaVideo,
   FaPause,
 } from "react-icons/fa";
-import { getVideoByIdApi, getAllVideosApi } from "../../services/videoApi";
+import {  getAllVideosApi } from "../../services/videoApi";
 import { getSeriesApi } from "../../services/seriesApi";
 import { createSlug } from "../../utils/slugify";
 import { baseUrl } from "../../services/config";
 
 const ModulePage1 = () => {
   const navigate = useNavigate();
-  const { seriesSlug } = useParams();
+  const { seriesSlug, videoId } = useParams();
   const location = useLocation();
   const videoRef = useRef(null);
 
-  const [videoData, setVideoData] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
   const [seriesData, setSeriesData] = useState(null);
   const [allVideos, setAllVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedVideo, setSelectedVideo] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // ✅ Data initialize karein
   useEffect(() => {
     const initializeData = async () => {
       try {
         setLoading(true);
+        console.log("📍 ModulePage1 - Full Location:", location);
         console.log("📍 ModulePage1 - Location State:", location.state);
+        console.log("📍 ModulePage1 - Series Slug:", seriesSlug);
+        console.log("📍 ModulePage1 - Video ID from URL:", videoId); // Add this
 
-        // ✅ Pehle state se data lein
-        if (location.state?.videoData) {
-          setVideoData(location.state.videoData);
-          setSelectedVideo(location.state.videoData);
+        // Step 1: Get series data
+        const allSeries = await getSeriesApi();
+        const foundSeries = allSeries.find((series) => {
+          const seriesSlugFromName = createSlug(series.name || series.title);
+          return seriesSlugFromName === seriesSlug;
+        });
+
+        if (!foundSeries) {
+          setError("Series not found");
+          setLoading(false);
+          return;
         }
 
-        if (location.state?.seriesData) {
-          setSeriesData(location.state.seriesData);
+        setSeriesData(foundSeries);
+        console.log(
+          "🎬 Found series:",
+          foundSeries.name,
+          "ID:",
+          foundSeries.id
+        );
+
+        // Step 2: Get all videos for this series
+        const allVideosData = await getAllVideosApi();
+        const seriesVideos = allVideosData.filter(
+          (video) => video.series_id == foundSeries.id
+        );
+
+        setAllVideos(seriesVideos);
+        console.log("🎥 All videos in series:", seriesVideos);
+
+        // Step 3: Determine which video to play (UPDATED PRIORITY)
+        let videoToPlay = null;
+
+        // ✅ PRIORITY 1: Check URL parameter first (most reliable)
+        if (videoId) {
+          videoToPlay = seriesVideos.find((v) => v.id == videoId);
+          console.log("🎯 Using video from URL parameter:", videoToPlay?.title);
+        }
+        // ✅ PRIORITY 2: Check location state
+        else if (location.state?.currentVideo) {
+          videoToPlay = location.state.currentVideo;
+          console.log("🎯 Using video from location state:", videoToPlay.title);
+        } else if (location.state?.videoId) {
+          const stateVideoId = location.state.videoId;
+          videoToPlay = seriesVideos.find((v) => v.id == stateVideoId);
+          console.log("🎯 Using video from state videoId:", videoToPlay?.title);
+        }
+        // ✅ PRIORITY 3: Fallback to first video
+        else if (seriesVideos.length > 0) {
+          videoToPlay = seriesVideos[0];
+          console.log(
+            "🔄 No specific video selected, using first video:",
+            videoToPlay.title
+          );
         }
 
-        // ✅ Agar series data nahi hai, to fetch karein
-        if (!location.state?.seriesData && seriesSlug) {
-          console.log("🎬 Fetching series data for slug:", seriesSlug);
-          const allSeries = await getSeriesApi();
-          const foundSeries = allSeries.find((series) => {
-            const seriesSlugFromName = createSlug(series.name || series.title);
-            return seriesSlugFromName === seriesSlug;
-          });
-          if (foundSeries) {
-            setSeriesData(foundSeries);
-
-            // ✅ Series ke saare videos fetch karein
-            try {
-              const videos = await getAllVideosApi();
-              const seriesVideos = videos.filter(
-                (video) => video.series_id == foundSeries.id
-              );
-              setAllVideos(seriesVideos);
-              console.log("🎥 Series Videos:", seriesVideos);
-
-              // ✅ Agar koi specific video selected nahi hai, to pehla video select karein
-              if (!location.state?.videoData && seriesVideos.length > 0) {
-                setSelectedVideo(seriesVideos[0]);
-                setVideoData(seriesVideos[0]);
-              }
-            } catch (videoErr) {
-              console.error("❌ Error fetching videos:", videoErr);
-            }
-          }
-        }
-
-        // ✅ Agar video data nahi hai, to fetch karein
-        if (!location.state?.videoData && location.state?.videoId) {
-          console.log("📹 Fetching video data for ID:", location.state.videoId);
-          const video = await getVideoByIdApi(location.state.videoId);
-          setVideoData(video);
-          setSelectedVideo(video);
+        if (videoToPlay) {
+          setSelectedVideo(videoToPlay);
+          console.log(
+            "✅ Final selected video:",
+            videoToPlay.title,
+            "ID:",
+            videoToPlay.id
+          );
+        } else {
+          setError("No videos available in this series");
         }
       } catch (err) {
         console.error("❌ Error initializing data:", err);
-        setError("Failed to load video content");
+        setError("Failed to load video content: " + err.message);
       } finally {
         setLoading(false);
       }
     };
 
     initializeData();
-  }, [location.state, seriesSlug]);
+  }, [location.state, seriesSlug, location, videoId]); // ✅ Add videoId to dependencies
 
   // Build correct video URL
   const buildVideoUrl = (videoUrl) => {
@@ -111,8 +123,7 @@ const ModulePage1 = () => {
     return `${baseUrl}/${videoUrl}`;
   };
 
-  
-
+  // Video controls functions...
   const handlePlayPause = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -138,29 +149,33 @@ const ModulePage1 = () => {
   };
 
   const formatTime = (time) => {
+    if (!time || isNaN(time)) return "0:00";
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-const handleNext = () => {
-  navigate(`/child/module/${seriesSlug}/quiz`, {
-    state: {
-      videoData: selectedVideo,
-      seriesData: seriesData,
-      videoId: selectedVideo.id, // ✅ Ensure videoId is passed
-    },
-  });
-};
+  const handleNext = () => {
+    if (!selectedVideo) {
+      console.error("❌ No video selected for quiz");
+      return;
+    }
+
+    console.log("➡️ Navigating to quiz with video:", selectedVideo.title);
+
+    // ✅ Option 1: Pass videoId in URL (Recommended)
+    navigate(`/child/module/${seriesSlug}/quiz/${selectedVideo.id}`, {
+      state: {
+        currentVideo: selectedVideo,
+        seriesData: seriesData,
+        videoId: selectedVideo.id,
+      },
+      replace: false,
+    });
+  };
 
   const handleBack = () => {
-    navigate(`/child/module/${seriesSlug}/introduction`, {
-      state: {
-        videoData: selectedVideo,
-        seriesData: seriesData,
-        ...location.state,
-      },
-    });
+    navigate(-1); // Go back to previous page
   };
 
   if (loading) {
@@ -209,7 +224,9 @@ const handleNext = () => {
           Watch & Learn
         </h2>
         <p className="text-muted">
-          Watch the video to continue your learning journey
+          {selectedVideo
+            ? `Now Playing: ${selectedVideo.title}`
+            : "Select a video to watch"}
         </p>
       </div>
 
@@ -220,7 +237,6 @@ const handleNext = () => {
           style={{ maxWidth: "900px" }}
         >
           <Card.Body className="p-0">
-            {/* Video Player */}
             <div className="position-relative">
               <video
                 ref={videoRef}
@@ -244,7 +260,6 @@ const handleNext = () => {
                 Your browser does not support the video tag.
               </video>
 
-              {/* Custom Play/Pause Overlay */}
               {!isPlaying && (
                 <div
                   className="position-absolute top-50 start-50 translate-middle"
@@ -253,10 +268,7 @@ const handleNext = () => {
                 >
                   <div
                     className="bg-primary rounded-circle p-4"
-                    style={{
-                      opacity: 0.8,
-                      transition: "all 0.3s",
-                    }}
+                    style={{ opacity: 0.8, transition: "all 0.3s" }}
                   >
                     <FaPlay className="text-white" size={32} />
                   </div>
@@ -264,7 +276,6 @@ const handleNext = () => {
               )}
             </div>
 
-            {/* Video Info */}
             <div className="p-4">
               <h4 className="fw-bold" style={{ color: "#3a86ff" }}>
                 {selectedVideo.title}
@@ -274,7 +285,6 @@ const handleNext = () => {
                   "Watch this educational video to learn important concepts."}
               </p>
 
-              {/* Video Controls */}
               <div className="d-flex justify-content-between align-items-center">
                 <Button
                   variant={isPlaying ? "outline-danger" : "outline-success"}
@@ -288,7 +298,6 @@ const handleNext = () => {
                   )}
                   {isPlaying ? "Pause" : "Play"}
                 </Button>
-
                 <div className="text-muted">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </div>
@@ -298,7 +307,6 @@ const handleNext = () => {
         </Card>
       )}
 
-     
       {/* Navigation Buttons */}
       <div
         className="d-flex justify-content-between mx-auto"
@@ -307,14 +315,7 @@ const handleNext = () => {
         <Button
           variant="secondary"
           onClick={handleBack}
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            border: "none",
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-            padding: "12px 24px",
-          }}
+          className="d-flex align-items-center"
         >
           <FaArrowLeft className="me-2" />
           BACK
@@ -323,18 +324,20 @@ const handleNext = () => {
         <Button
           variant="primary"
           onClick={handleNext}
-          style={{
-            background: "linear-gradient(135deg, #ff1493 0%, #3a86ff 100%)",
-            border: "none",
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-            padding: "12px 24px",
-          }}
+          disabled={!selectedVideo}
+          className="d-flex align-items-center"
         >
           CONTINUE TO QUIZ
           <FaArrowRight className="ms-2" />
         </Button>
+      </div>
+
+      {/* Debug Info */}
+      <div className="text-center mt-4">
+        <small className="text-muted">
+          Current Video: {selectedVideo?.title} (ID: {selectedVideo?.id}) |
+          Series: {seriesData?.name} | Total Videos: {allVideos.length}
+        </small>
       </div>
     </Container>
   );

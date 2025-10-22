@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Container, Row, Col, Card, Badge, Button } from "react-bootstrap";
-import { FaTrophy, FaShare, FaHome, FaList } from "react-icons/fa";
+import { FaTrophy, FaShare, FaHome, FaList, FaArrowLeft } from "react-icons/fa";
 
 const ModuleCompletion = () => {
   const navigate = useNavigate();
-  const { seriesId, videoId } = useParams();
+  const { seriesSlug, videoId } = useParams(); // ✅ FIXED: Use seriesSlug instead of seriesId
   const location = useLocation();
   const [showConfetti, setShowConfetti] = useState(true);
 
@@ -13,6 +13,8 @@ const ModuleCompletion = () => {
   const score = location.state?.score || 0;
   const totalQuestions = location.state?.totalQuestions || 3;
   const quizId = location.state?.quizId;
+  const seriesData = location.state?.seriesData;
+  const videoData = location.state?.videoData;
 
   const percentage = Math.round((score / totalQuestions) * 100);
   const isPerfectScore = score === totalQuestions;
@@ -26,21 +28,43 @@ const ModuleCompletion = () => {
   }, []);
 
   const handleFinish = () => {
-    navigate(`/child/series/${seriesId}`);
+    // ✅ FIXED: Navigate back to series detail page
+    if (seriesSlug) {
+      navigate(`/child/module/${seriesSlug}`);
+    } else {
+      navigate("/child/module");
+    }
   };
 
   const handleRetakeQuiz = () => {
-    navigate(`/child/series/${seriesId}/quiz/${videoId}`);
+    // ✅ FIXED: Navigate back to quiz with correct parameters
+    if (seriesSlug && videoId) {
+      navigate(`/child/module/${seriesSlug}/quiz/${videoId}`, {
+        state: {
+          currentVideo: videoData,
+          seriesData: seriesData,
+          videoId: videoId,
+        },
+      });
+    }
   };
 
   const handleGoHome = () => {
     navigate("/child");
   };
 
+  const handleBackToSeries = () => {
+    if (seriesSlug) {
+      navigate(`/child/module/${seriesSlug}`);
+    } else {
+      navigate("/child/module");
+    }
+  };
+
   const getScoreColor = () => {
-    if (percentage >= 80) return "#2ec4b6"; // Green for excellent
-    if (percentage >= 60) return "#ff9e00"; // Orange for good
-    return "#e71d36"; // Red for needs improvement
+    if (percentage >= 80) return "#2ec4b6";
+    if (percentage >= 60) return "#ff9e00";
+    return "#e71d36";
   };
 
   const getScoreMessage = () => {
@@ -63,6 +87,18 @@ const ModuleCompletion = () => {
       <Container>
         <Row className="justify-content-center">
           <Col md={10} lg={8}>
+            {/* Back Button */}
+            <div className="mb-3">
+              <Button
+                variant="outline-light"
+                onClick={handleBackToSeries}
+                className="d-flex align-items-center"
+              >
+                <FaArrowLeft className="me-2" />
+                Back to Series
+              </Button>
+            </div>
+
             {/* Confetti animation */}
             {showConfetti && isPerfectScore && (
               <div className="confetti-container">
@@ -152,6 +188,19 @@ const ModuleCompletion = () => {
 
               <p className="text-muted mb-4 fs-5">{getScoreMessage()}</p>
 
+              {/* Video Info */}
+              {videoData && (
+                <div className="bg-light p-3 rounded-3 mb-4">
+                  <h6 className="fw-bold mb-2">Completed:</h6>
+                  <p className="mb-1">{videoData.title}</p>
+                  {seriesData && (
+                    <small className="text-muted">
+                      Series: {seriesData.name}
+                    </small>
+                  )}
+                </div>
+              )}
+
               {/* Achievement metrics */}
               <Row className="mb-4 text-center">
                 <Col md={4} className="mb-3">
@@ -187,55 +236,6 @@ const ModuleCompletion = () => {
                 </Col>
               </Row>
 
-              {/* Performance feedback */}
-              <div className="bg-light p-4 rounded-3 mb-4">
-                <h5 className="fw-semibold mb-3" style={{ color: "#ff1493" }}>
-                  📊 Your Performance:
-                </h5>
-                <Row>
-                  <Col md={6} className="mb-2">
-                    <div className="d-flex align-items-center justify-content-start">
-                      <span className="me-2">
-                        {percentage >= 60 ? "✅" : "⚠️"}
-                      </span>
-                      <span>
-                        {percentage >= 60
-                          ? "Passing score achieved"
-                          : "Below passing threshold"}
-                      </span>
-                    </div>
-                  </Col>
-                  <Col md={6} className="mb-2">
-                    <div className="d-flex align-items-center justify-content-start">
-                      <span className="me-2">{score > 0 ? "✅" : "❌"}</span>
-                      <span>
-                        {score > 0
-                          ? `${score} questions correct`
-                          : "No correct answers"}
-                      </span>
-                    </div>
-                  </Col>
-                  <Col md={6} className="mb-2">
-                    <div className="d-flex align-items-center justify-content-start">
-                      <span className="me-2">
-                        {isPerfectScore ? "🎯" : "📚"}
-                      </span>
-                      <span>
-                        {isPerfectScore
-                          ? "Perfect accuracy"
-                          : "Room for improvement"}
-                      </span>
-                    </div>
-                  </Col>
-                  <Col md={6} className="mb-2">
-                    <div className="d-flex align-items-center justify-content-start">
-                      <span className="me-2">⏱️</span>
-                      <span>Completed all questions</span>
-                    </div>
-                  </Col>
-                </Row>
-              </div>
-
               {/* Action buttons */}
               <div className="d-flex flex-column flex-md-row justify-content-center gap-3">
                 <Button
@@ -269,14 +269,14 @@ const ModuleCompletion = () => {
                   Back Home
                 </Button>
               </div>
-            </Card>
 
-            {/* Additional encouragement */}
-            <p className="text-center text-white mt-4">
-              {isPerfectScore
-                ? "Ready to continue your learning journey? Explore more lessons in your series!"
-                : "Keep learning and practicing to improve your score!"}
-            </p>
+              {/* Debug Info */}
+              <div className="mt-4 text-center">
+                <small className="text-muted">
+                  Series: {seriesSlug || "None"} | Video ID: {videoId || "None"}
+                </small>
+              </div>
+            </Card>
           </Col>
         </Row>
       </Container>
