@@ -1,5 +1,8 @@
+// ParentApi
 import axios from "axios";
 import { baseUrl, getToken } from "../services/config";
+
+const API_URL = `${baseUrl}/api/child-requests`;
 
 // Child Management APIs
 export const addChildApi = async (childData) => {
@@ -127,6 +130,21 @@ export const requestedChildApi = async (requestData) => {
         error?.response?.data?.message ||
         "Failed to send request"
     );
+  }
+};
+
+export const getChildRequests = async () => {
+  try {
+    const response = await axios.get(API_URL, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching child requests:", error);
+    throw error;
   }
 };
 

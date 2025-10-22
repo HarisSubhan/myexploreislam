@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
 import AdminLayout from "../../AdminApp";
 import axios from "axios";
+import ParentRequestChild from "../../../../components/admin/ParentRequestChild";
 
 
 const ManageChildren = () => {
@@ -83,16 +84,27 @@ const ManageChildren = () => {
                 <td>{child.name}</td>
                 <td>{child.email}</td>
                 <td>{child.parent_name}</td>
-                <td>{child.is_active == 1 ? (
-                  <span className="badge bg-success">Active</span>
-                ) : (
-                  <span className="badge bg-danger">In Active</span>
-                )}</td>
                 <td>
-                  <Button variant="info" size="sm" className="me-2" onClick={() => handleView(child)}>
+                  {child.is_active == 1 ? (
+                    <span className="badge bg-success">Active</span>
+                  ) : (
+                    <span className="badge bg-danger">In Active</span>
+                  )}
+                </td>
+                <td>
+                  <Button
+                    variant="info"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => handleView(child)}
+                  >
                     View
                   </Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(child.id)}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(child.id)}
+                  >
                     Delete
                   </Button>
                 </td>
@@ -108,9 +120,15 @@ const ManageChildren = () => {
           <Modal.Body>
             {selectedChild && (
               <div>
-                <p><strong>Name:</strong> {selectedChild.name}</p>
-                <p><strong>Email:</strong> {selectedChild.email}</p>
-                <p><strong>Parent Name:</strong> {selectedChild.parent_name}</p>
+                <p>
+                  <strong>Name:</strong> {selectedChild.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedChild.email}
+                </p>
+                <p>
+                  <strong>Parent Name:</strong> {selectedChild.parent_name}
+                </p>
                 <p>
                   <strong>Status:</strong>{" "}
                   {selectedChild.is_active === 1 ? (
@@ -128,6 +146,8 @@ const ManageChildren = () => {
             </Button>
           </Modal.Footer>
         </Modal>
+       
+        <ParentRequestChild/>
       </div>
     </AdminLayout>
   );
