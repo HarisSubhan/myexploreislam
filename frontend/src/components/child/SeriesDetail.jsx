@@ -24,33 +24,25 @@ const SeriesDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Capitalize first word of title
+  const capitalizeFirstWord = (title) => {
+    if (!title) return "";
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  };
+
   // Build correct thumbnail URL
   const buildThumbnailUrl = (thumbnailUrl) => {
     if (!thumbnailUrl) return null;
-
-    if (thumbnailUrl.startsWith("http")) {
-      return thumbnailUrl;
-    }
-
-    if (thumbnailUrl.startsWith("/")) {
-      return `${baseUrl}${thumbnailUrl}`;
-    }
-
+    if (thumbnailUrl.startsWith("http")) return thumbnailUrl;
+    if (thumbnailUrl.startsWith("/")) return `${baseUrl}${thumbnailUrl}`;
     return `${baseUrl}/${thumbnailUrl}`;
   };
 
   // Build correct video URL
   const buildVideoUrl = (videoUrl) => {
     if (!videoUrl) return null;
-
-    if (videoUrl.startsWith("http")) {
-      return videoUrl;
-    }
-
-    if (videoUrl.startsWith("/")) {
-      return `${baseUrl}${videoUrl}`;
-    }
-
+    if (videoUrl.startsWith("http")) return videoUrl;
+    if (videoUrl.startsWith("/")) return `${baseUrl}${videoUrl}`;
     return `${baseUrl}/${videoUrl}`;
   };
 
@@ -60,19 +52,14 @@ const SeriesDetail = () => {
         setLoading(true);
         setError(null);
 
-        console.log("Series Slug:", seriesSlug);
-
         // Get all series to find the matching one
         const allSeries = await getSeriesApi();
-        console.log("All series:", allSeries);
 
         // Find series by slug match
         const foundSeries = allSeries.find((series) => {
           const seriesSlugFromName = createSlug(series.name || series.title);
           return seriesSlugFromName === seriesSlug;
         });
-
-        console.log("Found series:", foundSeries);
 
         if (!foundSeries) {
           setError("Series not found");
@@ -89,14 +76,11 @@ const SeriesDetail = () => {
 
         // Now fetch videos for this series
         try {
-          console.log("Fetching videos for series ID:", foundSeries.id);
           const seriesVideos = await getVideosBySeriesApi(foundSeries.id);
-          console.log("Videos from series API:", seriesVideos);
 
           let processedVideos = [];
 
           if (seriesVideos && seriesVideos.length > 0) {
-            // Process videos to ensure proper thumbnail URLs
             processedVideos = seriesVideos.map((video) => ({
               ...video,
               thumbnail_url: buildThumbnailUrl(video.thumbnail_url),
@@ -108,9 +92,7 @@ const SeriesDetail = () => {
             const filteredVideos = allVideos.filter(
               (video) => video.series_id == foundSeries.id
             );
-            console.log("Filtered videos:", filteredVideos);
 
-            // Process videos to ensure proper thumbnail URLs
             processedVideos = filteredVideos.map((video) => ({
               ...video,
               thumbnail_url: buildThumbnailUrl(video.thumbnail_url),
@@ -124,14 +106,12 @@ const SeriesDetail = () => {
             setError("No videos available in this series");
           }
         } catch (videoError) {
-          console.error("Video fetch error:", videoError);
           // Fallback: get all videos and filter
           const allVideos = await getAllVideosApi();
           const filteredVideos = allVideos.filter(
             (video) => video.series_id == foundSeries.id
           );
 
-          // Process videos to ensure proper thumbnail URLs
           const processedVideos = filteredVideos.map((video) => ({
             ...video,
             thumbnail_url: buildThumbnailUrl(video.thumbnail_url),
@@ -145,7 +125,6 @@ const SeriesDetail = () => {
           }
         }
       } catch (err) {
-        console.error("Series fetch error:", err);
         setError("Failed to load series data: " + err.message);
       } finally {
         setLoading(false);
@@ -290,7 +269,9 @@ const SeriesDetail = () => {
             <div className="flex-grow-1">
               <div className="d-flex align-items-center gap-3 mb-2">
                 <h1 className="fw-bold mb-0">
-                  {series?.name || series?.title || `Series ${series?.id}`}
+                  {capitalizeFirstWord(
+                    series?.name || series?.title || `Series ${series?.id}`
+                  )}
                 </h1>
                 <Badge bg="primary" className="fs-6">
                   <FaListUl className="me-1" />
@@ -304,11 +285,6 @@ const SeriesDetail = () => {
                 <span className="text-muted">
                   {videos.length} {videos.length === 1 ? "video" : "videos"}
                 </span>
-                {series?.video_count && (
-                  <span className="text-muted">
-                    Total: {series.video_count} videos
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -358,7 +334,9 @@ const SeriesDetail = () => {
                       </div>
                     </div>
                     <Card.Body>
-                      <h6 className="fw-bold">{video.title}</h6>
+                      <h6 className="fw-bold">
+                        {capitalizeFirstWord(video.title)}
+                      </h6>
                       <p className="text-muted small mb-2">
                         {video.description || "No description available"}
                       </p>
