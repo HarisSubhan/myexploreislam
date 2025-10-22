@@ -88,6 +88,23 @@ const deleteQuiz = (id, callback) => {
   db.query(sql, [id], callback);
 };
 
+// Get Quiz by Video ID
+const getQuizByVideoId = (videoId, callback) => {
+  const quizSql = `SELECT * FROM quizzes WHERE video_id = ? AND is_deleted = 0 LIMIT 1`;
+  const questionsSql = `SELECT * FROM quiz_questions WHERE quiz_id = ?`;
+
+  db.query(quizSql, [videoId], (err, quizResult) => {
+    if (err || quizResult.length === 0) return callback(err || { error: 'No quiz found' });
+
+    const quizId = quizResult[0].id;
+    db.query(questionsSql, [quizId], (err, questionResult) => {
+      if (err) return callback(err);
+      callback(null, { ...quizResult[0], questions: questionResult });
+    });
+  });
+};
+
+
 module.exports = {
   createQuiz,
   addQuestions,
@@ -95,4 +112,5 @@ module.exports = {
   getQuizById,
   updateQuiz,
   deleteQuiz,
+  getQuizByVideoId
 };

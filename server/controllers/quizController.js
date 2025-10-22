@@ -60,10 +60,24 @@ const deleteQuiz = (req, res) => {
   });
 };
 
+// GET QUIZ BY VIDEO ID (for children)
+const getQuizByVideoId = (req, res) => {
+  const { video_id } = req.params;
+
+  quizModel.getQuizByVideoId(video_id, (err, data) => {
+    if (err || !data) {
+      return res.status(404).json({ error: 'Quiz not found for this video' });
+    }
+    res.json(data);
+  });
+};
+
+
 module.exports = {
   createQuiz,
   getAllQuizzes,
   getQuizById,
   updateQuiz,
   deleteQuiz,
+  getQuizByVideoId
 };

@@ -19,4 +19,8 @@ router.put('/:id', verifyToken, isAdmin, quizController.updateQuiz);
 // Delete quiz
 router.delete('/:id', verifyToken, isAdmin, quizController.deleteQuiz);
 
+// Get quiz by Video ID (for child)
+router.get('/video/:video_id', quizController.getQuizByVideoId);
+
+
 module.exports = router;
