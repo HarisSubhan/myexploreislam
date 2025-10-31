@@ -17,6 +17,9 @@ import AboutIslam from "./pages/SharedPortal/pages/AboutIslam";
 import { Toaster } from "react-hot-toast";
 
 
+
+
+
 function RequireAuth({ children, allowedRoles }) {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("userRole");
@@ -39,13 +42,14 @@ function App() {
       <Routes>
         <Route element={<StaticApp />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:titleSlug" element={<BlogDetail />} />
-          <Route path="/Subscriptions" element={<Subscription />} />
+          <Route path="/Subscription" element={<Subscription />} />
           <Route path="/Contact" element={<ContactUs />} />
           <Route path="/faqs" element={<FaqsPage />} />
           <Route path="/about-islam" element={<AboutIslam />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+           
         </Route>
 
         {/* 👇 Protected routes */}
@@ -78,7 +82,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/set-password" element={<AdminPasswordSetup />} />
-        <Route path="/subscription" element={<Subscription />} />
+       
+      
+
 
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
