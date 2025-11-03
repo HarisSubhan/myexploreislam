@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Badge } from "react-bootstrap";
-import Header from "../../../components/common/Header";
-import MainFooter from "./../../../components/MainFooter";
 import { getsubscriptionsAllActiveApi } from "../../../services/subscribeApi";
 
 const Subscription = () => {
@@ -27,18 +25,35 @@ const Subscription = () => {
     fetchPlans();
   }, []);
 
-  const handleSubscribeClick = (plan) => {
-    navigate("/register", {
-      state: {
-        subscription_id: plan.id, 
-        planData: plan, 
-      },
+  const handleSubscribeClick = async (plan) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/stripe/create-checkout-session`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription_id: plan.id, // 👈 send this
+        planName: plan.plan_name,
+        price: plan.price,
+      }),
     });
-  };
+
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url; // Redirect to Stripe Checkout
+    } else {
+      alert("Something went wrong. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error redirecting to Stripe:", error);
+  }
+};
+
+
+ 
 
   return (
     <div>
-      <Header />
+     
       <div className="bg-dark text-white py-5 text-center">
         <Container>
           <h1 className="display-4 fw-bold">Upgrade Your Learning Journey</h1>
@@ -133,7 +148,7 @@ const Subscription = () => {
           )}
         </Container>
       </div>
-      <MainFooter />
+    
     </div>
   );
 };

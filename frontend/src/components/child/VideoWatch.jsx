@@ -35,7 +35,13 @@ const VideoWatch = () => {
   const [error, setError] = useState(null);
   const [videoLoading, setVideoLoading] = useState(true);
   const [videoError, setVideoError] = useState(null);
-  const [videoType, setVideoType] = useState("single"); // "single" or "series"
+  const [videoType, setVideoType] = useState("single");
+
+  // Capitalize first word of title
+  const capitalizeFirstWord = (title) => {
+    if (!title) return "";
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  };
 
   // Get child ID from localStorage
   const getChildId = () => {
@@ -81,30 +87,16 @@ const VideoWatch = () => {
   // Build correct video URL
   const buildVideoUrl = (videoUrl) => {
     if (!videoUrl) return null;
-
-    if (videoUrl.startsWith("http")) {
-      return videoUrl;
-    }
-
-    if (videoUrl.startsWith("/")) {
-      return `${baseUrl}${videoUrl}`;
-    }
-
+    if (videoUrl.startsWith("http")) return videoUrl;
+    if (videoUrl.startsWith("/")) return `${baseUrl}${videoUrl}`;
     return `${baseUrl}/${videoUrl}`;
   };
 
   // Build thumbnail URL
   const buildThumbnailUrl = (thumbnailUrl) => {
     if (!thumbnailUrl) return null;
-
-    if (thumbnailUrl.startsWith("http")) {
-      return thumbnailUrl;
-    }
-
-    if (thumbnailUrl.startsWith("/")) {
-      return `${baseUrl}${thumbnailUrl}`;
-    }
-
+    if (thumbnailUrl.startsWith("http")) return thumbnailUrl;
+    if (thumbnailUrl.startsWith("/")) return `${baseUrl}${thumbnailUrl}`;
     return `${baseUrl}/${thumbnailUrl}`;
   };
 
@@ -115,14 +107,9 @@ const VideoWatch = () => {
         setError(null);
         setVideoError(null);
 
-        console.log("URL Parameters:", { moduleSlug, videoSlug, seriesSlug });
-        console.log("Location State:", location.state);
-
         // CASE 1: Video data passed via location state (from series)
         if (location.state?.videoData) {
           const videoData = location.state.videoData;
-          console.log("Using video data from location state:", videoData);
-
           setCurrentVideo(videoData);
           setVideoType("series");
           await logVideoWatch(videoData);
@@ -145,8 +132,6 @@ const VideoWatch = () => {
 
         // CASE 2: Fetch video by slug or ID
         const allVideos = await getAllVideosApi();
-        console.log("All videos from API:", allVideos);
-
         let videoData = null;
 
         // Priority: videoSlug > moduleSlug
@@ -155,8 +140,6 @@ const VideoWatch = () => {
         } else if (moduleSlug) {
           videoData = findVideoBySlug(allVideos, moduleSlug);
         }
-
-        console.log("Found video data:", videoData);
 
         if (videoData) {
           setCurrentVideo(videoData);
@@ -172,7 +155,6 @@ const VideoWatch = () => {
 
           // Get recommended videos for both single and series videos
           if (videoData.series_id) {
-            // For series videos: recommend other videos from the same series
             const seriesVideos = allVideos.filter(
               (video) =>
                 video.series_id === videoData.series_id &&
@@ -183,7 +165,6 @@ const VideoWatch = () => {
               .slice(0, 6);
             setRecommendedVideos(sortedVideos);
           } else {
-            // For single videos: recommend other single videos
             const singleVideos = allVideos.filter((video) => !video.series_id);
             const filteredVideos = singleVideos.filter(
               (video) => video.id !== videoData.id
@@ -197,7 +178,6 @@ const VideoWatch = () => {
           setError("Video not found. Please check the URL.");
         }
       } catch (err) {
-        console.error("Video fetch error:", err);
         setError("Failed to load video data");
       } finally {
         setLoading(false);
@@ -219,13 +199,11 @@ const VideoWatch = () => {
   };
 
   const handleVideoError = (e) => {
-    console.error("Video error:", e);
     setVideoLoading(false);
     setVideoError(
       "Failed to load video. The video file may be corrupted or unavailable."
     );
 
-    // Try to play anyway
     setTimeout(() => {
       if (videoRef.current) {
         videoRef.current.load();
@@ -251,7 +229,6 @@ const VideoWatch = () => {
       await logVideoWatch(video);
 
       if (video.series_id) {
-        // For series videos
         const seriesSlugFromVideo =
           createSlug(video.series_title) || `series-${video.series_id}`;
         const videoSlug = createSlug(video.title) || `video-${video.id}`;
@@ -259,7 +236,6 @@ const VideoWatch = () => {
           state: { videoData: video },
         });
       } else {
-        // For single videos
         const videoSlug =
           createSlug(video.title) || `${video.id}-${createSlug(video.title)}`;
         navigate(`/child/browse/singles/${videoSlug}`);
@@ -487,9 +463,6 @@ const VideoWatch = () => {
                     <p className="mb-0">
                       The video file is currently unavailable.
                     </p>
-                    <small className="text-muted">
-                      Video URL: {currentVideo.video_url || "Not provided"}
-                    </small>
                   </Alert>
                 </div>
               )}
@@ -500,7 +473,9 @@ const VideoWatch = () => {
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div className="flex-grow-1">
                   <div className="d-flex align-items-center gap-3 mb-2">
-                    <h3 className="fw-bold mb-0">{currentVideo.title}</h3>
+                    <h3 className="fw-bold mb-0">
+                      {capitalizeFirstWord(currentVideo.title)}
+                    </h3>
                     <Badge
                       bg={videoType === "series" ? "primary" : "success"}
                       className="fs-6"
@@ -559,7 +534,7 @@ const VideoWatch = () => {
           </div>
         </Col>
 
-        {/* Recommended Videos Sidebar - Show for both single and series videos */}
+        {/* Recommended Videos Sidebar */}
         {recommendedVideos.length > 0 && (
           <Col lg={4}>
             <div className="recommended-sidebar">
@@ -613,7 +588,7 @@ const VideoWatch = () => {
                                 overflow: "hidden",
                               }}
                             >
-                              {video.title}
+                              {capitalizeFirstWord(video.title)}
                             </h6>
                             <Badge
                               bg={
