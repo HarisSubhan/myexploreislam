@@ -5,11 +5,14 @@ const bcrypt = require('bcryptjs');
 
 const createUser = (name, username, email, password, role, phone_number, subscription_id, callback) => {
   db.query(
-    "INSERT INTO users (name, username, email, password, role, phone_number, subscription_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [name, username, email, password, role, phone_number, subscription_id],
+    `INSERT INTO users 
+      (name, username, email, password, role, phone_number, subscription_id, is_active) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, username, email, password, role, phone_number, subscription_id, 0],
     callback
   );
 };
+
 
 
 const findUserByEmail = (email, callback) => {

@@ -114,17 +114,21 @@ const initDB = () => {
   const subscriptionTable = `CREATE TABLE IF NOT EXISTS subscriptions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     parent_id INT,
-    plan_name VARCHAR(100),         -- e.g., "Basic", "Premium", etc.
+    plan_name VARCHAR(100),
     price DECIMAL(10, 2),
-    max_children INT DEFAULT 2,     -- default 2 allowed
+    max_children INT DEFAULT 2,
     is_active BOOLEAN DEFAULT TRUE,
     is_deleted BOOLEAN DEFAULT 0,
+    status ENUM('pending','active','canceled','expired') DEFAULT 'pending',
+    session_id VARCHAR(255),
+    payment_intent VARCHAR(255),
+    stripe_customer_id VARCHAR(255),
     start_date DATE,
-    end_date DATE, 
+    end_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES users(id)
-  )`;
+  );`;
 
   const AssignmentsTable = `CREATE TABLE IF NOT EXISTS assignments (
     id INT AUTO_INCREMENT PRIMARY KEY,
