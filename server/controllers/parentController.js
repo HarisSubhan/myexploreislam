@@ -1,6 +1,6 @@
 const db = require('../config/db');
+const bcrypt = require('bcrypt');
 
-// ✅ Add Child Controller
 const addChild = (req, res) => {
   const parentId = req.user.id;
   const { name, username, email, password, age } = req.body;
@@ -36,15 +36,19 @@ const addChild = (req, res) => {
           return res.status(400).json({ error: "Username or email already exists." });
         }
 
-        // Step 4: Insert new child
-        const sql = `
-          INSERT INTO children (name, username, email, password, age, parent_id)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `;
-        db.query(sql, [name, username, email, password, age, parentId], (err) => {
-          if (err) return res.status(500).json({ error: "Failed to add child." });
+        // Step 4: Hash password and insert new child
+        bcrypt.hash(password, 10, (hashErr, hash) => {
+          if (hashErr) return res.status(500).json({ error: 'Password hashing error' });
 
-          res.status(201).json({ message: "Child added successfully." });
+          const sql = `
+            INSERT INTO children (name, username, email, password, age, parent_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          db.query(sql, [name, username, email, hash, age, parentId], (err) => {
+            if (err) return res.status(500).json({ error: "Failed to add child." });
+
+            res.status(201).json({ message: "Child added successfully." });
+          });
         });
       });
     });

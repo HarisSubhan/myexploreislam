@@ -27,7 +27,6 @@ const ParentNotifications = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all"); 
 
-
   const activityToNotificationMap = {
     "Logged In": {
       type: "update",
@@ -160,32 +159,8 @@ const ParentNotifications = () => {
           };
         });
 
-        // Add system notifications (you can fetch these from another API if needed)
-        const systemNotifications = [
-          {
-            id: "system-1",
-            type: "reminder",
-            message: "Weekly progress report will be available tomorrow",
-            read: true,
-            timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-            childName: null,
-            action: "report_reminder",
-            source: "system"
-          },
-          {
-            id: "system-2", 
-            type: "alert",
-            message: "Verify your email address for important updates",
-            read: false,
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            childName: null, 
-            action: "email_verification",
-            source: "system"
-          }
-        ];
-
-        const allNotifications = [...systemNotifications, ...activityNotifications];
-        setNotifications(allNotifications);
+        // Only use real activities from API, no mock system notifications
+        setNotifications(activityNotifications);
         
       } catch (error) {
         console.error("Error fetching notifications:", error);
