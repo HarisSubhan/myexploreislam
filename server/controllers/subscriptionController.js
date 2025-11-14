@@ -128,4 +128,5 @@ module.exports = {
   activeInactiveSubscription,
   getAllActiveSubscriptions,
   createCheckoutSession
+  getAllActiveSubscriptions
 };
