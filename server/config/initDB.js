@@ -42,6 +42,7 @@ const initDB = () => {
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
+    age INT NULL,
     thumbnail_url VARCHAR(255),
     series_id INT,
     video_url VARCHAR(255),
@@ -53,10 +54,11 @@ const initDB = () => {
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
+    age INT NULL,
     thumbnail_url VARCHAR(255),
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );`
+  )`;
 
   const modulesTable = `CREATE TABLE IF NOT EXISTS modules (
     id INT AUTO_INCREMENT PRIMARY KEY,

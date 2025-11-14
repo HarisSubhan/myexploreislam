@@ -3,8 +3,90 @@ const db = require('../config/db');
 const logUserActivity = require("../utils/activityLogger");
 
 // Upload video (single ya series ka part)
+// const uploadVideoFile = (req, res) => {
+//   const { title, description, series_id } = req.body;
+
+//   if (
+//     !req.files ||
+//     !req.files.video ||
+//     !req.files.thumbnail ||
+//     req.files.video.length === 0 ||
+//     req.files.thumbnail.length === 0
+//   ) {
+//     return res.status(400).json({ error: 'Video or thumbnail not uploaded' });
+//   }
+
+//   const videoFiles = req.files.video;
+//   const thumbnailPath = `/uploads/thumbnails/${req.files.thumbnail[0].filename}`;
+
+//   // Agar series_id diya gaya hai ya multiple videos upload ho rahi hain
+//   const isSeries = !!series_id || videoFiles.length > 1;
+
+//   if (isSeries) {
+//     // Multiple videos ek saath
+//     if (videoFiles.length > 1) {
+//       const values = videoFiles.map((file) => [
+//         title,
+//         description,
+//         thumbnailPath,
+//         series_id || null,
+//         `/uploads/videos/${file.filename}`
+//       ]);
+
+//       const sql = `
+//         INSERT INTO videos (title, description, thumbnail_url, series_id, video_url)
+//         VALUES ?
+//       `;
+
+//       db.query(sql, [values], (err) => {
+//         if (err) {
+//           console.error('DB Error:', err);
+//           return res.status(500).json({ error: 'Database error during series upload.' });
+//         }
+//         res.status(201).json({ message: 'Series videos uploaded successfully.' });
+//       });
+//     } else {
+//       // Single video but series ka part
+//       const videoPath = `/uploads/videos/${videoFiles[0].filename}`;
+//       const sql = `
+//         INSERT INTO videos (title, description, thumbnail_url, series_id, video_url)
+//         VALUES (?, ?, ?, ?, ?)
+//       `;
+//       db.query(
+//         sql,
+//         [title, description, thumbnailPath, series_id, videoPath],
+//         (err) => {
+//           if (err) {
+//             console.error('DB Error:', err);
+//             return res.status(500).json({ error: 'Database error during series upload.' });
+//           }
+//           res.status(201).json({ message: 'Series video uploaded successfully.' });
+//         }
+//       );
+//     }
+//   } else {
+//     // Standalone video
+//     const videoPath = `/uploads/videos/${videoFiles[0].filename}`;
+//     const sql = `
+//       INSERT INTO videos (title, description, thumbnail_url, video_url)
+//       VALUES (?, ?, ?, ?)
+//     `;
+//     db.query(
+//       sql,
+//       [title, description, thumbnailPath, videoPath],
+//       (err) => {
+//         if (err) {
+//           console.error('DB Error:', err);
+//           return res.status(500).json({ error: 'Database error during single video upload.' });
+//         }
+//         res.status(201).json({ message: 'Single video uploaded successfully.' });
+//       }
+//     );
+//   }
+// };
+
 const uploadVideoFile = (req, res) => {
-  const { title, description, series_id } = req.body;
+  const { title, description, series_id, age } = req.body;
 
   if (
     !req.files ||
@@ -19,22 +101,21 @@ const uploadVideoFile = (req, res) => {
   const videoFiles = req.files.video;
   const thumbnailPath = `/uploads/thumbnails/${req.files.thumbnail[0].filename}`;
 
-  // Agar series_id diya gaya hai ya multiple videos upload ho rahi hain
   const isSeries = !!series_id || videoFiles.length > 1;
 
   if (isSeries) {
-    // Multiple videos ek saath
     if (videoFiles.length > 1) {
       const values = videoFiles.map((file) => [
         title,
         description,
+        age || null,
         thumbnailPath,
         series_id || null,
         `/uploads/videos/${file.filename}`
       ]);
 
       const sql = `
-        INSERT INTO videos (title, description, thumbnail_url, series_id, video_url)
+        INSERT INTO videos (title, description, age, thumbnail_url, series_id, video_url)
         VALUES ?
       `;
 
@@ -45,16 +126,16 @@ const uploadVideoFile = (req, res) => {
         }
         res.status(201).json({ message: 'Series videos uploaded successfully.' });
       });
+
     } else {
-      // Single video but series ka part
       const videoPath = `/uploads/videos/${videoFiles[0].filename}`;
       const sql = `
-        INSERT INTO videos (title, description, thumbnail_url, series_id, video_url)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO videos (title, description, age, thumbnail_url, series_id, video_url)
+        VALUES (?, ?, ?, ?, ?, ?)
       `;
       db.query(
         sql,
-        [title, description, thumbnailPath, series_id, videoPath],
+        [title, description, age || null, thumbnailPath, series_id, videoPath],
         (err) => {
           if (err) {
             console.error('DB Error:', err);
@@ -64,16 +145,16 @@ const uploadVideoFile = (req, res) => {
         }
       );
     }
+
   } else {
-    // Standalone video
     const videoPath = `/uploads/videos/${videoFiles[0].filename}`;
     const sql = `
-      INSERT INTO videos (title, description, thumbnail_url, video_url)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO videos (title, description, age, thumbnail_url, video_url)
+      VALUES (?, ?, ?, ?, ?)
     `;
     db.query(
       sql,
-      [title, description, thumbnailPath, videoPath],
+      [title, description, age || null, thumbnailPath, videoPath],
       (err) => {
         if (err) {
           console.error('DB Error:', err);
@@ -84,6 +165,7 @@ const uploadVideoFile = (req, res) => {
     );
   }
 };
+
 
 // Get all videos (latest first)
 const getAllVideos = (req, res) => {

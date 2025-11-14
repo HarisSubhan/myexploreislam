@@ -26,22 +26,38 @@ const fetchSeries = (req, res) => {
 };
 
 // Add new series
+// const addSeries = (req, res) => {
+//   const { title, description, age } = req.body;
+//   const thumbnail_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+//   createSeries(title, description, thumbnail_url, (err, result) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.status(201).json({ message: 'Series added successfully', id: result.insertId });
+//   });
+// };
+
+
 const addSeries = (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, age } = req.body;   // ✔ age added
   const thumbnail_url = req.file ? `/uploads/${req.file.filename}` : null;
 
-  createSeries(title, description, thumbnail_url, (err, result) => {
+  createSeries(title, description, age, thumbnail_url, (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.status(201).json({ message: 'Series added successfully', id: result.insertId });
   });
 };
 
+module.exports = { 
+  addSeries
+};
+
+
 // Update series
 const editSeries = (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, age } = req.body;
   const thumbnail_url = req.file ? `/uploads/${req.file.filename}` : req.body.thumbnail_url;
 
-  updateSeries(req.params.id, title, description, thumbnail_url, (err) => {
+  updateSeries(req.params.id, title, age, description, thumbnail_url, (err) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Series updated successfully' });
   });
