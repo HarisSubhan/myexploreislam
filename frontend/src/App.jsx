@@ -15,6 +15,9 @@ import ContactUs from "./pages/SharedPortal/pages/ContactUs";
 import FaqsPage from "./pages/SharedPortal/pages/FaqsPage";
 import AboutIslam from "./pages/SharedPortal/pages/AboutIslam";
 import { Toaster } from "react-hot-toast";
+import StripeCancelPage from "./components/common/StripeCancelPage";
+import StripeSuccessPage from "./components/common/StripeSuccessPage";
+
 
 
 
@@ -82,6 +85,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/set-password" element={<AdminPasswordSetup />} />
+        <Route path="/stripe/success" element={<StripeSuccessPage />} />
+        <Route path="/stripe/cancel" element={<StripeCancelPage />} />
+        
        
       
 

@@ -36,9 +36,7 @@ function AdminPasswordSetup() {
         {/* Left Side (Image) */}
         <Col md={6} className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white p-0 position-relative">
           <Image src={logo} alt="Explore Islam" fluid className="position-absolute w-100 h-100" style={{ objectFit: "cover", opacity: 0.75 }} />
-          <div className="position-relative text-center px-4">
-            <h1 className="display-5 mb-3" style={{ fontFamily: "serif" }}>فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ</h1>
-          </div>
+         
         </Col>
 
         {/* Right Side (Form) */}
