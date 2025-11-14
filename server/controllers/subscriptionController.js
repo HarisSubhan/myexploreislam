@@ -127,6 +127,6 @@ module.exports = {
   updateSubscription,
   activeInactiveSubscription,
   getAllActiveSubscriptions,
-  createCheckoutSession
+  createCheckoutSession,
   getAllActiveSubscriptions
 };

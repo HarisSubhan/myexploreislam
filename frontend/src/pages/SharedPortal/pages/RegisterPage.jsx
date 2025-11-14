@@ -37,7 +37,7 @@ const RegisterPage = () => {
       setSubscriptionId(location.state.subscription_id);
     } else {
       setError("Please select a subscription plan first.");
-      setTimeout(() => navigate("/subscriptions"), 2000);
+      setTimeout(() => navigate("/subscription"), 2000);
     }
   }, [location, navigate]);
 
@@ -64,37 +64,29 @@ const RegisterPage = () => {
         subscription_id,
       });
 
-      console.log("API Response:", res); 
+      console.log("API Response:", res);
 
-      
-      if (res && (res.token || res.data || res.success)) {
+      // Check if response contains Stripe checkout URL
+      if (res && res.stripeCheckoutUrl) {
+        // Redirect to Stripe payment page
+        window.location.href = res.stripeCheckoutUrl;
+      } 
+      // Agar direct token mil raha hai (without payment)
+      else if (res && res.token) {
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("userRole", "parent");
+        localStorage.setItem("subscription_id", subscription_id);
         
-        if (res.token) {
-          localStorage.setItem("token", res.token);
-          localStorage.setItem("userRole", "parent");
-          localStorage.setItem("subscription_id", subscription_id);
-        }
-
         setSuccess("Registration successful! Redirecting...");
-
-        
         setTimeout(() => {
           navigate("/parent");
-        },);
-      } else {
-        
-        if (res && res.message) {
-          setSuccess(res.message);
-          setTimeout(() => {
-            navigate("/login"); 
-          }, 2000);
-        } else {
-          throw new Error("Registration completed but no token received");
-        }
+        }, 2000);
+      } 
+      else {
+        throw new Error("Unexpected response from server");
       }
     } catch (err) {
       console.error("Registration error:", err);
-
       
       const errorMessage =
         err.response?.data?.message ||
@@ -127,6 +119,9 @@ const RegisterPage = () => {
                 <img src={logo} alt="Logo" style={{ width: 300 }} />
                 <h2 className="mt-2">Explore Islam</h2>
                 <p>Platform for Young Minds</p>
+                <p className="text-muted">
+                  You will be redirected to Stripe for payment after registration
+                </p>
               </div>
 
               {error && <Alert variant="danger">{error}</Alert>}
@@ -143,6 +138,7 @@ const RegisterPage = () => {
                     required
                   />
                 </Form.Group>
+                
                 <Form.Group className="mb-3">
                   <Form.Control
                     type="text"
@@ -201,7 +197,7 @@ const RegisterPage = () => {
                   className="w-100 mb-3"
                   disabled={loading || !subscription_id}
                 >
-                  {loading ? "Processing..." : "Register"}
+                  {loading ? "Processing..." : "Register & Proceed to Payment"}
                 </Button>
               </Form>
 
