@@ -67,7 +67,7 @@ const initDB = () => {
     is_active BOOLEAN DEFAULT 1,
     is_deleted BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );`
+  )`;
 
   const quizTable = `CREATE TABLE IF NOT EXISTS quizzes (
     id INT AUTO_INCREMENT PRIMARY KEY,
