@@ -105,7 +105,66 @@ const getRecentActivityLogs = (req, res) => {
   });
 };
 
+// ✅ Assign video or series to a specific child
+const assignContentToChild = (req, res) => {
+  const parentId = req.user.id;  // Authenticated parent
+  const { child_id, video_id, series_id } = req.body;
+
+  if (!child_id || (!video_id && !series_id)) {
+    return res.status(400).json({
+      error: "child_id required and either video_id or series_id must be provided."
+    });
+  }
+
+  const sql = `
+        INSERT INTO child_assigned_content (parent_id, child_id, video_id, series_id)
+        VALUES (?, ?, ?, ?)
+    `;
+
+  db.query(sql, [parentId, child_id, video_id || null, series_id || null], (err, result) => {
+    if (err) {
+      console.error("Error assigning content:", err);
+      return res.status(500).json({ error: "Database error while assigning content." });
+    }
+
+    res.status(201).json({
+      message: "Content assigned successfully!",
+      id: result.insertId
+    });
+  });
+};
+
+// ✅ Get all assigned content for a specific child
+const getAssignedContentForChild = (req, res) => {
+  const child_id = req.params.child_id;
+
+  const sql = `
+        SELECT cac.id, cac.video_id, cac.series_id, v.title AS video_title, s.title AS series_title
+        FROM child_assigned_content cac
+        LEFT JOIN videos v ON cac.video_id = v.id
+        LEFT JOIN series s ON cac.series_id = s.id
+        WHERE cac.child_id = ?
+        ORDER BY cac.created_at DESC
+    `;
+
+  db.query(sql, [child_id], (err, rows) => {
+    if (err) {
+      console.error("Error fetching assigned content:", err);
+      return res.status(500).json({ error: "Database error while fetching assigned content." });
+    }
+
+    res.status(200).json({
+      message: "Assigned content fetched successfully",
+      total: rows.length,
+      data: rows
+    });
+  });
+};
+
+
 module.exports = {
   addChild,
   getRecentActivityLogs,
+  assignContentToChild,
+  getAssignedContentForChild
 };

@@ -203,19 +203,30 @@ const initDB = () => {
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   )
   `;
+
+  const childAssignContentTable = `
+  CREATE TABLE IF NOT EXISTS child_assigned_content (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  parent_id INT NOT NULL,
+  child_id INT NOT NULL,
+  video_id INT DEFAULT NULL,
+  series_id INT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+  `;
   db.query(userTable, (err) => {
     if (err) {
-      console.log(':x: Error creating users table:', err.code, err.message);
+      console.log('Error creating users table:', err.code, err.message);
     } else {
-      console.log(':white_check_mark: Users table ready.');
+      console.log(' Users table ready.');
       db.query("SELECT * FROM users WHERE role = 'admin'", (err, results) => {
-        if (err) return console.log(':x: Admin check error:', err.message);
+        if (err) return console.log('Admin check error:', err.message);
         if (results.length === 0) {
           // No admin exists – create one without password
           const sql = `INSERT INTO users (name, email, role) VALUES (?, ?, 'admin')`;
           db.query(sql, ['Super Admin', 'admin@exploreislam.com'], (err) => {
-            if (err) return console.log(':x: Failed to create admin:', err.message);
-            console.log(':white_check_mark: Default admin created (no password)');
+            if (err) return console.log('Failed to create admin:', err.message);
+            console.log(' Default admin created (no password)');
           });
         }
       });
@@ -223,122 +234,130 @@ const initDB = () => {
   });
   db.query(childrenTable, (err) => {
     if (err) {
-      console.log(':x: Error creating children table:', err.code, err.message);
+      console.log('Error creating children table:', err.code, err.message);
     } else {
-      console.log(':white_check_mark: Users table ready.');
+      console.log('Users table ready.');
     }
   });
   db.query(videoTable, (err) => {
     if (err) {
-      console.log(":x: Error creating videos table:", err.message);
+      console.log("Error creating videos table:", err.message);
     } else {
-      console.log(":white_check_mark: Videos table ready.");
+      console.log("Videos table ready.");
     }
   });
   db.query(seriesTable, (err) => {
     if (err) {
-      console.log(":x: Error creating series table:", err.message);
+      console.log("Error creating series table:", err.message);
     } else {
-      console.log(":white_check_mark: Series table ready.");
+      console.log("Series table ready.");
     }
   });
   db.query(quizTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Quiz table:", err.message);
+      console.log("Error creating Quiz table:", err.message);
     } else {
-      console.log(":white_check_mark: Quiz table ready.");
+      console.log("Quiz table ready.");
     }
   });
   db.query(quizQuestionsTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Quiz Questions table:", err.message);
+      console.log("Error creating Quiz Questions table:", err.message);
     } else {
-      console.log(":white_check_mark: Quiz Questions table ready.");
+      console.log("Quiz Questions table ready.");
     }
   });
   db.query(modulesTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Modules table:", err.message);
+      console.log("Error creating Modules table:", err.message);
     } else {
-      console.log(":white_check_mark: Modules table ready.");
+      console.log("Modules table ready.");
     }
   });
   db.query(booksTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Books table:", err.message);
+      console.log("Error creating Books table:", err.message);
     } else {
-      console.log(":white_check_mark: Books table ready.");
+      console.log("Books table ready.");
     }
   });
   db.query(blogsTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Blogs table:", err.message);
+      console.log("Error creating Blogs table:", err.message);
     } else {
-      console.log(":white_check_mark: Blogs table ready.");
+      console.log("Blogs table ready.");
     }
   });
   db.query(subscriptionTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Subscription table:", err.message);
+      console.log("Error creating Subscription table:", err.message);
     } else {
-      console.log(":white_check_mark: Subscription table ready.");
+      console.log("Subscription table ready.");
     }
   });
   db.query(AssignmentsTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Assignment  table:", err.message);
+      console.log("Error creating Assignment  table:", err.message);
     } else {
-      console.log(":white_check_mark: Assignment table ready.");
+      console.log("Assignment table ready.");
     }
   });
   db.query(categoriesTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Categories table:", err.message);
+      console.log("Error creating Categories table:", err.message);
     } else {
-      console.log(":white_check_mark: Categories table ready.");
+      console.log("Categories table ready.");
     }
   });
   db.query(childRequestTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Child Requests table:", err.message);
+      console.log("Error creating Child Requests table:", err.message);
     } else {
-      console.log(":white_check_mark: Child Requests table ready.");
+      console.log("Child Requests table ready.");
     }
   });
   db.query(quizSubmissionTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Quiz Submission table:", err.message);
+      console.log("Error creating Quiz Submission table:", err.message);
     } else {
-      console.log(":white_check_mark: Quiz Submission table ready.");
+      console.log("Quiz Submission table ready.");
     }
   });
   db.query(assignmentSubmissionTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Assignment Submission table:", err.message);
+      console.log("Error creating Assignment Submission table:", err.message);
     } else {
-      console.log(":white_check_mark: Assignment Submission table ready.");
+      console.log("Assignment Submission table ready.");
     }
   });
   db.query(userActivityTable, (err) => {
     if (err) {
-      console.log(":x: Error creating User Activity table:", err.message);
+      console.log("Error creating User Activity table:", err.message);
     } else {
-      console.log(":white_check_mark: User Activity table ready.");
+      console.log("User Activity table ready.");
     }
   });
   db.query(ticketsTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Tickets table:", err.message);
+      console.log("Error creating Tickets table:", err.message);
     } else {
-      console.log(":white_check_mark: Tickets table ready.");
+      console.log("Tickets table ready.");
     }
   });
   db.query(couponTable, (err) => {
     if (err) {
-      console.log(":x: Error creating Coupons table:", err.message);
+      console.log("Error creating Coupons table:", err.message);
     } else {
-      console.log(":white_check_mark: Coupons table ready.");
+      console.log("Coupons table ready.");
+    }
+  });
+  db.query(childAssignContentTable, (err) => {
+    if (err) {
+      console.log("Error creating child Content Assign table:", err.message);
+    } else {
+      console.log("Child Content Assign table ready.");
     }
   });
 };
+
 module.exports = initDB;
