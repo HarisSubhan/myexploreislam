@@ -21,6 +21,7 @@ const fetchSeries = (req, res) => {
     res.json(results[0]);
   });
 };
+
 const addSeries = (req, res) => {
   const { title, description, age } = req.body;   // :heavy_check_mark: age added
   const thumbnail_url = req.file ? `/uploads/${req.file.filename}` : null;

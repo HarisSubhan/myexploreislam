@@ -17,7 +17,7 @@ router.get('/admin/all', verifyToken, isAdmin, subscriptionController.getAllSubs
 router.put('/:id', verifyToken, isAdmin, subscriptionController.updateSubscription);
 router.put('/:id/status', verifyToken, isAdmin, subscriptionController.activeInactiveSubscription);
 
-router.post('/create-checkout-session', verifyToken, isAdmin, subscriptionController.createCheckoutSession);
+router.post('/create-checkout-session', subscriptionController.createCheckoutSession);
 
 
 module.exports = router;
