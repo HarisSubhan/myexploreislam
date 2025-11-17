@@ -126,6 +126,13 @@ const RegisterPage = () => {
                 <h2 className="mt-2">Explore Islam</h2>
                 <p>Platform for Young Minds</p>
                 
+                {subscriptionData && (
+                  <div className="alert alert-info">
+                    <strong>Selected Plan:</strong> {subscriptionData.plan_name}<br />
+                    <strong>Price:</strong> ${subscriptionData.price}/month<br />
+                    <strong>Max Children:</strong> {subscriptionData.max_children}
+                  </div>
+                )}
               </div>
 
               {error && <Alert variant="danger">{error}</Alert>}

@@ -87,6 +87,7 @@ function App() {
         <Route path="/set-password" element={<AdminPasswordSetup />} />
         <Route path="/stripe/success" element={<StripeSuccessPage />} />
         <Route path="/stripe/cancel" element={<StripeCancelPage />} />
+        
 
 
         {/* Catch-all route */}

@@ -69,18 +69,25 @@ const RegisterPage = () => {
         subscription_id: subscriptionData.id,
       });
 
+      console.log("Full Registration Response:", registerResponse);
+
+      // Simple response handling - backend se direct user_id expect karein
       let userId = registerResponse.user_id || registerResponse.id;
 
-      if (userId) {
-        const stripePriceId = import.meta.env.VITE_STRIPE_PRICE_ID; 
+      console.log("Extracted User ID:", userId);
 
+      if (userId) {
+        // Step 2: Create Stripe Checkout Session
+        // Sirf parent_id bhejein, baaki data backend manage karega
         const checkoutData = {
           parent_id: userId,
+          // Plan details bhejna optional hai agar backend mein already hain
           plan_name: subscriptionData.plan_name,
           subscription_id: subscriptionData.id,
-          stripe_price_id: stripePriceId,
-          price: subscriptionData.price,
+          stripe_price_id: process.env.REACT_APP_STRIPE_PRICE_ID_Islam
         };
+
+        console.log("Creating checkout with:", checkoutData);
         
         const checkoutResponse = await CreateStripeCheckoutSession(checkoutData);
         
@@ -94,6 +101,8 @@ const RegisterPage = () => {
         throw new Error("User registration failed - no user ID received");
       }
     } catch (err) {
+      console.error("Registration/Payment error:", err);
+      
       const errorMessage =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -126,6 +135,13 @@ const RegisterPage = () => {
                 <h2 className="mt-2">Explore Islam</h2>
                 <p>Platform for Young Minds</p>
                 
+                {subscriptionData && (
+                  <div className="alert alert-info">
+                    <strong>Selected Plan:</strong> {subscriptionData.plan_name}<br />
+                    <strong>Price:</strong> ${subscriptionData.price}/month<br />
+                    <strong>Max Children:</strong> {subscriptionData.max_children}
+                  </div>
+                )}
               </div>
 
               {error && <Alert variant="danger">{error}</Alert>}

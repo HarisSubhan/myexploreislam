@@ -50,61 +50,78 @@ const RegisterPage = () => {
     setError("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
+  setLoading(true);
 
-    if (!subscriptionData) {
-      setError("Please select a subscription plan first.");
-      setLoading(false);
-      return;
-    }
+  if (!subscriptionData) {
+    setError("Please select a subscription plan first.");
+    setLoading(false);
+    return;
+  }
 
-    try {
-      // Step 1: Register user
-      const registerResponse = await RegisterApi({
-        ...form,
-        subscription_id: subscriptionData.id,
-      });
+  try {
+    // Step 1: Register user
+    const registerResponse = await RegisterApi({
+      ...form,
+      subscription_id: subscriptionData.id,
+    });
 
-      let userId = registerResponse.user_id || registerResponse.id;
+    console.log("Full Registration Response:", registerResponse);
 
-      if (userId) {
-        const stripePriceId = import.meta.env.VITE_STRIPE_PRICE_ID; 
+    let userId = registerResponse.user_id || registerResponse.id;
+    console.log("Extracted User ID:", userId);
 
-        const checkoutData = {
-          parent_id: userId,
-          plan_name: subscriptionData.plan_name,
-          subscription_id: subscriptionData.id,
-          stripe_price_id: stripePriceId,
-          price: subscriptionData.price,
-        };
-        
-        const checkoutResponse = await CreateStripeCheckoutSession(checkoutData);
-        
-        if (checkoutResponse && checkoutResponse.url) {
-          // Step 3: Redirect to Stripe payment
-          window.location.href = checkoutResponse.url;
-        } else {
-          throw new Error("Failed to create payment session");
-        }
-      } else {
-        throw new Error("User registration failed - no user ID received");
+    if (userId) {
+      // Step 2: Create Stripe Checkout Session with environment variable
+      const stripePriceId = import.meta.env.VITE_STRIPE_PRICE_ID;
+      
+      // Check if environment variable is loaded
+      if (!stripePriceId) {
+        console.error("Stripe Price ID not found in environment variables");
+        // Fallback to hardcoded value
+        console.log("Using fallback Stripe Price ID");
       }
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Registration failed. Please try again.";
 
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      const checkoutData = {
+        parent_id: userId,
+        plan_name: subscriptionData.plan_name,
+        subscription_id: subscriptionData.id,
+        stripe_price_id: import.VITE_STRIPE_PRICE_ID , 
+        price: subscriptionData.price,
+      
+      };
+
+      console.log("Creating checkout with:", checkoutData);
+      console.log("Environment Stripe Price ID:", import.meta.env.VITE_STRIPE_PRICE_ID);
+      
+      const checkoutResponse = await CreateStripeCheckoutSession(checkoutData);
+      
+      if (checkoutResponse && checkoutResponse.url) {
+        // Step 3: Redirect to Stripe payment
+        window.location.href = checkoutResponse.url;
+      } else {
+        throw new Error("Failed to create payment session");
+      }
+    } else {
+      throw new Error("User registration failed - no user ID received");
     }
-  };
+  } catch (err) {
+    console.error("Registration/Payment error:", err);
+    
+    const errorMessage =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.message ||
+      "Registration failed. Please try again.";
+
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>
@@ -126,6 +143,13 @@ const RegisterPage = () => {
                 <h2 className="mt-2">Explore Islam</h2>
                 <p>Platform for Young Minds</p>
                 
+                {subscriptionData && (
+                  <div className="alert alert-info">
+                    <strong>Selected Plan:</strong> {subscriptionData.plan_name}<br />
+                    <strong>Price:</strong> ${subscriptionData.price}/month<br />
+                    <strong>Max Children:</strong> {subscriptionData.max_children}
+                  </div>
+                )}
               </div>
 
               {error && <Alert variant="danger">{error}</Alert>}
