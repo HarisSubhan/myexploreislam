@@ -47,34 +47,9 @@ const CartoonModules = () => {
           return;
         }
 
-        console.log("Fetching assigned content for child:", childId);
-        
         // Fetch assigned content for the child
-        const response = await getAssignedContentApi(childId);
-        console.log("API Response:", response);
+        const assignedContent = await getAssignedContentApi(childId);
         
-        // Handle different response formats
-        let assignedContent = [];
-        
-        if (Array.isArray(response)) {
-          // If response is directly an array
-          assignedContent = response;
-        } else if (response && Array.isArray(response.data)) {
-          // If response has data array
-          assignedContent = response.data;
-        } else if (response && response.data && Array.isArray(response.data.content)) {
-          // If response has data.content array
-          assignedContent = response.data.content;
-        } else if (response && response.content && Array.isArray(response.content)) {
-          // If response has content array
-          assignedContent = response.content;
-        } else {
-          console.warn("Unexpected API response format:", response);
-          assignedContent = [];
-        }
-
-        console.log("Processed assigned content:", assignedContent);
-
         // Process assigned content into singles and series
         const singleVideosData = [];
         const seriesModulesData = [];
@@ -82,51 +57,44 @@ const CartoonModules = () => {
         assignedContent.forEach((item) => {
           const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-        
-
-          if (item.contentType === 'video' || item.type === 'single' || item.video_id) {
+          if (item.contentType === 'video' || item.type === 'single') {
             // Single video
             singleVideosData.push({
-              id: item.contentId || item.id || item.video_id,
-              title: capitalizeFirstWord(item.title || item.name || "Untitled Video"),
+              id: item.contentId || item.id,
+              title: capitalizeFirstWord(item.title || "Untitled Video"),
               description: item.description || "No description available",
-              thumbnail: item.thumbnail_url || item.thumbnail
-                ? (item.thumbnail_url || item.thumbnail).startsWith("http")
-                  ? (item.thumbnail_url || item.thumbnail)
-                  : (item.thumbnail_url || item.thumbnail).startsWith("/")
-                    ? `${baseUrl}${item.thumbnail_url || item.thumbnail}`
-                    : `${baseUrl}/${item.thumbnail_url || item.thumbnail}`
+              thumbnail: item.thumbnail_url
+                ? item.thumbnail_url.startsWith("http")
+                  ? item.thumbnail_url
+                  : item.thumbnail_url.startsWith("/")
+                    ? `${baseUrl}${item.thumbnail_url}`
+                    : `${baseUrl}/${item.thumbnail_url}`
                 : "https://via.placeholder.com/300x200?text=No+Thumbnail",
-              videoUrl: item.video_url || item.videoUrl,
+              videoUrl: item.video_url,
               type: "single",
-              slug: createSlug(item.title || item.name || `video-${item.contentId || item.id || item.video_id}`),
+              slug: createSlug(item.title || `video-${item.contentId || item.id}`),
             });
-          } else if (item.contentType === 'series' || item.type === 'series' || item.series_id) {
+          } else if (item.contentType === 'series' || item.type === 'series') {
             // Series
             seriesModulesData.push({
-              id: item.contentId || item.id || item.series_id,
-              title: capitalizeFirstWord(item.title || item.name || `Series ${item.contentId || item.id || item.series_id}`),
+              id: item.contentId || item.id,
+              title: capitalizeFirstWord(item.title || `Series ${item.contentId || item.id}`),
               description: item.description || "Explore learning series",
-              thumbnail: item.thumbnail_url || item.thumbnail || "https://via.placeholder.com/300x200?text=Series",
+              thumbnail: item.thumbnail_url || "https://via.placeholder.com/300x200?text=Series",
               videoCount: item.video_count || item.videos?.length || 0,
               type: "series",
-              slug: createSlug(item.title || item.name || `series-${item.contentId || item.id || item.series_id}`),
+              slug: createSlug(item.title || `series-${item.contentId || item.id}`),
               videos: item.videos || [],
             });
-          } else {
-            console.warn("Unknown content type:", item);
           }
         });
-
-        console.log("Single videos:", singleVideosData);
-        console.log("Series modules:", seriesModulesData);
 
         setSingleVideos(singleVideosData);
         setSeriesModules(seriesModulesData);
 
       } catch (err) {
-        console.error("Error fetching assigned content:", err);
         setError("Failed to load assigned content. Please try again.");
+        console.error("Error fetching assigned content:", err);
       } finally {
         setLoading(false);
       }
@@ -314,7 +282,18 @@ const CartoonModules = () => {
         </div>
       )}
 
-   
+      {/* Welcome Message */}
+      {!loading && !error && (
+        <div className="alert alert-info mb-4">
+          <h6 className="alert-heading">Welcome to your learning content! 🎉</h6>
+          <p className="mb-0">
+            Here you'll find all the videos and series that have been assigned to you. 
+            {singleVideos.length === 0 && seriesModules.length === 0 && 
+              " No content has been assigned yet. Please ask your parent to assign some content for you."
+            }
+          </p>
+        </div>
+      )}
 
       {/* Tabs */}
       <Tabs

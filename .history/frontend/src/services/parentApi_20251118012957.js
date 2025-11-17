@@ -7,9 +7,9 @@ const API_URL = `${baseUrl}/api/child-requests`;
 
 export const assignContentToChildApi = async (assignData) => {
   try {
-    
+    // Get token from getToken function
     const token = getToken();
-  
+    console.log("Token from getToken:", token); // Debug ke liye
     
     const config = {
       headers: {
@@ -17,7 +17,7 @@ export const assignContentToChildApi = async (assignData) => {
       }
     };
     
-    
+    // Add authorization header if token exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,31 +25,6 @@ export const assignContentToChildApi = async (assignData) => {
     const response = await axios.post(`${baseUrl}/api/parent/assign-content`, assignData, config);
     return response.data;
   } catch (error) {
-    throw error;
-  }
-};
-
-
-export const getAssignedContentApi = async (childId) => {
-  try {
-    const token = getToken();
-    
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    console.log(`Fetching assigned content for child ${childId}`);
-    const response = await axios.get(`${baseUrl}/api/parent/child/${childId}/assigned-content`, config);
-    console.log("Assigned content API response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error in getAssignedContentApi:", error.response?.data || error.message);
     throw error;
   }
 };

@@ -12,7 +12,8 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { getAssignedContentApi } from "../../../services/parentApi";
+import { getAllVideosApi } from "../../../services/videoApi";
+import { getSeriesApi } from "../../../services/seriesApi";
 import { createSlug } from "../../../utils/slugify";
 import { FaVideo, FaListUl, FaPlay } from "react-icons/fa";
 
@@ -32,107 +33,90 @@ const CartoonModules = () => {
   };
 
   useEffect(() => {
-    const fetchAssignedContent = async () => {
+    const fetchAllContent = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Get child ID from localStorage or user data
-        const userData = JSON.parse(localStorage.getItem("user") || "{}");
-        const childId = userData.id || userData.childId;
-        
-        if (!childId) {
-          setError("Child ID not found. Please login again.");
-          setLoading(false);
-          return;
-        }
+        // Check cache
+        const cached = localStorage.getItem("allContentCache");
+        const cacheTimestamp = localStorage.getItem("allContentCacheTimestamp");
+        const CACHE_DURATION = 5 * 60 * 1000;
 
-        console.log("Fetching assigned content for child:", childId);
-        
-        // Fetch assigned content for the child
-        const response = await getAssignedContentApi(childId);
-        console.log("API Response:", response);
-        
-        // Handle different response formats
-        let assignedContent = [];
-        
-        if (Array.isArray(response)) {
-          // If response is directly an array
-          assignedContent = response;
-        } else if (response && Array.isArray(response.data)) {
-          // If response has data array
-          assignedContent = response.data;
-        } else if (response && response.data && Array.isArray(response.data.content)) {
-          // If response has data.content array
-          assignedContent = response.data.content;
-        } else if (response && response.content && Array.isArray(response.content)) {
-          // If response has content array
-          assignedContent = response.content;
-        } else {
-          console.warn("Unexpected API response format:", response);
-          assignedContent = [];
-        }
-
-        console.log("Processed assigned content:", assignedContent);
-
-        // Process assigned content into singles and series
-        const singleVideosData = [];
-        const seriesModulesData = [];
-
-        assignedContent.forEach((item) => {
-          const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
-        
-
-          if (item.contentType === 'video' || item.type === 'single' || item.video_id) {
-            // Single video
-            singleVideosData.push({
-              id: item.contentId || item.id || item.video_id,
-              title: capitalizeFirstWord(item.title || item.name || "Untitled Video"),
-              description: item.description || "No description available",
-              thumbnail: item.thumbnail_url || item.thumbnail
-                ? (item.thumbnail_url || item.thumbnail).startsWith("http")
-                  ? (item.thumbnail_url || item.thumbnail)
-                  : (item.thumbnail_url || item.thumbnail).startsWith("/")
-                    ? `${baseUrl}${item.thumbnail_url || item.thumbnail}`
-                    : `${baseUrl}/${item.thumbnail_url || item.thumbnail}`
-                : "https://via.placeholder.com/300x200?text=No+Thumbnail",
-              videoUrl: item.video_url || item.videoUrl,
-              type: "single",
-              slug: createSlug(item.title || item.name || `video-${item.contentId || item.id || item.video_id}`),
-            });
-          } else if (item.contentType === 'series' || item.type === 'series' || item.series_id) {
-            // Series
-            seriesModulesData.push({
-              id: item.contentId || item.id || item.series_id,
-              title: capitalizeFirstWord(item.title || item.name || `Series ${item.contentId || item.id || item.series_id}`),
-              description: item.description || "Explore learning series",
-              thumbnail: item.thumbnail_url || item.thumbnail || "https://via.placeholder.com/300x200?text=Series",
-              videoCount: item.video_count || item.videos?.length || 0,
-              type: "series",
-              slug: createSlug(item.title || item.name || `series-${item.contentId || item.id || item.series_id}`),
-              videos: item.videos || [],
-            });
-          } else {
-            console.warn("Unknown content type:", item);
+        if (cached && cacheTimestamp) {
+          const cacheAge = Date.now() - parseInt(cacheTimestamp);
+          if (cacheAge < CACHE_DURATION) {
+            const cachedData = JSON.parse(cached);
+            setSingleVideos(cachedData.singleVideos || []);
+            setSeriesModules(cachedData.seriesModules || []);
+            setLoading(false);
+            return;
           }
-        });
+        }
 
-        console.log("Single videos:", singleVideosData);
-        console.log("Series modules:", seriesModulesData);
+        // Fetch all videos and series
+        const [videosData, seriesData] = await Promise.all([
+          getAllVideosApi(),
+          getSeriesApi(),
+        ]);
+
+        const baseUrl =
+          import.meta.env.VITE_API_BASE_URL;
+
+        // Process Single Videos
+        const singleVideosData = videosData
+          .filter((video) => !video.series_id)
+          .map((item) => ({
+            id: item.id,
+            title: capitalizeFirstWord(item.title || "Untitled Video"),
+            description: item.description || "No description available",
+            thumbnail: item.thumbnail_url
+              ? item.thumbnail_url.startsWith("http")
+                ? item.thumbnail_url
+                : item.thumbnail_url.startsWith("/")
+                  ? `${baseUrl}${item.thumbnail_url}`
+                  : `${baseUrl}/${item.thumbnail_url}`
+              : "https://via.placeholder.com/300x200?text=No+Thumbnail",
+            videoUrl: item.video_url,
+            type: "single",
+            slug: createSlug(item.title || `video-${item.id}`),
+          }));
+
+        // Process Series
+        const seriesModulesData = seriesData.map((series) => ({
+          id: series.id,
+          title: capitalizeFirstWord(
+            series.name || series.title || `Series ${series.id}`
+          ),
+          description: series.description || "Explore learning series",
+          thumbnail: series.thumbnail_url,
+          videoCount: series.video_count || series.videos?.length || 0,
+          type: "series",
+          slug: createSlug(
+            series.name || series.title || `series-${series.id}`
+          ),
+          videos: series.videos || [],
+        }));
 
         setSingleVideos(singleVideosData);
         setSeriesModules(seriesModulesData);
 
+        // Cache data
+        const cacheData = {
+          singleVideos: singleVideosData,
+          seriesModules: seriesModulesData,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem("allContentCache", JSON.stringify(cacheData));
+        localStorage.setItem("allContentCacheTimestamp", Date.now().toString());
       } catch (err) {
-        console.error("Error fetching assigned content:", err);
-        setError("Failed to load assigned content. Please try again.");
+        setError("Failed to load content. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAssignedContent();
+    fetchAllContent();
   }, []);
 
   const handleTabChange = (tab) => {
@@ -152,7 +136,9 @@ const CartoonModules = () => {
     navigate("/child");
   };
 
-  const refreshContent = () => {
+  const clearCache = () => {
+    localStorage.removeItem("allContentCache");
+    localStorage.removeItem("allContentCacheTimestamp");
     window.location.reload();
   };
 
@@ -289,14 +275,14 @@ const CartoonModules = () => {
             ← Back to Dashboard
           </Button>
           <h2 className="fw-bold d-inline-block" style={{ color: "#0d6efd" }}>
-            My Assigned Content
+            Browse Content
           </h2>
         </div>
         <Button
-          onClick={refreshContent}
+          onClick={clearCache}
           variant="outline-secondary"
           size="sm"
-          title="Refresh content"
+          title="Clear cache and reload"
         >
           Refresh
         </Button>
@@ -313,8 +299,6 @@ const CartoonModules = () => {
           </Button>
         </div>
       )}
-
-   
 
       {/* Tabs */}
       <Tabs
@@ -344,8 +328,8 @@ const CartoonModules = () => {
               <Col xs={12} className="text-center py-5">
                 <div className="text-muted">
                   <FaVideo size={48} className="mb-3" />
-                  <h5>No single videos assigned</h5>
-                  <p>Your parent hasn't assigned any single videos yet</p>
+                  <h5>No single videos available</h5>
+                  <p>Check back later for new content</p>
                 </div>
               </Col>
             )}
@@ -373,8 +357,8 @@ const CartoonModules = () => {
               <Col xs={12} className="text-center py-5">
                 <div className="text-muted">
                   <FaListUl size={48} className="mb-3" />
-                  <h5>No series assigned</h5>
-                  <p>Your parent hasn't assigned any series yet</p>
+                  <h5>No series available</h5>
+                  <p>Check back later for new series content</p>
                 </div>
               </Col>
             )}
@@ -390,7 +374,7 @@ const CartoonModules = () => {
             {activeTab === "singles"
               ? singleVideos.length
               : seriesModules.length}{" "}
-            {activeTab === "singles" ? "single videos" : "series"} • Total Assigned:{" "}
+            {activeTab === "singles" ? "single videos" : "series"} • Total:{" "}
             {singleVideos.length + seriesModules.length} items
           </small>
         </div>

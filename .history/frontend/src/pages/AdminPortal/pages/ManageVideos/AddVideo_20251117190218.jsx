@@ -95,7 +95,7 @@ const AddVideo = () => {
               <Form.Group className="mb-3">
                 <Form.Label>Age</Form.Label>
                 <Form.Control
-                  type="number"
+                  as="textarea"
                   rows={1}
                   required
                   value={age}
