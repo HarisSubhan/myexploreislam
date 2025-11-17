@@ -1,0 +1,400 @@
+.learning-reports {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.reports-header h1 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+.period-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+}
+
+.reports-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  color: #666;
+  font-weight: 500;
+}
+
+.tab-button.active {
+  color: #3498db;
+  border-bottom-color: #3498db;
+}
+
+.tab-button:hover {
+  color: #2980b9;
+}
+
+/* Subjects & Progress Styles */
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.subject-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.subject-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.subject-header h3 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.grade-badge {
+  background: #3498db;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #ecf0f1;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #27ae60;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.strengths-weaknesses div {
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.strength strong {
+  color: #27ae60;
+}
+
+.weakness strong {
+  color: #e74c3c;
+}
+
+/* Assignments Styles */
+.assignments-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.overview-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.overview-card.completed {
+  border-top: 4px solid #27ae60;
+}
+
+.overview-card.in-progress {
+  border-top: 4px solid #f39c12;
+}
+
+.overview-card.overdue {
+  border-top: 4px solid #e74c3c;
+}
+
+.overview-card h4 {
+  margin: 0 0 10px 0;
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+.overview-card .count {
+  font-size: 2em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.assignments-list h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.assignment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 15px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.assignment-info h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.subject-tag {
+  background: #ecf0f1;
+  color: #7f8c8d;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  margin-right: 10px;
+}
+
+.due-date {
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+.assignment-status {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.status-completed {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.status-in-progress {
+  background: #fdebd0;
+  color: #f39c12;
+}
+
+.status-overdue {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.score {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* Report Card Styles */
+.report-card-actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.action-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.action-button.print {
+  background: #3498db;
+  color: white;
+}
+
+.action-button.email {
+  background: #27ae60;
+  color: white;
+}
+
+.action-button:hover {
+  opacity: 0.9;
+}
+
+.report-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.report-header {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 20px;
+}
+
+.report-header h2 {
+  color: #2c3e50;
+  margin: 0 0 20px 0;
+}
+
+.student-info {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.student-info p {
+  margin: 0;
+  color: #7f8c8d;
+}
+
+.subjects-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.subjects-table th,
+.subjects-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.subjects-table th {
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.grade-cell {
+  font-weight: bold;
+  color: #3498db;
+}
+
+.progress-bar-small {
+  width: 80px;
+  height: 6px;
+  background: #ecf0f1;
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.report-summary {
+  border-top: 2px solid #3498db;
+  padding-top: 20px;
+}
+
+.summary-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+}
+
+.overall-grade {
+  font-size: 1.2em;
+  color: #2c3e50;
+}
+
+.teacher-comments p {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+  margin: 10px 0 0 0;
+}
+
+/* Print Styles */
+@media print {
+  .reports-tabs,
+  .report-card-actions,
+  .period-select {
+    display: none;
+  }
+  
+  .report-card {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .reports-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .reports-tabs {
+    flex-direction: column;
+  }
+  
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .assignments-overview {
+    grid-template-columns: 1fr;
+  }
+  
+  .assignment-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .summary-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .student-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
