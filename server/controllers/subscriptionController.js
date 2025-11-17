@@ -3,27 +3,24 @@ const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const createCheckoutSession = async (req, res) => {
-  const { plan_name, price, max_children, stripe_price_id } = req.body;
-  const parent_id = req.user.id; // parent must be logged in
+  const { plan_name, price, max_children, stripe_price_id, parent_id } = req.body;
 
-  if (!plan_name || !price || !stripe_price_id) {
+  if (!plan_name || !price || !stripe_price_id || !parent_id) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    // 1️⃣ Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
         { price: stripe_price_id, quantity: 1 }
       ],
-      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      success_url: `http://localhost:5000/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:5000/payment-cancel`,
       metadata: { parent_id, plan_name, price }
     });
 
-    // 2️⃣ Save pending subscription in DB
     const data = {
       parent_id,
       plan_name,
@@ -35,8 +32,6 @@ const createCheckoutSession = async (req, res) => {
 
     Subscription.create(data, (err) => {
       if (err) return res.status(500).json({ error: 'Subscription creation failed' });
-
-      // 3️⃣ Return Stripe URL to frontend
       res.status(201).json({ url: session.url });
     });
 
@@ -45,6 +40,7 @@ const createCheckoutSession = async (req, res) => {
     res.status(500).json({ error: 'Stripe checkout session creation failed' });
   }
 };
+
 
 
 const subscribe = (req, res) => {
