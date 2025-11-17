@@ -22,6 +22,7 @@ router.get('/child/all', verifyToken, seriesController.getSeriesForChild);
 // router.get('/child/all', seriesController.getSeriesForChild);
 
 router.get('/', verifyToken, seriesController.fetchAllSeries);
+router.get('/all-series', seriesController.fetchAllSeries);
 router.get('/:id', verifyToken, seriesController.fetchSeries);
 router.post('/', verifyToken, upload.single('thumbnail'), seriesController.addSeries);
 router.put('/:id', verifyToken, upload.single('thumbnail'), seriesController.editSeries);
