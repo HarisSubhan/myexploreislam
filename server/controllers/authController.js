@@ -31,6 +31,44 @@ const setPassword = (req, res) => {
   });
 };
 
+// const register = (req, res) => {
+//   const { name, username, email, password, phone_number, subscription_id } = req.body;
+//   const role = 'parent'; // 👈 only parent can register from frontend
+
+//   if (!username || !name || !email || !password) {
+//     return res.status(400).json({ error: 'All required fields must be filled' });
+//   }
+
+//   // Check if username already exists
+//   findUserByUsername(username, (err, usersWithUsername) => {
+//     if (err) return res.status(500).json({ error: 'DB error' });
+//     if (usersWithUsername.length > 0) {
+//       return res.status(400).json({ error: 'Username already taken' });
+//     }
+
+//     // Check if email already exists
+//     findUserByEmail(email, (err, usersWithEmail) => {
+//       if (err) return res.status(500).json({ error: 'DB error' });
+//       if (usersWithEmail.length > 0) {
+//         return res.status(400).json({ error: 'Email already registered' });
+//       }
+
+//       // Hash password
+//       bcrypt.hash(password, 10, (err, hash) => {
+//         if (err) return res.status(500).json({ error: 'Hashing error' });
+
+//         // Create new user
+//         createUser(name, username, email, hash, role, phone_number, subscription_id, (err, result) => {
+//           if (err) return res.status(500).json({ error: 'Insert failed' });
+
+//           res.status(201).json({ message: 'Parent registered successfully', user_id: result.insertId });
+//         });
+//       });
+//     });
+//   });
+// };
+
+
 const register = (req, res) => {
   const { name, username, email, password, phone_number, subscription_id } = req.body;
   const role = 'parent'; // 👈 only parent can register from frontend
@@ -61,12 +99,17 @@ const register = (req, res) => {
         createUser(name, username, email, hash, role, phone_number, subscription_id, (err, result) => {
           if (err) return res.status(500).json({ error: 'Insert failed' });
 
-          res.status(201).json({ message: 'Parent registered successfully' });
+          // result.insertId contains the new user's ID
+          res.status(201).json({ 
+            message: 'Parent registered successfully',
+            user_id: result.insertId 
+          });
         });
       });
     });
   });
 };
+
 
 const login = (req, res) => {
   const { identifier, password } = req.body; // 👈 identifier = email ya username
