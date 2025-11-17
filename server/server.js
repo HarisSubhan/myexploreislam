@@ -111,6 +111,8 @@ app.use("/api/children", parentChildrenRoutes);
 
 app.use("/api/activity", childActivityRoutes);
 
+app.use("/stripe", require("./routes/stripeWebhook"));
+
 // Test route
 app.get('/', (req, res) => {
   res.send('Explore Islam API is running...');
