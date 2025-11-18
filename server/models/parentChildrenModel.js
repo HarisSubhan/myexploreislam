@@ -9,7 +9,7 @@ const getChildrenByParentId = (parentId) => {
         name,
         username,
         email,
-        color,
+        avatar,
         age, 
         is_active,
         is_deleted,
