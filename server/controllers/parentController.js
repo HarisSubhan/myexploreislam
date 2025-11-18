@@ -3,9 +3,9 @@ const bcrypt = require('bcrypt');
 
 const addChild = (req, res) => {
   const parentId = req.user.id;
-  const { name, username, email, password, age } = req.body;
+  const { name, username, email, password, age, avatar } = req.body;
 
-  if (!name || !username || !email || !password || !age) {
+  if (!name || !username || !email || !password || !age || !avatar) {
     return res.status(400).json({ error: "All required fields must be filled." });
   }
 
@@ -41,10 +41,10 @@ const addChild = (req, res) => {
           if (hashErr) return res.status(500).json({ error: 'Password hashing error' });
 
           const sql = `
-            INSERT INTO children (name, username, email, password, age, parent_id)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO children (name, username, email, password, age, parent_id, avatar)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
-          db.query(sql, [name, username, email, hash, age, parentId], (err) => {
+          db.query(sql, [name, username, email, hash, age, parentId, avatar], (err) => {
             if (err) return res.status(500).json({ error: "Failed to add child." });
 
             res.status(201).json({ message: "Child added successfully." });
