@@ -30,6 +30,7 @@ export const assignContentToChildApi = async (assignData) => {
 };
 
 
+// services/parentApi.js - Updated getAssignedContentApi
 export const getAssignedContentApi = async (childId) => {
   try {
     const token = getToken();

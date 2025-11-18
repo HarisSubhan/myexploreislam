@@ -7,49 +7,9 @@ const API_URL = `${baseUrl}/api/child-requests`;
 
 export const assignContentToChildApi = async (assignData) => {
   try {
-    
-    const token = getToken();
-  
-    
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
-    
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    const response = await axios.post(`${baseUrl}/api/parent/assign-content`, assignData, config);
+    const response = await axios.post(`${baseUrl}/api/parent/assign-content`, assignData);
     return response.data;
   } catch (error) {
-    throw error;
-  }
-};
-
-
-export const getAssignedContentApi = async (childId) => {
-  try {
-    const token = getToken();
-    
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    console.log(`Fetching assigned content for child ${childId}`);
-    const response = await axios.get(`${baseUrl}/api/parent/child/${childId}/assigned-content`, config);
-    console.log("Assigned content API response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error in getAssignedContentApi:", error.response?.data || error.message);
     throw error;
   }
 };

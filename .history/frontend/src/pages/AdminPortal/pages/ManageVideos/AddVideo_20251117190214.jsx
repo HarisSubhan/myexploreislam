@@ -41,7 +41,7 @@ const AddVideo = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("age", age);
+    formData.append("description", age);
     formData.append("thumbnail", thumbnail);
 
     if (videoType === "series") {
@@ -95,7 +95,7 @@ const AddVideo = () => {
               <Form.Group className="mb-3">
                 <Form.Label>Age</Form.Label>
                 <Form.Control
-                  type="number"
+                  as="textarea"
                   rows={1}
                   required
                   value={age}

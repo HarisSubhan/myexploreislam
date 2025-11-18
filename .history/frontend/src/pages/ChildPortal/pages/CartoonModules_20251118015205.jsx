@@ -82,7 +82,8 @@ const CartoonModules = () => {
         assignedContent.forEach((item) => {
           const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-        
+          // Debug log each item
+          console.log("Processing item:", item);
 
           if (item.contentType === 'video' || item.type === 'single' || item.video_id) {
             // Single video
@@ -314,7 +315,18 @@ const CartoonModules = () => {
         </div>
       )}
 
-   
+      {/* Debug Info - Remove in production */}
+      {!loading && (
+        <div className="alert alert-info mb-4">
+          <h6 className="alert-heading">Content Status</h6>
+          <p className="mb-1">
+            Single Videos: {singleVideos.length} | Series: {seriesModules.length}
+          </p>
+          <small className="text-muted">
+            Showing only content assigned to you by your parent.
+          </small>
+        </div>
+      )}
 
       {/* Tabs */}
       <Tabs

@@ -82,7 +82,8 @@ const CartoonModules = () => {
         assignedContent.forEach((item) => {
           const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-        
+          // Debug log each item
+          console.log("Processing item:", item);
 
           if (item.contentType === 'video' || item.type === 'single' || item.video_id) {
             // Single video
