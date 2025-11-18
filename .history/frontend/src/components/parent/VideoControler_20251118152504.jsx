@@ -49,9 +49,7 @@ const VideoController = () => {
           ...item,
           id: item.id || `${type}-${index}`,
           type,
-          checked: false,
-          // Add fallback for age field
-          age: item.age || item.recommended_age || item.recommendedAge || 'N/A'
+          checked: false
         }));
 
       const seriesData = processData(seriesResponse, 'series');
@@ -312,7 +310,7 @@ const VideoController = () => {
                     <th width="60" className="text-center">Select</th>
                     <th width="100">Type</th>
                     <th>Content Details</th>
-                    <th width="120" className="text-center">Age</th>
+                    <th width="120" className="text-center">ID</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -355,13 +353,15 @@ const VideoController = () => {
                                 }
                               </p>
                             )}
+                            {item.age && (
+                              <small className="text-muted">
+                                <i className="bi bi-clock me-1"></i>
+                                Recommended age: {item.age}
+                              </small>
+                            )}
                           </div>
                         </td>
-                        <td className="text-center">
-                          <Badge bg="secondary">
-                            {item.age && item.age !== 'N/A' ? item.age : 'N/A'}
-                          </Badge>
-                        </td>
+                        
                       </tr>
                     ))
                   ) : (
@@ -458,9 +458,6 @@ const VideoController = () => {
                           {item.type}
                         </Badge>
                         {item.title || item.name || item.video}
-                        {item.age && item.age !== 'N/A' && (
-                          <Badge bg="secondary" className="ms-2">Age: {item.age}</Badge>
-                        )}
                       </small>
                     </li>
                   ))}

@@ -9,24 +9,12 @@ const Series = () => {
 
   // Add modal state
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newSeries, setNewSeries] = useState({ 
-    title: "", 
-    description: "", 
-    age: "",
-    thumbnail: null 
-  });
+  const [newSeries, setNewSeries] = useState({ title: "", description: "", thumbnail: null });
   const [saving, setSaving] = useState(false);
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editSeriesData, setEditSeriesData] = useState({ 
-    id: "", 
-    title: "", 
-    description: "", 
-    age: "", 
-    thumbnail_url: "", 
-    thumbnail: null 
-  });
+  const [editSeriesData, setEditSeriesData] = useState({ id: "", title: "", description: "",age:"", thumbnail_url: "", thumbnail: null });
   const [updating, setUpdating] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -45,7 +33,6 @@ const Series = () => {
         const res = await axios.get("/api/series", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Fetched series:", res.data); // Debug log
         setSeriesList(res.data);
       } catch (error) {
         console.error("Error fetching series:", error);
@@ -80,12 +67,7 @@ const Series = () => {
 
       setSeriesList((prev) => [res.data, ...prev]);
       setShowAddModal(false);
-      setNewSeries({ 
-        title: "", 
-        description: "", 
-        age: "", 
-        thumbnail: null 
-      });
+      setNewSeries({ title: "", description: "", thumbnail: null });
     } catch (error) {
       console.error("Error adding series:", error);
       alert("Failed to add series");
@@ -104,19 +86,17 @@ const Series = () => {
       setSeriesList((prev) => prev.filter((s) => s.id !== id));
     } catch (error) {
       console.error("Error deleting series:", error);
-      alert("Failed to delete series");
     }
   };
 
   // Open edit modal
   const handleEditClick = (series) => {
-    console.log("Editing series:", series); // Debug log
     setEditSeriesData({
       id: series.id,
-      title: series.title || "",
-      description: series.description || "",
-      age: series.age || "",
-      thumbnail_url: series.thumbnail_url || "",
+      title: series.title,
+      description: series.description,
+      age:series.age,
+      thumbnail_url: series.thumbnail_url,
       thumbnail: null,
     });
     setShowEditModal(true);
@@ -135,22 +115,10 @@ const Series = () => {
       formData.append("title", editSeriesData.title);
       formData.append("description", editSeriesData.description);
       formData.append("age", editSeriesData.age);
-      
-      // Only append thumbnail_url if we're not uploading a new thumbnail
-      if (!editSeriesData.thumbnail) {
-        formData.append("thumbnail_url", editSeriesData.thumbnail_url);
-      }
-      
+      formData.append("thumbnail_url", editSeriesData.thumbnail_url); // old image path
       if (editSeriesData.thumbnail) {
-        formData.append("thumbnail", editSeriesData.thumbnail);
+        formData.append("thumbnail", editSeriesData.thumbnail); // new image
       }
-
-      console.log("Updating series with data:", {
-        title: editSeriesData.title,
-        description: editSeriesData.description,
-        age: editSeriesData.age,
-        hasNewThumbnail: !!editSeriesData.thumbnail
-      });
 
       const res = await axios.put(`/api/series/${editSeriesData.id}`, formData, {
         headers: {
@@ -159,25 +127,15 @@ const Series = () => {
         },
       });
 
-      console.log("Update response:", res.data); // Debug log
-
       // Update local table
       setSeriesList((prev) =>
         prev.map((s) => (s.id === editSeriesData.id ? { ...s, ...res.data } : s))
       );
 
       setShowEditModal(false);
-      setEditSeriesData({ 
-        id: "", 
-        title: "", 
-        description: "", 
-        age: "", 
-        thumbnail_url: "", 
-        thumbnail: null 
-      });
     } catch (error) {
-      console.error("Error updating series:", error.response?.data || error.message);
-      alert("Failed to update series: " + (error.response?.data?.message || error.message));
+      console.error("Error updating series:", error);
+      alert("Failed to update series");
     } finally {
       setUpdating(false);
     }
@@ -205,7 +163,6 @@ const Series = () => {
                 <th>Title</th>
                 <th>Thumbnail</th>
                 <th>Age</th>
-                <th>Description</th>
                 <th>Created At</th>
                 <th>Action</th>
               </tr>
@@ -224,19 +181,6 @@ const Series = () => {
                         height={60}
                         style={{ objectFit: "cover" }}
                       />
-                    </td>
-                    <td>{series.age || "N/A"}</td>
-                    <td>
-                      {series.description ? (
-                        <span title={series.description}>
-                          {series.description.length > 50 
-                            ? `${series.description.substring(0, 50)}...` 
-                            : series.description
-                          }
-                        </span>
-                      ) : (
-                        "No description"
-                      )}
                     </td>
                     <td>{new Date(series.created_at).toLocaleString()}</td>
                     <td>
@@ -260,7 +204,7 @@ const Series = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center text-muted">
+                  <td colSpan="5" className="text-center text-muted">
                     No series found.
                   </td>
                 </tr>
@@ -277,7 +221,7 @@ const Series = () => {
           <Modal.Body>
             <Form onSubmit={handleAddSeries}>
               <Form.Group className="mb-3">
-                <Form.Label>Title *</Form.Label>
+                <Form.Label>Title</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter series title"
@@ -303,22 +247,7 @@ const Series = () => {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Age</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="e.g., 3-5, 6-8, 9-12"
-                  value={newSeries.age}
-                  onChange={(e) =>
-                    setNewSeries({ ...newSeries, age: e.target.value })
-                  }
-                />
-                <Form.Text className="text-muted">
-                  Enter age range like "3-5" or specific age like "5+"
-                </Form.Text>
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Thumbnail *</Form.Label>
+                <Form.Label>Thumbnail</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
@@ -330,13 +259,6 @@ const Series = () => {
               </Form.Group>
 
               <div className="text-end">
-                <Button 
-                  variant="secondary" 
-                  className="me-2" 
-                  onClick={() => setShowAddModal(false)}
-                >
-                  Cancel
-                </Button>
                 <Button type="submit" variant="primary" disabled={saving}>
                   {saving ? "Saving..." : "Add Series"}
                 </Button>
@@ -353,7 +275,7 @@ const Series = () => {
           <Modal.Body>
             <Form onSubmit={handleUpdateSeries}>
               <Form.Group className="mb-3">
-                <Form.Label>Title *</Form.Label>
+                <Form.Label>Title</Form.Label>
                 <Form.Control
                   type="text"
                   value={editSeriesData.title}
@@ -377,37 +299,16 @@ const Series = () => {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Age</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="e.g., 3-5, 6-8, 9-12"
-                  value={editSeriesData.age}
-                  onChange={(e) =>
-                    setEditSeriesData({ ...editSeriesData, age: e.target.value })
-                  }
-                />
-                <Form.Text className="text-muted">
-                  Enter age range like "3-5" or specific age like "5+"
-                </Form.Text>
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Thumbnail</Form.Label>
-                {editSeriesData.thumbnail_url && (
-                  <div className="mb-2">
-                    <Form.Label>Current Thumbnail:</Form.Label>
-                    <div>
-                      <Image
-                        src={getImageUrl(editSeriesData.thumbnail_url)}
-                        alt="Current Thumbnail"
-                        width={80}
-                        height={80}
-                        style={{ objectFit: "cover", border: "1px solid #ddd" }}
-                      />
-                    </div>
-                  </div>
-                )}
-                <Form.Label>Upload New Thumbnail (optional):</Form.Label>
+                <Form.Label>Current Thumbnail</Form.Label>
+                <div className="mb-2">
+                  <Image
+                    src={getImageUrl(editSeriesData.thumbnail_url)}
+                    alt="Current Thumbnail"
+                    width={80}
+                    height={80}
+                    style={{ objectFit: "cover", border: "1px solid #ddd" }}
+                  />
+                </div>
                 <Form.Control
                   type="file"
                   accept="image/*"
@@ -415,19 +316,9 @@ const Series = () => {
                     setEditSeriesData({ ...editSeriesData, thumbnail: e.target.files[0] })
                   }
                 />
-                <Form.Text className="text-muted">
-                  Leave empty to keep current thumbnail
-                </Form.Text>
               </Form.Group>
 
               <div className="text-end">
-                <Button 
-                  variant="secondary" 
-                  className="me-2" 
-                  onClick={() => setShowEditModal(false)}
-                >
-                  Cancel
-                </Button>
                 <Button type="submit" variant="primary" disabled={updating}>
                   {updating ? "Updating..." : "Update Series"}
                 </Button>

@@ -53,15 +53,21 @@ const CartoonModules = () => {
         const response = await getAssignedContentApi(childId);
         console.log("API Response:", response);
         
-        // Handle the actual API response format
+        // Handle different response formats
         let assignedContent = [];
         
-        if (response && response.data && Array.isArray(response.data)) {
-          // Use the data array from the response
-          assignedContent = response.data;
-        } else if (Array.isArray(response)) {
+        if (Array.isArray(response)) {
           // If response is directly an array
           assignedContent = response;
+        } else if (response && Array.isArray(response.data)) {
+          // If response has data array
+          assignedContent = response.data;
+        } else if (response && response.data && Array.isArray(response.data.content)) {
+          // If response has data.content array
+          assignedContent = response.data.content;
+        } else if (response && response.content && Array.isArray(response.content)) {
+          // If response has content array
+          assignedContent = response.content;
         } else {
           console.warn("Unexpected API response format:", response);
           assignedContent = [];
@@ -69,52 +75,45 @@ const CartoonModules = () => {
 
         console.log("Processed assigned content:", assignedContent);
 
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-
-        // Process assigned content into singles and series based on actual API fields
+        // Process assigned content into singles and series
         const singleVideosData = [];
         const seriesModulesData = [];
 
         assignedContent.forEach((item) => {
-          console.log("Processing item:", item);
+          const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-          // Single video (has video_id and video_title)
-          if (item.video_id && item.video_title) {
+        
+
+          if (item.contentType === 'video' || item.type === 'single' || item.video_id) {
+            // Single video
             singleVideosData.push({
-              id: item.video_id,
-              title: capitalizeFirstWord(item.video_title || "Untitled Video"),
-              description: "Watch this video",
-              thumbnail: item.video_thumbnail
-                ? item.video_thumbnail.startsWith("http")
-                  ? item.video_thumbnail
-                  : item.video_thumbnail.startsWith("/")
-                    ? `${baseUrl}${item.video_thumbnail}`
-                    : `${baseUrl}/${item.video_thumbnail}`
-                : "https://via.placeholder.com/300x200?text=No+Thumbnail",
-              videoUrl: "", // You might need to fetch this separately
+              id: item.contentId || item.id || item.video_id,
+              title: capitalizeFirstWord(item.title || item.name || "Untitled Video"),
+              description: item.description || "No description available",
+              thumbnail: item.thumbnail_url || item.thumbnail
+                ? (item.thumbnail_url || item.thumbnail).startsWith("http")
+                  ? (item.thumbnail_url || item.thumbnail)
+                  : (item.thumbnail_url || item.thumbnail).startsWith("/")
+                    ? `${baseUrl}${item.thumbnail_url || item.thumbnail}`
+                    : `${baseUrl}/${item.thumbnail_url || item.thumbnail}`,
+              videoUrl: item.video_url || item.videoUrl,
               type: "single",
-              slug: createSlug(item.video_title || `video-${item.video_id}`),
+              slug: createSlug(item.title || item.name || `video-${item.contentId || item.id || item.video_id}`),
             });
-          }
-
-          // Series (has series_id and series_title)
-          if (item.series_id && item.series_title) {
+          } else if (item.contentType === 'series' || item.type === 'series' || item.series_id) {
+            // Series
             seriesModulesData.push({
-              id: item.series_id,
-              title: capitalizeFirstWord(item.series_title || `Series ${item.series_id}`),
-              description: "Explore this learning series",
-              thumbnail: item.series_thumbnail
-                ? item.series_thumbnail.startsWith("http")
-                  ? item.series_thumbnail
-                  : item.series_thumbnail.startsWith("/")
-                    ? `${baseUrl}${item.series_thumbnail}`
-                    : `${baseUrl}/${item.series_thumbnail}`
-                : "https://via.placeholder.com/300x200?text=Series",
-              videoCount: 0, // You might need to fetch this separately
+              id: item.contentId || item.id || item.series_id,
+              title: capitalizeFirstWord(item.title || item.name || `Series ${item.contentId || item.id || item.series_id}`),
+              description: item.description || "Explore learning series",
+              thumbnail: item.thumbnail_url || item.thumbnail || "https://via.placeholder.com/300x200?text=Series",
+              videoCount: item.video_count || item.videos?.length || 0,
               type: "series",
-              slug: createSlug(item.series_title || `series-${item.series_id}`),
-              videos: [],
+              slug: createSlug(item.title || item.name || `series-${item.contentId || item.id || item.series_id}`),
+              videos: item.videos || [],
             });
+          } else {
+            console.warn("Unknown content type:", item);
           }
         });
 
@@ -314,15 +313,7 @@ const CartoonModules = () => {
         </div>
       )}
 
-      {/* Welcome Message */}
-      {!loading && !error && (
-        <div className="alert alert-info mb-4">
-          <h6 className="alert-heading">Welcome to your assigned content! 🎉</h6>
-          <p className="mb-0">
-            Here you'll find all the videos and series that have been assigned to you by your parent.
-          </p>
-        </div>
-      )}
+   
 
       {/* Tabs */}
       <Tabs
