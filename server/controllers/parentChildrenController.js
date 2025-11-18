@@ -58,11 +58,11 @@ exports.toggleChildStatus = (req, res) => {
 
 exports.updateChild = async (req, res) => {
   const { childId } = req.params;
-  const { name, username, email, password, age } = req.body;
+  const { name, username, email, password, age, avatar } = req.body;
 
   try {
     // Validate at least one field
-    if (!name && !username && !email && !password && !age) {
+    if (!name && !username && !email && !password && !age && !avatar) {
       return res.status(400).json({ message: "At least one field is required to update." });
     }
 
@@ -88,6 +88,11 @@ exports.updateChild = async (req, res) => {
     if (age) {
       fields.push("age = ?");
       values.push(age);
+    }
+
+    if (avatar) {
+      fields.push("avatar = ?");
+      values.push(avatar);
     }
 
     if (password) {

@@ -11,13 +11,14 @@ const getSeriesById = (id, callback) => {
 };
 
 // Add new series
-const createSeries = (title, age, description, thumbnail_url, callback) => {
+const createSeries = (title, description, age, thumbnail_url, callback) => {
   db.query(
-    'INSERT INTO series (title, age, description, thumbnail_url) VALUES (?, ?, ?, ?)',
-    [title, age, description, thumbnail_url],
+    'INSERT INTO series (title, description, age, thumbnail_url) VALUES (?, ?, ?, ?)',
+    [title, description, age, thumbnail_url],
     callback
   );
 };
+
 
 // Update series
 const updateSeries = (id, title, description, age, thumbnail_url, callback) => {

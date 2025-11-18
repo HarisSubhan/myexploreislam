@@ -23,16 +23,19 @@ const fetchSeries = (req, res) => {
 };
 
 const addSeries = (req, res) => {
-  const { title, description, age } = req.body;   // :heavy_check_mark: age added
+  const { title, description, age } = req.body;
   const thumbnail_url = req.file ? `/uploads/${req.file.filename}` : null;
+
   createSeries(title, description, age, thumbnail_url, (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.status(201).json({ message: 'Series added successfully', id: result.insertId });
+
+    res.status(201).json({
+      message: 'Series added successfully',
+      id: result.insertId
+    });
   });
 };
-module.exports = {
-  addSeries
-};
+
 // Update series
 const editSeries = (req, res) => {
   const { title, description, age } = req.body;
