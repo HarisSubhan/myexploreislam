@@ -40,11 +40,20 @@ const addSeries = (req, res) => {
 const editSeries = (req, res) => {
   const { title, description, age } = req.body;
   const thumbnail_url = req.file ? `/uploads/${req.file.filename}` : req.body.thumbnail_url;
-  updateSeries(req.params.id, title, age, description, thumbnail_url, (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Series updated successfully' });
-  });
+
+  updateSeries(
+    req.params.id,
+    title,
+    description,   // ✔ phir description
+    age,           // ✔ phir age
+    thumbnail_url,
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Series updated successfully' });
+    }
+  );
 };
+
 // Soft delete series
 const removeSeries = (req, res) => {
   softDeleteSeries(req.params.id, (err) => {

@@ -23,11 +23,12 @@ const createSeries = (title, description, age, thumbnail_url, callback) => {
 // Update series
 const updateSeries = (id, title, description, age, thumbnail_url, callback) => {
   db.query(
-    'UPDATE series SET title = ?, description = ?, age, thumbnail_url = ? WHERE id = ? AND is_deleted = 0',
+    'UPDATE series SET title = ?, description = ?, age = ?, thumbnail_url = ? WHERE id = ? AND is_deleted = 0',
     [title, description, age, thumbnail_url, id],
     callback
   );
 };
+
 
 // Soft delete series
 const softDeleteSeries = (id, callback) => {
