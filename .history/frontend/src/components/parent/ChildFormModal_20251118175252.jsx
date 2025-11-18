@@ -1,0 +1,228 @@
+// components/ChildFormModal.js
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Row, Col, Alert, Button, Image } from "react-bootstrap";
+
+// Available avatars
+const AVAILABLE_AVATARS = [
+  "avatar1",
+  "avatar2", 
+  "avatar3",
+  "avatar4",
+  "avatar5",
+  "avatar6"
+];
+
+const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {
+  const [form, setForm] = useState({
+    id: null,
+    name: "",
+    age: "",
+    email: "",
+    username: "",
+    password: "",
+    progress: 0,
+    avatar: "avatar1",
+  });
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
+
+  useEffect(() => {
+    setForm({
+      id: editing?.id ?? null,
+      name: editing?.name ?? "",
+      age: editing?.age ?? "",
+      email: editing?.email ?? "",
+      username: editing?.username ?? "",
+      password: "",
+      progress: editing?.progress ?? 0,
+      avatar: editing?.avatar ?? "avatar1",
+    });
+    setErrors({});
+    setApiError(null);
+  }, [editing]);
+
+  const validate = () => {
+    const err = {};
+    if (!form.name.trim()) err.name = "Name required";
+    if (!form.age || isNaN(Number(form.age))) err.age = "Valid age required";
+    if (!form.email) err.email = "Email required";
+    if (!form.username) err.username = "Username required";
+    if (!editing && !form.password) err.password = "Password required";
+
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setApiError(null);
+
+    if (!validate()) return;
+
+    try {
+      const submitData = {
+        name: form.name,
+        age: Number(form.age),
+        email: form.email,
+        username: form.username,
+        avatar: form.avatar,
+        ...(form.password && { password: form.password }),
+        ...(!editing && { 
+          parent_id: JSON.parse(localStorage.getItem("user") || "{}").id || 2 
+        }),
+      };
+
+      await onSave(editing ? { ...form, ...submitData } : submitData);
+    } catch (err) {
+      console.error("Form submission error:", err);
+      setApiError(err.message || "Failed to save child. Please try again.");
+    }
+  };
+
+  return (
+    <Modal
+      show={show}
+      onHide={onHide}
+      centered
+      aria-labelledby="child-form-title"
+    >
+      <Form onSubmit={submit}>
+        <Modal.Header closeButton>
+          <Modal.Title id="child-form-title">
+            {form.id ? "Edit Child" : "Add Child"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {apiError && (
+            <Alert variant="danger" className="mb-3">
+              {apiError}
+            </Alert>
+          )}
+
+          {/* Avatar Selection */}
+          <Form.Group className="mb-3">
+            <Form.Label>Select Avatar *</Form.Label>
+            <Row>
+              {AVAILABLE_AVATARS.map((avatar) => (
+                <Col xs={4} sm={3} key={avatar} className="mb-2">
+                  <div
+                    className={`avatar-option border rounded p-2 text-center ${
+                      form.avatar === avatar ? "border-primary border-2" : "border-secondary"
+                    }`}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setForm({ ...form, avatar })}
+                  >
+                    <Image
+                      src={`/assets/add-child-avatar/${avatar}.png`}
+                      alt={avatar}
+                      fluid
+                      className="mb-1"
+                      style={{ height: "60px", objectFit: "contain" }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    <small className="d-block">{avatar}</small>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </Form.Group>
+
+          <Row>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Child Full Name *</Form.Label>
+                <Form.Control
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  isInvalid={!!errors.name}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Child's User Name *</Form.Label>
+                <Form.Control
+                  value={form.username}
+                  onChange={(e) =>
+                    setForm({ ...form, username: e.target.value })
+                  }
+                  isInvalid={!!errors.username}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.username}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Email *</Form.Label>
+                <Form.Control
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  isInvalid={!!errors.email}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.email}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Password {!editing && "*"}</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  isInvalid={!!errors.password}
+                  placeholder={editing ? "Leave blank to keep current" : ""}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.password}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col xs={6}>
+              <Form.Group className="mb-2">
+                <Form.Label>Age *</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={form.age}
+                  onChange={(e) => setForm({ ...form, age: e.target.value })}
+                  isInvalid={!!errors.age}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.age}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="primary" disabled={submitting}>
+            {submitting ? "Saving..." : form.id ? "Update" : "Create"}
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  );
+};
+
+export default ChildFormModal;
