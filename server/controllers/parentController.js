@@ -139,7 +139,7 @@ const getAssignedContentForChild = (req, res) => {
   const child_id = req.params.child_id;
 
   const sql = `
-        SELECT cac.id, cac.video_id, cac.series_id, v.title AS video_title, s.title AS series_title
+        SELECT cac.id, cac.video_id, cac.series_id, v.title AS video_title, s.title AS series_title, v.thumbnail_url AS video_thumbnail, s.thumbnail_url AS series_thumbnail
         FROM child_assigned_content cac
         LEFT JOIN videos v ON cac.video_id = v.id
         LEFT JOIN series s ON cac.series_id = s.id
