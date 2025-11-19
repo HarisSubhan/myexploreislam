@@ -9,21 +9,44 @@ import {
 import "../../../components/child/ChildProfilePage.css";
 import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
-import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
+
+// Import images from assets
+import boyAvatar from "../../../assets/images/avatars/boy.png";
+import girlAvatar from "../../../assets/images/avatars/girl.png";
+import childAvatar from "../../../assets/images/avatars/child.png";
+import babyAvatar from "../../../assets/images/avatars/baby.png";
+import superheroAvatar from "../../../assets/images/avatars/superhero.png";
+import wizardAvatar from "../../../assets/images/avatars/wizard.png";
+import fairyAvatar from "../../../assets/images/avatars/fairy.png";
+import catAvatar from "../../../assets/images/avatars/cat.png";
+import dogAvatar from "../../../assets/images/avatars/dog.png";
+import foxAvatar from "../../../assets/images/avatars/fox.png";
+import defaultAvatar from "../../../assets/images/avatars/default.png";
 
 const ChildProfilePage = () => {
   const { user } = useUser();
   const [profile, setProfile] = useState({
     name: "",
     age: "",
-    avatar: "",
+    avatar: "boy",
+    avatarType: "image",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Map avatar names from backend to imported images
+  // Map avatar names to imported images
   const avatarImages = {
-    avatar1: avatar1
+    boy: boyAvatar,
+    girl: girlAvatar,
+    child: childAvatar,
+    baby: babyAvatar,
+    superhero: superheroAvatar,
+    wizard: wizardAvatar,
+    fairy: fairyAvatar,
+    cat: catAvatar,
+    dog: dogAvatar,
+    fox: foxAvatar,
+    default: defaultAvatar
   };
 
   useEffect(() => {
@@ -45,9 +68,9 @@ const ChildProfilePage = () => {
     fetchChildData();
   }, [user]);
 
-  // Get the correct avatar image based on profile.avatar from backend
+  // Get the correct avatar image based on profile.avatar
   const getAvatarImage = () => {
-    const avatarKey = profile.avatar || 'default';
+    const avatarKey = profile.avatar?.toLowerCase() || 'default';
     return avatarImages[avatarKey] || avatarImages.default;
   };
 

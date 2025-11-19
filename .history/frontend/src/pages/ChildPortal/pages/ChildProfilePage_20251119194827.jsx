@@ -6,25 +6,22 @@ import {
   Container,
   Image,
 } from "react-bootstrap";
+import { GiPartyPopper } from "react-icons/gi";
 import "../../../components/child/ChildProfilePage.css";
 import { useUser } from "../../../context/UserContext";
-import { getUserChildDataApi } from "../../../services/api";
-import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
 
 const ChildProfilePage = () => {
   const { user } = useUser();
   const [profile, setProfile] = useState({
     name: "",
     age: "",
-    avatar: "",
+    favoriteColor: "#ff6b6b",
+    avatar: "👦",
+    avatarType: "emoji",
+    bio: "",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Map avatar names from backend to imported images
-  const avatarImages = {
-    avatar1: avatar1
-  };
 
   useEffect(() => {
     const fetchChildData = async () => {
@@ -45,11 +42,7 @@ const ChildProfilePage = () => {
     fetchChildData();
   }, [user]);
 
-  // Get the correct avatar image based on profile.avatar from backend
-  const getAvatarImage = () => {
-    const avatarKey = profile.avatar || 'default';
-    return avatarImages[avatarKey] || avatarImages.default;
-  };
+  const emojis = ["👦", "👧", "🧒", "👶", "🦸", "🧙", "🧚", "🐱", "🐶", "🦊"];
 
   if (loading) {
     return (
@@ -97,13 +90,16 @@ const ChildProfilePage = () => {
 
             <Card.Body>
               <div className="avatar-section">
-                <div className="avatar">
-                  <Image 
-                    src={getAvatarImage()} 
-                    roundedCircle 
-                    className="profile-avatar-image"
-                    alt={profile.name || "Child Avatar"}
-                  />
+                <div
+                  className={`avatar ${profile.avatarType}`}
+                >
+                  {profile.avatarType === "emoji" ? (
+                    <span className="emoji-avatar">{profile.avatar}</span>
+                  ) : profile.avatar ? (
+                    <Image src={profile.avatar} roundedCircle />
+                  ) : (
+                    <span className="emoji-avatar">{emojis[0]}</span>
+                  )}
                 </div>
               </div>
 
@@ -114,6 +110,9 @@ const ChildProfilePage = () => {
                 <Card.Subtitle className="mb-2 text-muted profile-age">
                   Age: {profile.age || "Not specified"}
                 </Card.Subtitle>
+                <Card.Text className="profile-bio">
+                  {profile.bio || "No bio available"}
+                </Card.Text>
               </div>
             </Card.Body>
           </Card>

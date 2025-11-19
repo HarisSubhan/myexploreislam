@@ -11,19 +11,21 @@ import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
 import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
 
+
 const ChildProfilePage = () => {
   const { user } = useUser();
   const [profile, setProfile] = useState({
     name: "",
     age: "",
-    avatar: "",
+    avatar: "boy",
+    avatarType: "image",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Map avatar names from backend to imported images
+  // Map avatar names to imported images
   const avatarImages = {
-    avatar1: avatar1
+    boy: avatar1,
   };
 
   useEffect(() => {
@@ -45,9 +47,9 @@ const ChildProfilePage = () => {
     fetchChildData();
   }, [user]);
 
-  // Get the correct avatar image based on profile.avatar from backend
+  // Get the correct avatar image based on profile.avatar
   const getAvatarImage = () => {
-    const avatarKey = profile.avatar || 'default';
+    const avatarKey = profile.avatar?.toLowerCase() || 'default';
     return avatarImages[avatarKey] || avatarImages.default;
   };
 

@@ -135,7 +135,7 @@ export const getUserChildDataApi = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("You are not logged in. Please log in first.");
 
-  const response = await axios.get(`${baseUrl}/api/child/me/name`, {
+  const response = await axios.get(`${baseUrl}/api/me/name`, {
     headers: { Authorization: `Bearer ${token}` }
   });
 

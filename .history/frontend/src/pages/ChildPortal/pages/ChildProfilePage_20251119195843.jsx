@@ -9,7 +9,12 @@ import {
 import "../../../components/child/ChildProfilePage.css";
 import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
+
+// Import all avatar images
 import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
+import avatar2 from "../../../assets/add-child-avatar/avatar2.png";
+
+import defaultAvatar from "../../../assets/add-child-avatar/default.png";
 
 const ChildProfilePage = () => {
   const { user } = useUser();
@@ -23,7 +28,8 @@ const ChildProfilePage = () => {
 
   // Map avatar names from backend to imported images
   const avatarImages = {
-    avatar1: avatar1
+    avatar1: avatar1,
+    default: defaultAvatar
   };
 
   useEffect(() => {

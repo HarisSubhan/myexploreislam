@@ -12,6 +12,7 @@ const ParentDashboard = lazy(() => import("../pages/ParentPortal/pages/ParentDas
 const Subscription = lazy(() => import("../pages/ParentPortal/pages/Subscription"));
 const Payments = lazy(() => import("../pages/ParentPortal/pages/Payments"));
 const Profile = lazy(() => import("../pages/ParentPortal/pages/Profile"));
+const ChangePassword = lazy(() => import("../pages/ParentPortal/pages/ChangePassword"));
 const DefaultTheme = lazy(() => import("../pages/ParentPortal/pages/DefaultTheme"));
 const Account = lazy(() => import("../pages/ParentPortal/pages/Account"));
 const RequestChild = lazy(() => import("../components/parent/RequestChild"));

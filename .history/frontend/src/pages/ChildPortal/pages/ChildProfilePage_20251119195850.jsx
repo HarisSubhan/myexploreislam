@@ -11,6 +11,9 @@ import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
 import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
 
+
+import defaultAvatar from "../../../assets/add-child-avatar/default.png";
+
 const ChildProfilePage = () => {
   const { user } = useUser();
   const [profile, setProfile] = useState({
@@ -23,7 +26,8 @@ const ChildProfilePage = () => {
 
   // Map avatar names from backend to imported images
   const avatarImages = {
-    avatar1: avatar1
+    avatar1: avatar1,
+    default: defaultAvatar
   };
 
   useEffect(() => {

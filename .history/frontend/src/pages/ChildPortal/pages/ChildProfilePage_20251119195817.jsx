@@ -9,7 +9,21 @@ import {
 import "../../../components/child/ChildProfilePage.css";
 import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
+
+// Import all avatar images
 import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
+import avatar2 from "../../../assets/add-child-avatar/avatar2.png";
+import avatar3 from "../../../assets/add-child-avatar/avatar3.png";
+import avatar4 from "../../../assets/add-child-avatar/avatar4.png";
+import avatar5 from "../../../assets/add-child-avatar/avatar5.png";
+import avatar6 from "../../../assets/add-child-avatar/avatar6.png";
+import avatar7 from "../../../assets/add-child-avatar/avatar7.png";
+import avatar8 from "../../../assets/add-child-avatar/avatar8.png";
+import avatar9 from "../../../assets/add-child-avatar/avatar9.png";
+import avatar10 from "../../../assets/add-child-avatar/avatar10.png";
+import avatar11 from "../../../assets/add-child-avatar/avatar11.png";
+import avatar12 from "../../../assets/add-child-avatar/avatar12.png";
+import defaultAvatar from "../../../assets/add-child-avatar/default.png";
 
 const ChildProfilePage = () => {
   const { user } = useUser();
@@ -23,7 +37,19 @@ const ChildProfilePage = () => {
 
   // Map avatar names from backend to imported images
   const avatarImages = {
-    avatar1: avatar1
+    avatar1: avatar1,
+    avatar2: avatar2,
+    avatar3: avatar3,
+    avatar4: avatar4,
+    avatar5: avatar5,
+    avatar6: avatar6,
+    avatar7: avatar7,
+    avatar8: avatar8,
+    avatar9: avatar9,
+    avatar10: avatar10,
+    avatar11: avatar11,
+    avatar12: avatar12,
+    default: defaultAvatar
   };
 
   useEffect(() => {

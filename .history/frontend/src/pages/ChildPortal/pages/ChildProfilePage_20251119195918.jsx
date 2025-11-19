@@ -23,7 +23,8 @@ const ChildProfilePage = () => {
 
   // Map avatar names from backend to imported images
   const avatarImages = {
-    avatar1: avatar1
+    avatar1: avatar1,
+    default: defaultAvatar
   };
 
   useEffect(() => {
