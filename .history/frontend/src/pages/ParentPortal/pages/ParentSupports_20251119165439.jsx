@@ -1,0 +1,571 @@
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Form,
+  Table,
+  Accordion,
+  Card,
+  Alert,
+  Spinner,
+  Badge,
+} from "react-bootstrap";
+import {
+  FaPlusCircle,
+  FaTicketAlt,
+  FaQuestionCircle,
+  FaEnvelope,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaSync,
+  FaExclamationCircle,
+  FaUser,
+} from "react-icons/fa";
+import ticketApi from "../../../services/ticketApi";
+
+// Memoized Status Badge Component
+const StatusBadge = React.memo(({ status }) => {
+  const statusConfig = useMemo(
+    () => ({
+      OPEN: { bg: "danger", icon: <FaTimesCircle />, text: "Open" },
+      IN_PROGRESS: { bg: "warning text-dark", icon: "⏳", text: "In Progress" },
+      RESOLVED: { bg: "success", icon: <FaCheckCircle />, text: "Resolved" },
+      CLOSED: { bg: "secondary", icon: "🔒", text: "Closed" },
+    }),
+    []
+  );
+
+  const config = statusConfig[status] || statusConfig.OPEN;
+
+  return (
+    <Badge
+      className={`${config.bg} d-flex align-items-center justify-content-center gap-1`}
+    >
+      {config.icon} {config.text}
+    </Badge>
+  );
+});
+
+
+
+// Memoized Ticket Row Component
+const TicketRow = React.memo(({ ticket }) => {
+  const formatDate = useCallback((dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, []);
+
+  return (
+    <tr>
+      <td>
+        <Badge bg="light" text="dark">
+          {ticket.ticket_number}
+        </Badge>
+      </td>
+      <td>
+        <div>
+          <div className="fw-semibold">{ticket.subject}</div>
+          {ticket.description && (
+            <small
+              className="text-muted d-block text-truncate"
+              style={{ maxWidth: "min(300px, 30vw)" }}
+            >
+              {ticket.description}
+            </small>
+          )}
+        </div>
+      </td>
+      <td>
+        <StatusBadge status={ticket.status} />
+      </td>
+      <td>
+        <small>{formatDate(ticket.created_at)}</small>
+      </td>
+      <td>
+        <small>{formatDate(ticket.updated_at)}</small>
+      </td>
+    </tr>
+  );
+});
+
+// Memoized Tickets Table Component
+const TicketsTable = React.memo(
+  ({ tickets, loading, currentUser, onOpenTicket, onRefresh }) => {
+    if (loading) {
+      return (
+        <div className="text-center py-4">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-2">Loading tickets...</p>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+          <small className="text-muted">
+            Showing {tickets.length} ticket(s)
+            
+          </small>
+          <div className="d-flex gap-2 flex-shrink-0">
+            <Button
+              variant="outline-primary"
+              onClick={onRefresh}
+              disabled={loading}
+              size="sm"
+              className="d-flex align-items-center"
+            >
+              <FaSync className="me-1" />
+              Refresh
+            </Button>
+            <Button
+              variant="primary"
+              onClick={onOpenTicket}
+              className="d-flex align-items-center"
+              size="sm"
+            >
+              <FaPlusCircle className="me-1" />
+              New Ticket
+            </Button>
+          </div>
+        </div>
+
+        <div className="table-responsive">
+          <Table hover bordered className="align-middle mb-0">
+            <thead className="table-light">
+              <tr>
+                <th>Ticket #</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th className="d-none d-md-table-cell">Created</th>
+                <th className="d-none d-lg-table-cell">Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="text-muted text-center py-4">
+                    No tickets found. Create your first ticket!
+                  </td>
+                </tr>
+              ) : (
+                tickets.map((ticket) => (
+                  <TicketRow key={ticket.id} ticket={ticket} />
+                ))
+              )}
+            </tbody>
+          </Table>
+        </div>
+      </>
+    );
+  }
+);
+
+// Memoized Authentication Required Component
+const AuthRequired = React.memo(({ onManualLogin }) => (
+  <Card className="shadow-sm border-0 rounded-3">
+    <Card.Body className="text-center py-5">
+      <FaExclamationCircle size={48} className="text-warning mb-3" />
+      <h4>Authentication Required</h4>
+      <p className="text-muted mb-4">
+        Please log in to access the support center.
+      </p>
+      <Button variant="primary" onClick={onManualLogin}>
+        Go to Login Page
+      </Button>
+    </Card.Body>
+  </Card>
+));
+
+const ParentSupports = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [tickets, setTickets] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const [newTicket, setNewTicket] = useState({
+    subject: "",
+    description: "",
+  });
+
+  const checkAuth = useCallback(() => {
+    try {
+      const userData = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
+
+      console.log("🔍 ParentSupports - Checking auth...");
+      console.log("🔍 User data from localStorage:", userData);
+
+      if (userData && token) {
+        const user = JSON.parse(userData);
+
+        // TEMPORARY FIX: If no ID found, use email or create a fallback
+        const userId =
+          user.id ||
+          user.userId ||
+          user._id ||
+          user.user_id ||
+          user.email ||
+          `user-${Date.now()}`;
+
+        if (userId) {
+          const userWithId = {
+            ...user,
+            id: userId,
+            name: user.name || user.username || user.email,
+            email: user.email || "",
+            role: user.role || "user",
+          };
+
+          console.log("✅ Setting current user:", userWithId);
+          setCurrentUser(userWithId);
+          fetchTickets();
+          fetchSummary();
+        } else {
+          console.error("❌ No user identifier found");
+          setError("User data incomplete - please log in again");
+        }
+      } else {
+        console.log("❌ No user data or token found");
+        setError("Please log in to access support tickets");
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      setError("Error checking authentication status");
+    }
+  }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // Memoized API calls
+  const fetchTickets = useCallback(async () => {
+    if (!currentUser?.id) return;
+
+    setLoading(true);
+    setError("");
+    try {
+      const response = await ticketApi.getById();
+      setTickets(response.tickets || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  const fetchSummary = useCallback(async () => {
+    if (!currentUser?.id) return;
+
+    try {
+      const response = await ticketApi.getSummary();
+      setSummary(response.data);
+    } catch (err) {
+      console.error("Error fetching summary:", err);
+    }
+  }, [currentUser]);
+
+  const handleRefresh = useCallback(async () => {
+    if (!currentUser?.id) {
+      setError("Please log in to refresh tickets");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+    await Promise.all([fetchTickets(), fetchSummary()]);
+    setSuccess("Tickets refreshed successfully!");
+  }, [currentUser, fetchTickets, fetchSummary]);
+
+  const handleOpenTicket = useCallback(() => {
+    if (!currentUser?.id) {
+      setError("Please log in to create a ticket");
+      return;
+    }
+    setShowModal(true);
+  }, [currentUser]);
+
+  const handleCloseTicket = useCallback(() => {
+    setShowModal(false);
+    setNewTicket({ subject: "", description: "" });
+    setError("");
+  }, []);
+
+ const handleSubmitTicket = useCallback(
+  async (e) => {
+    e.preventDefault();
+
+    if (!currentUser?.id) {
+      setError("Please log in to create a ticket");
+      return;
+    }
+
+    setSubmitting(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      console.log("🔍 Creating ticket with data:", {
+        user: currentUser,
+        ticket: newTicket,
+        parent_id: currentUser.id, // Add parent_id
+        token: localStorage.getItem('token') ? 'Present' : 'Missing'
+      });
+      
+      // Create ticket data with parent_id
+      const ticketData = {
+        subject: newTicket.subject,
+        description: newTicket.description,
+        parent_id: currentUser.id // Add the parent_id here
+      };
+      
+      await ticketApi.create(ticketData);
+      setSuccess("Ticket created successfully!");
+      await Promise.all([fetchTickets(), fetchSummary()]);
+      handleCloseTicket();
+    } catch (err) {
+      console.error("❌ Ticket creation error details:", err);
+      setError(err.message);
+      
+      // If authentication error, clear storage and redirect
+      if (err.message.includes('authenticated') || err.message.includes('login')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setCurrentUser(null);
+        setError("Session expired. Please log in again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  },
+  [currentUser, newTicket, fetchTickets, fetchSummary, handleCloseTicket]
+);
+
+ 
+
+  const handleManualLogin = useCallback(() => {
+    window.location.href = "/login";
+  }, []);
+
+  // Memoized header component
+  const headerContent = useMemo(
+    () => (
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <h2 className="fw-bold text-primary mb-0">Support Center</h2>
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          {currentUser && (
+            <div className="d-flex align-items-center gap-2">
+              <Badge
+                bg="light"
+                text="dark"
+                className="p-2 d-flex align-items-center"
+              >
+                <FaUser className="me-1" />
+                <span className="d-none d-sm-inline">{currentUser.name}</span>
+                <span className="d-sm-none">ID: {currentUser.id}</span>
+              </Badge>
+              
+            </div>
+          )}
+        </div>
+      </div>
+    ),
+    [currentUser]
+  );
+
+  return (
+    <Container
+      fluid
+      className="p-3 p-md-4"
+      style={{ backgroundColor: "#f5f7fa", minHeight: "100vh" }}
+    >
+      {headerContent}
+
+      {/* Alerts */}
+      {error && (
+        <Alert
+          variant="danger"
+          onClose={() => setError("")}
+          dismissible
+          className="mb-3"
+        >
+          <FaExclamationCircle className="me-2" />
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert
+          variant="success"
+          onClose={() => setSuccess("")}
+          dismissible
+          className="mb-3"
+        >
+          {success}
+        </Alert>
+      )}
+
+      {!currentUser ? (
+        <AuthRequired onManualLogin={handleManualLogin} />
+      ) : (
+        <Row className="g-3">
+
+          <Col xl={8} lg={7}>
+            <Card className="shadow-sm border-0 rounded-3 h-100">
+              <Card.Body>
+                <div className="d-flex align-items-center mb-3">
+                  <FaTicketAlt size={20} className="text-primary me-2" />
+                  <h5 className="fw-bold m-0">Support Tickets</h5>
+                </div>
+                <TicketsTable
+                  tickets={tickets}
+                  loading={loading}
+                  currentUser={currentUser}
+                  onOpenTicket={handleOpenTicket}
+                  onRefresh={handleRefresh}
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+
+          {/* Sidebar */}
+          <Col xl={4} lg={5}>
+            <Card className="shadow-sm border-0 rounded-3 h-100">
+              <Card.Body>
+                <div className="d-flex align-items-center mb-3">
+                  <FaQuestionCircle size={20} className="text-primary me-2" />
+                  <h5 className="fw-bold m-0">FAQs & Help</h5>
+                </div>
+
+                <Accordion flush className="mb-3">
+                  {[
+                    {
+                      key: "0",
+                      header: "🔑 How do I reset my password?",
+                      body: "Go to Account Settings → Reset Password and follow the steps.",
+                    },
+                    {
+                      key: "1",
+                      header: "💳 How can I manage my subscription?",
+                      body: "Visit Subscriptions & Billing to change your plan or payment method.",
+                    },
+                    {
+                      key: "2",
+                      header: "🕒 How do I set screen-time limits?",
+                      body: "Navigate to Parental Controls and configure screen-time settings for each child.",
+                    },
+                  ].map(({ key, header, body }) => (
+                    <Accordion.Item key={key} eventKey={key}>
+                      <Accordion.Header className="py-2">
+                        {header}
+                      </Accordion.Header>
+                      <Accordion.Body className="py-2">{body}</Accordion.Body>
+                    </Accordion.Item>
+                  ))}
+                </Accordion>
+
+                <div className="p-3 bg-light rounded mb-3">
+                  <h6 className="fw-bold mb-2">Quick Actions</h6>
+                  <div className="d-grid gap-1">
+                    <Button
+                      variant="primary"
+                      onClick={handleOpenTicket}
+                      size="sm"
+                    >
+                      <FaPlusCircle className="me-1" />
+                      Open New Ticket
+                    </Button>
+                   
+                  </div>
+                </div>
+
+               
+              </Card.Body>
+            </Card>
+          </Col>
+          
+        </Row>
+      )}
+
+      {/* Create Ticket Modal */}
+      <Modal show={showModal} onHide={handleCloseTicket} centered size="lg">
+        <Modal.Header closeButton className="border-bottom-0">
+          <Modal.Title className="fw-bold d-flex align-items-center">
+            <FaPlusCircle className="me-2 text-primary" />
+            New Support Ticket
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="pt-0">
+          {currentUser && (
+            <div className="mb-3 p-2 bg-light rounded">
+              <small>
+                <strong>Creating ticket as:</strong> {currentUser.name} (ID:{" "}
+                {currentUser.id})
+              </small>
+            </div>
+          )}
+          <Form onSubmit={handleSubmitTicket}>
+            <Form.Group className="mb-3">
+              <Form.Label>Subject *</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Brief description of your issue"
+                value={newTicket.subject}
+                onChange={(e) =>
+                  setNewTicket((prev) => ({ ...prev, subject: e.target.value }))
+                }
+                required
+                maxLength={100}
+              />
+              <Form.Text className="text-muted">
+                {newTicket.subject.length}/100 characters
+              </Form.Text>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Description *</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                placeholder="Please provide detailed information about your issue..."
+                value={newTicket.description}
+                onChange={(e) =>
+                  setNewTicket((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                required
+              />
+            </Form.Group>
+            <div className="d-grid gap-2">
+              <Button type="submit" variant="primary" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Creating Ticket...
+                  </>
+                ) : (
+                  "Submit Ticket"
+                )}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+    </Container>
+  );
+};
+
+export default React.memo(ParentSupports);
