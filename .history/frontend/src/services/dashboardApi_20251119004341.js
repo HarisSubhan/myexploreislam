@@ -36,6 +36,8 @@ export const dashboardAPI = {
   },
 };
 
+
+
 // Create axios instance with common configuration
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -82,6 +84,7 @@ export const dashboardApi = {
     apiClient.get(`/parent/${parentId}/children-activity`, {
       params: { range },
     }),
+
 
 
   // Fetch timeline activities
