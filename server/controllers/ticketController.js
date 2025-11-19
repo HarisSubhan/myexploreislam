@@ -118,3 +118,26 @@ exports.markResolved = (req, res) => {
     });
   });
 };
+
+
+// ✅ Get Tickets By Parent (Parent Side)
+exports.getTicketsByParent = (req, res) => {
+  const parentId = req.params.parentId;
+
+  if (!parentId) {
+    return res.status(400).json({ message: "Parent ID is required." });
+  }
+
+  Ticket.getTicketsByParent(parentId, (err, results) => {
+    if (err) {
+      console.error("Error fetching tickets by parent:", err.message);
+      return res.status(500).json({ message: "Database error." });
+    }
+
+    res.status(200).json({
+      message: "Tickets fetched successfully.",
+      total: results.length,
+      tickets: results,
+    });
+  });
+};
