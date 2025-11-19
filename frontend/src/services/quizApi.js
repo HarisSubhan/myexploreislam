@@ -95,4 +95,16 @@ export const getQuizBySeriesVideoApi = async (seriesId, videoId) => {
   return response.data;
 };
 
+export const getQuizByIdVideoAPi = async (id) => {
+  const token = getToken();
+
+  const response = await axios.get(`${baseUrl}/api/quizzes/video/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
 

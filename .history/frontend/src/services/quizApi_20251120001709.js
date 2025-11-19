@@ -39,6 +39,7 @@ export const getQuizByIdApi = async (id) => {
   return response.data;
 };
 
+
 // Update a quiz by ID
 export const updateQuizApi = async (id, updatedData) => {
   const token = getToken();
@@ -94,13 +95,16 @@ export const getQuizBySeriesVideoApi = async (seriesId, videoId) => {
   return response.data;
 };
 
-
-export const getQuizByIdApi = async (id) => {
+export const getQuizByIdVideoAPi = async (id) => {
   const token = getToken();
+
   const response = await axios.get(`${baseUrl}/api/quizzes/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+
   return response.data;
 };
+
+

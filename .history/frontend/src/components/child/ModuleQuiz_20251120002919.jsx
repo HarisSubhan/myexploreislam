@@ -7,14 +7,15 @@ import {
   Button,
   Spinner,
 } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { getQuizBySeriesVideoApi, submitQuizApi } from "../../services/quizApi";
-
+import { submitQuizApi, getQuizByIdVideoAPi } from "./../../services/quizApi";
 
 const ModuleQuiz = () => {
   const navigate = useNavigate();
-  const { seriesId, videoId } = useParams();
+  const { seriesSlug, videoId } = useParams();
+  const location = useLocation();
+
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -24,64 +25,55 @@ const ModuleQuiz = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quizId, setQuizId] = useState(null);
-  const [childId] = useState(1); // In a real app, this would come from auth context
+  const [childId] = useState(1);
+
+  const videoData = location.state?.currentVideo || location.state?.videoData;
 
   useEffect(() => {
-    fetchQuizData();
-  }, [seriesId, videoId]);
+    if (videoId) {
+      fetchQuizData();
+    } else {
+      setError("No video ID provided for quiz");
+      setLoading(false);
+    }
+  }, [videoId]);
 
   const fetchQuizData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch quiz based on seriesId and videoId
-      const quizData = await getQuizBySeriesVideoApi(seriesId, videoId);
+      const quizData = await getQuizByIdVideoAPi(videoId);
 
-      if (!quizData || !quizData.questions || quizData.questions.length === 0) {
-        setError("No quiz available for this lesson.");
-        return;
+      if (quizData?.questions?.length > 0) {
+        const processedQuestions = quizData.questions.map((q) => ({
+          id: q.id,
+          question: q.question,
+          options: [q.option_a, q.option_b, q.option_c, q.option_d].filter(
+            (opt) => opt !== null && opt !== undefined
+          ),
+          correctAnswer: getCorrectAnswerIndex(q.correct_option),
+        }));
+
+        setQuestions(processedQuestions);
+        setQuizId(quizData.id || 1);
+      } else {
+        setError("No quiz questions available for this video");
       }
-
-      setQuizId(quizData.id);
-
-      // Transform API data to match our component structure
-      const transformedQuestions = quizData.questions.map((q, index) => ({
-        id: q.id || index + 1,
-        question: q.question,
-        options: [q.option_a, q.option_b, q.option_c, q.option_d].filter(
-          (opt) => opt !== null && opt !== ""
-        ),
-        correctAnswer: getCorrectAnswerIndex(q.correct_option),
-        correctOption: q.correct_option,
-      }));
-
-      setQuestions(transformedQuestions);
     } catch (err) {
       setError("Failed to load quiz. Please try again.");
-      console.error("Error fetching quiz:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const getCorrectAnswerIndex = (correctOption) => {
-    switch (correctOption) {
-      case "a":
-        return 0;
-      case "b":
-        return 1;
-      case "c":
-        return 2;
-      case "d":
-        return 3;
-      default:
-        return 0;
-    }
+    const options = { a: 0, b: 1, c: 2, d: 3 };
+    return options[correctOption] || 0;
   };
 
   const getOptionLetter = (index) => {
-    return String.fromCharCode(97 + index); // a, b, c, d
+    return String.fromCharCode(97 + index);
   };
 
   const handleAnswerSelect = (index) => {
@@ -97,12 +89,10 @@ const ModuleQuiz = () => {
         child_id: childId,
         score: finalScore,
         answers: answers,
-        series_id: seriesId,
         video_id: videoId,
       });
     } catch (err) {
-      console.error("Error submitting quiz results:", err);
-      // Continue navigation even if submission fails
+      // Silent fail - don't show error to user
     }
   };
 
@@ -117,13 +107,10 @@ const ModuleQuiz = () => {
       setScore(score + 1);
     }
 
-    // Prepare answers for submission
-    const currentAnswers = questions
-      .slice(0, currentQuestion + 1)
-      .map((q, index) => ({
-        question_id: q.id,
-        selected_option: getOptionLetter(selectedAnswer),
-      }));
+    const currentAnswers = questions.slice(0, currentQuestion + 1).map((q) => ({
+      question_id: q.id,
+      selected_option: getOptionLetter(selectedAnswer),
+    }));
 
     if (currentQuestion < questions.length - 1) {
       setTimeout(() => {
@@ -132,18 +119,17 @@ const ModuleQuiz = () => {
         setShowFeedback(false);
       }, 2000);
     } else {
-      // Submit final results
       const finalScore = correct ? score + 1 : score;
       const allAnswers = [...currentAnswers];
 
       setTimeout(async () => {
         await submitQuizResults(finalScore, allAnswers);
-        navigate(`/child/series/${seriesId}/completion/${videoId}`, {
+
+        navigate(`/child/module/${seriesSlug}/completion/${videoId}`, {
           state: {
             score: finalScore,
             totalQuestions: questions.length,
-            quizId: quizId,
-            seriesId: seriesId,
+            videoData: videoData,
             videoId: videoId,
           },
         });
@@ -157,7 +143,12 @@ const ModuleQuiz = () => {
       setSelectedAnswer(null);
       setShowFeedback(false);
     } else {
-      navigate(`/child/series/${seriesId}/page1/${videoId}`);
+      navigate(`/child/module/${seriesSlug}/page1/${videoId}`, {
+        state: {
+          currentVideo: videoData,
+          videoId: videoId,
+        },
+      });
     }
   };
 
@@ -188,7 +179,8 @@ const ModuleQuiz = () => {
         }}
       >
         <Alert variant="danger" className="text-center">
-          {error}
+          <h5>Quiz Loading Error</h5>
+          <p>{error}</p>
           <div className="mt-3">
             <Button variant="primary" onClick={fetchQuizData}>
               Try Again
@@ -197,7 +189,9 @@ const ModuleQuiz = () => {
               variant="outline-primary"
               className="ms-2"
               onClick={() =>
-                navigate(`/child/series/${seriesId}/page1/${videoId}`)
+                navigate(`/child/module/${seriesSlug}/page1/${videoId}`, {
+                  state: { videoData, videoId },
+                })
               }
             >
               Back to Lesson
@@ -219,23 +213,25 @@ const ModuleQuiz = () => {
         }}
       >
         <Alert variant="warning" className="text-center">
-          No questions available for this quiz.
-          <div className="mt-3">
-            <Button
-              variant="primary"
-              onClick={() =>
-                navigate(`/child/series/${seriesId}/page1/${videoId}`)
-              }
-            >
-              Back to Lesson
-            </Button>
-          </div>
+          <h5>No Quiz Available</h5>
+          <p>No questions available for this lesson.</p>
+          <Button
+            variant="primary"
+            onClick={() =>
+              navigate(`/child/module/${seriesSlug}/page1/${videoId}`, {
+                state: { videoData, videoId },
+              })
+            }
+          >
+            Back to Lesson
+          </Button>
         </Alert>
       </Container>
     );
   }
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
+  const currentQ = questions[currentQuestion];
 
   return (
     <Container
@@ -251,6 +247,11 @@ const ModuleQuiz = () => {
           KNOWLEDGE CHECK
         </h4>
         <p className="text-muted">Test your understanding of the lesson</p>
+        {videoData && (
+          <p className="text-muted small">
+            Video: <strong>{videoData.title}</strong>
+          </p>
+        )}
       </div>
 
       <Card
@@ -262,7 +263,6 @@ const ModuleQuiz = () => {
           width: "100%",
         }}
       >
-        {/* Progress section */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <span className="text-muted">
             Question {currentQuestion + 1} of {questions.length}
@@ -275,92 +275,82 @@ const ModuleQuiz = () => {
           <span className="text-muted">{Math.round(progress)}%</span>
         </div>
 
-        {/* Score indicator */}
         <div className="text-center mb-3">
           <small className="text-muted">
-            Score: {score} / {currentQuestion}
+            Current Score: {score} / {currentQuestion}
           </small>
         </div>
 
-        {/* Question section */}
         <div className="mb-5">
-          <h3 className="fw-semibold text-dark mb-4">
-            {questions[currentQuestion].question}
-          </h3>
+          <h3 className="fw-semibold text-dark mb-4">{currentQ.question}</h3>
 
           <div className="space-y-3">
-            {questions[currentQuestion].options.map((option, index) => (
-              <div
-                key={index}
-                className={`p-3 rounded-3 border ${
-                  selectedAnswer === index
-                    ? showFeedback
-                      ? isCorrect && selectedAnswer === index
-                        ? "border-success bg-light-success"
-                        : selectedAnswer === index
-                          ? "border-danger bg-light-danger"
-                          : "border-light-subtle"
-                      : "border-primary bg-light-primary"
-                    : "border-light-subtle"
-                } 
-                ${!showFeedback && "hover-cursor"}`}
-                style={{
-                  transition: "all 0.2s ease",
-                  cursor: !showFeedback ? "pointer" : "default",
-                  backgroundColor:
-                    selectedAnswer === index
-                      ? showFeedback
-                        ? isCorrect
-                          ? "#d1f2eb"
-                          : "#f8d7da"
-                        : "#e3f2fd"
-                      : "white",
-                }}
-                onClick={() => handleAnswerSelect(index)}
-              >
-                <div className="d-flex align-items-center">
-                  <div
-                    className={`d-flex justify-content-center align-items-center me-3 ${
-                      selectedAnswer === index
-                        ? showFeedback
-                          ? isCorrect
-                            ? "bg-success"
-                            : "bg-danger"
-                          : "bg-primary"
-                        : "bg-light border"
-                    } 
-                    rounded-circle`}
-                    style={{
-                      width: "28px",
-                      height: "28px",
-                      minWidth: "28px",
-                      fontSize: "0.9rem",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {selectedAnswer === index && showFeedback ? (
-                      isCorrect ? (
-                        <span className="text-white">✓</span>
+            {currentQ.options.map((option, index) => {
+              const isSelected = selectedAnswer === index;
+              let borderClass = "border-light-subtle";
+              let bgClass = "white";
+
+              if (isSelected) {
+                if (showFeedback) {
+                  borderClass = isCorrect ? "border-success" : "border-danger";
+                  bgClass = isCorrect ? "#d1f2eb" : "#f8d7da";
+                } else {
+                  borderClass = "border-primary";
+                  bgClass = "#e3f2fd";
+                }
+              }
+
+              return (
+                <div
+                  key={index}
+                  className={`p-3 rounded-3 border ${borderClass} ${
+                    !showFeedback && "hover-cursor"
+                  }`}
+                  style={{
+                    transition: "all 0.2s ease",
+                    cursor: !showFeedback ? "pointer" : "default",
+                    backgroundColor: bgClass,
+                  }}
+                  onClick={() => handleAnswerSelect(index)}
+                >
+                  <div className="d-flex align-items-center">
+                    <div
+                      className={`d-flex justify-content-center align-items-center me-3 rounded-circle ${
+                        isSelected
+                          ? showFeedback
+                            ? isCorrect
+                              ? "bg-success"
+                              : "bg-danger"
+                            : "bg-primary"
+                          : "bg-light border"
+                      }`}
+                      style={{
+                        width: "28px",
+                        height: "28px",
+                        minWidth: "28px",
+                        fontSize: "0.9rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {isSelected && showFeedback ? (
+                        <span className="text-white">
+                          {isCorrect ? "✓" : "✗"}
+                        </span>
                       ) : (
-                        <span className="text-white">✗</span>
-                      )
-                    ) : (
-                      <span
-                        className={
-                          selectedAnswer === index ? "text-white" : "text-dark"
-                        }
-                      >
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                    )}
+                        <span
+                          className={isSelected ? "text-white" : "text-dark"}
+                        >
+                          {String.fromCharCode(65 + index)}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-dark flex-grow-1">{option}</span>
                   </div>
-                  <span className="text-dark flex-grow-1">{option}</span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {/* Feedback alert */}
           {showFeedback && (
             <Alert
               variant={isCorrect ? "success" : "danger"}
@@ -370,15 +360,12 @@ const ModuleQuiz = () => {
               {isCorrect
                 ? "Well done! You understand this concept."
                 : `The correct answer is: ${
-                    questions[currentQuestion].options[
-                      questions[currentQuestion].correctAnswer
-                    ]
+                    currentQ.options[currentQ.correctAnswer]
                   }`}
             </Alert>
           )}
         </div>
 
-        {/* Navigation buttons */}
         <div className="d-flex justify-content-between mt-4">
           <Button
             onClick={handleBack}
@@ -393,7 +380,7 @@ const ModuleQuiz = () => {
             onClick={handleSubmit}
             disabled={selectedAnswer === null || showFeedback}
             variant={selectedAnswer === null ? "outline-secondary" : "primary"}
-            className="d-flex align-items-center"
+            className="d-flex align-items-center px-4"
           >
             {currentQuestion < questions.length - 1
               ? "Next Question"

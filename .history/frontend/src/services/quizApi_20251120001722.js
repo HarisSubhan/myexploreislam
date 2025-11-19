@@ -25,17 +25,6 @@ export const getQuizApi = async () => {
 };
 
 
-// Other existing functions...
-export const getQuizApi = async () => {
-  const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/quizzes`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
-};
-
 
 
 export const getQuizByIdApi = async (id) => {
@@ -49,6 +38,7 @@ export const getQuizByIdApi = async (id) => {
 
   return response.data;
 };
+
 
 // Update a quiz by ID
 export const updateQuizApi = async (id, updatedData) => {
@@ -105,13 +95,16 @@ export const getQuizBySeriesVideoApi = async (seriesId, videoId) => {
   return response.data;
 };
 
-
-export const getQuizByIdApi = async (id) => {
+export const getQuizByIdVideoAPi = async (id) => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/quizzes/${id}`, {
+
+  const response = await axios.get(`${baseUrl}api/quizzes/video${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+
   return response.data;
 };
+
+
