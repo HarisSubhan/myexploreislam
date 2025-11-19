@@ -76,3 +76,62 @@ exports.getChildrenActivitySummary = (req, res) => {
     });
   });
 };
+
+
+// ============================
+//  CHILD SELF ACTIVITY SUMMARY
+// ============================
+exports.getSingleChildActivity = (req, res) => {
+  const childId = req.params.childId;
+
+  ChildActivity.getChildActivityLogs(childId, (err, logs) => {
+    if (err) {
+      console.error("Error fetching child logs:", err.message);
+      return res.status(500).json({ message: "Database error." });
+    }
+
+    // If no logs found
+    if (logs.length === 0) {
+      return res.status(404).json({
+        message: "No activity logs found for this child.",
+        daily_activity: [],
+      });
+    }
+
+    // Prepare day-wise data for last 7 days
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = moment().subtract(i, "days").format("YYYY-MM-DD");
+      last7Days.push({ date, minutes: 0 });
+    }
+
+    // Calculate time
+    let lastLogin = null;
+
+    logs.forEach((log) => {
+      const logDate = moment(log.created_at).format("YYYY-MM-DD");
+
+      if (log.action === "Logged In") {
+        lastLogin = moment(log.created_at);
+      } 
+      else if (log.action === "Logged Out" && lastLogin) {
+        const diffMinutes = moment(log.created_at).diff(lastLogin, "minutes");
+        lastLogin = null;
+
+        const dayData = last7Days.find((d) => d.date === logDate);
+        if (dayData) dayData.minutes += diffMinutes;
+      }
+    });
+
+    // Result summary
+    const totalMinutes = last7Days.reduce((sum, d) => sum + d.minutes, 0);
+
+    res.status(200).json({
+      message: "Child activity fetched successfully.",
+      child_id: childId,
+      daily_activity: last7Days,
+      total_active_minutes: totalMinutes,
+      total_active_hours: (totalMinutes / 60).toFixed(2),
+    });
+  });
+};
