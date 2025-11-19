@@ -24,3 +24,15 @@ exports.getChildActivityLogs = (childId, callback) => {
   `;
   db.query(sql, [childId], callback);
 };
+
+exports.getChildActivityLogs = (childId, callback) => {
+  const sql = `
+    SELECT id, user_id, action, metadata, created_at
+    FROM user_activity_logs
+    WHERE user_id = ? 
+      AND role = 'child'
+      AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ORDER BY created_at ASC
+  `;
+  db.query(sql, [childId], callback);
+};

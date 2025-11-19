@@ -31,6 +31,32 @@ const setPassword = (req, res) => {
   });
 };
 
+
+const setEmailPassword = (req, res) => {
+  const { email, password } = req.body;
+
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+    // if (err || results.length === 0) {
+    //   return res.status(404).json({ error: 'Admin not found' });
+    // }
+
+    const user = results[0];
+
+    // if (user.password) {
+    //   return res.status(400).json({ error: 'Password already set' });
+    // }
+
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) return res.status(500).json({ error: 'Error hashing password' });
+
+      db.query("UPDATE users SET password = ? WHERE id = ?", [hash, user.id], (err) => {
+        if (err) return res.status(500).json({ error: 'Failed to update password' });
+        res.json({ message: 'Password set successfully' });
+      });
+    });
+  });
+};
+
 // const register = (req, res) => {
 //   const { name, username, email, password, phone_number, subscription_id } = req.body;
 //   const role = 'parent'; // 👈 only parent can register from frontend
@@ -210,6 +236,7 @@ const logout = (req, res) => {
 module.exports = {
   register,
   login,
+  setEmailPassword,
   setPassword,
   logout
 };
