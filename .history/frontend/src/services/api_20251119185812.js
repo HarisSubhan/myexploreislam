@@ -70,7 +70,7 @@ export const setPasswordApi = async (email, password) => {
 export const setEmailPasswordApi = async (email, password) => {
   try {
     const response = await axios.post(
-      `${baseUrl}/api/auth/set-email-password`,
+      `${baseUrl}/api/auth/set-password`,
       { email, password }
     );
     return response.data;
