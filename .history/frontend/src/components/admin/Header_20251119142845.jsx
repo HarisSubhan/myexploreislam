@@ -21,7 +21,7 @@ const Header = () => {
   const dropdownItems = useMemo(
     () => [
       { href: "#/profile", label: "Profile" },
-      { href: "#/settings", label: "Settings" },
+      { href: "/admin/settings", label: "Settings" },
       { type: "divider" },
       { href: "#/logout", label: "Logout", onClick: logoutHandler },
     ],

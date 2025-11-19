@@ -100,7 +100,15 @@ const ParentRequestChild = () => {
             >
               Created At
             </th>
-           
+            <th
+              style={{
+                padding: "12px",
+                border: "1px solid #ddd",
+                textAlign: "left",
+              }}
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
