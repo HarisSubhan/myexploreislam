@@ -58,3 +58,23 @@ exports.updateTicketStatus = (ticketId, status, callback) => {
   `;
   db.query(sql, [status, ticketId], callback);
 };
+
+
+// ✅ Get Tickets by Parent ID
+exports.getTicketsByParent = (parentId, callback) => {
+  const sql = `
+    SELECT 
+      t.id, 
+      t.ticket_number, 
+      t.subject, 
+      t.description, 
+      t.status, 
+      t.created_at, 
+      t.updated_at
+    FROM tickets t
+    WHERE t.parent_id = ?
+    ORDER BY t.created_at DESC
+  `;
+  db.query(sql, [parentId], callback);
+};
+

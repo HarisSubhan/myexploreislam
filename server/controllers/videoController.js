@@ -85,6 +85,19 @@ const getAllVideos = (req, res) => {
     res.json(results);
   });
 };
+
+const getAllVideosWithoutSeries = (req, res) => {
+  const sql = `
+    SELECT v.*
+    FROM videos v WHERE series_id IS NULL
+    ORDER BY v.created_at DESC
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Failed to fetch videos' });
+    res.json(results);
+  });
+};
+
 const getUnassignedVideos = (req, res) => {
   const sql = `
     SELECT v.*
@@ -175,6 +188,7 @@ const watchVideo = (req, res) => {
 module.exports = {
   uploadVideoFile,
   getAllVideos,
+  getAllVideosWithoutSeries,
   getVideoById,
   updateVideoById,
   getVideosBySeriesId,

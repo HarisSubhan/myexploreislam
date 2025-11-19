@@ -5,6 +5,7 @@ const path = require('path');
 const {
   uploadVideoFile,
   getAllVideos,
+  getAllVideosWithoutSeries,
   getVideoById,
   updateVideoById,
   getVideosBySeriesId,
@@ -43,6 +44,7 @@ router.put('/videos/:id', upload.fields([
 ]), updateVideoById);
 
 router.get('/', getAllVideos);
+router.get('/without-series', getAllVideosWithoutSeries);
 router.get('/:id', getVideoById);
 
 router.get('/stream/:filename', (req, res) => {

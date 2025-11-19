@@ -13,4 +13,6 @@ router.put("/:id/in-progress", ticketController.markInProgress);
 
 router.put("/:id/resolved", ticketController.markResolved);
 
+router.get("/parent/:parentId", ticketController.getTicketsByParent);
+
 module.exports = router;
