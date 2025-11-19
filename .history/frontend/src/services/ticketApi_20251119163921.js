@@ -29,6 +29,7 @@ api.interceptors.response.use(
 
 export const ticketApi = {
   // Create ticket
+ const ticketApi = {
   create: async (ticketData) => {
     try {
       const token = localStorage.getItem('token');
@@ -37,7 +38,7 @@ export const ticketApi = {
         throw new Error('User not authenticated. Please log in again.');
       }
 
-      const response = await axios.post('/api/tickets/create', ticketData, {
+      const response = await axios.post('/api/tickets', ticketData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -57,16 +58,6 @@ export const ticketApi = {
       return response.data;
     } catch (error) {
       throw new Error(error.message || "Failed to fetch tickets");
-    }
-  },
-
-  // Get tickets by parent ID
-  getById: async (parentId) => {
-    try {
-      const response = await api.get(`/parent/${parentId}`);
-      return response.data;
-    } catch (error) {
-      throw new Error(error.message || "Failed to fetch tickets for parent");
     }
   },
 

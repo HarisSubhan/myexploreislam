@@ -251,14 +251,14 @@ const ParentSupports = () => {
     checkAuth();
   }, [checkAuth]);
 
+  // Memoized API calls
   const fetchTickets = useCallback(async () => {
     if (!currentUser?.id) return;
 
     setLoading(true);
     setError("");
     try {
-      // Use getById instead of getAll to fetch parent-specific tickets
-      const response = await ticketApi.getById(currentUser.id);
+      const response = await ticketApi.getById();
       setTickets(response.tickets || []);
     } catch (err) {
       setError(err.message);
@@ -277,7 +277,6 @@ const ParentSupports = () => {
       console.error("Error fetching summary:", err);
     }
   }, [currentUser]);
-
 
   const handleRefresh = useCallback(async () => {
     if (!currentUser?.id) {
@@ -496,7 +495,52 @@ const ParentSupports = () => {
               </Card.Body>
             </Card>
           </Col>
-          
+          <Col lg={12}>
+            <Card className="shadow-sm border-0 rounded-3">
+              <Card.Body>
+                <div className="d-flex align-items-center mb-3">
+                  <FaEnvelope size={22} className="text-primary me-2" />
+                  <h5 className="fw-bold m-0">Contact Support</h5>
+                </div>
+
+                <Form>
+                  <Row className="g-3">
+                    <Col md={6}>
+                      <Form.Group>
+                        <Form.Label>Your Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your name"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group>
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control
+                          type="email"
+                          placeholder="Enter your email"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md={12}>
+                      <Form.Group>
+                        <Form.Label>Message</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          rows={4}
+                          placeholder="Type your message..."
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Button variant="success" className="mt-3 w-100 fw-bold">
+                    Send Message
+                  </Button>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
         </Row>
       )}
 

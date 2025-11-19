@@ -29,7 +29,7 @@ api.interceptors.response.use(
 
 export const ticketApi = {
   // Create ticket
-  create: async (ticketData) => {
+ create: async (ticketData) => {
     try {
       const token = localStorage.getItem('token');
       
@@ -60,13 +60,12 @@ export const ticketApi = {
     }
   },
 
-  // Get tickets by parent ID
-  getById: async (parentId) => {
+  getById: async () => {
     try {
-      const response = await api.get(`/parent/${parentId}`);
+      const response = await api.get(`/parent/$");
       return response.data;
     } catch (error) {
-      throw new Error(error.message || "Failed to fetch tickets for parent");
+      throw new Error(error.message || "Failed to fetch tickets");
     }
   },
 

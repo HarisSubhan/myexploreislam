@@ -20,7 +20,7 @@ export const videoService = {
 
     getAllwithoutseriesVideos: async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/videos/without-series`, {
+      const response = await axios.get(`${baseUrl}/api/videos//without-series`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },

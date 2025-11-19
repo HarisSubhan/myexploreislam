@@ -1,62 +1,10 @@
 import React, { useState } from "react";
 import ColorChanging from "../../../components/parent/ColorChangeing";
-import { Card, Button, Form, Row, Col, Alert } from "react-bootstrap";
+import { Card, Button, Form, Row, Col } from "react-bootstrap";
 import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
-import { useUser } from "../../../context/UserContext"; // Import your actual UserContext
-import { setPasswordApi } from "../../../services/api";
 
 const DefaultTheme = () => {
   const [active, setActive] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
-  const [formData, setFormData] = useState({
-    password: ""
-  });
-
-  // Get email from your UserContext
-  const { user } = useUser();
-  const userEmail = user?.email || "";
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate password length
-    if (formData.password.length < 6) {
-      setMessage({ 
-        type: 'danger', 
-        text: 'Password must be at least 6 characters long' 
-      });
-      return;
-    }
-
-    setLoading(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      // Use email from context and password from form
-      await setPasswordApi(userEmail, formData.password);
-      setMessage({ 
-        type: 'success', 
-        text: 'Password updated successfully!' 
-      });
-      setFormData({ password: "" });
-    } catch (error) {
-      setMessage({ 
-        type: 'danger', 
-        text: error.message 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const cards = [
     {
@@ -65,53 +13,21 @@ const DefaultTheme = () => {
       icon: <FaUser size={28} />,
       desc: "Manage your personal details",
       form: (
-        <Form onSubmit={handleSubmit}>
-          {message.text && (
-            <Alert variant={message.type} className="mb-3">
-              {message.text}
-            </Alert>
-          )}
+        <>
           
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
-            <Form.Control 
-              type="email" 
-              value={userEmail}
-              readOnly
-              disabled
-              className="bg-light"
-            />
-            <Form.Text className="text-muted">
-              Your registered email address
-            </Form.Text>
+            <Form.Control type="email" placeholder="Enter email" />
           </Form.Group>
-          
           <Form.Group className="mb-3">
-            <Form.Label>New Password</Form.Label>
-            <Form.Control 
-              type="password" 
-              name="password"
-              placeholder="Enter new password" 
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              minLength={6}
-            />
-            <Form.Text className="text-muted">
-              Password must be at least 6 characters long
-            </Form.Text>
+            <Form.Label>Change Password</Form.Label>
+            <Form.Control type="text" placeholder="Enter full name" />
           </Form.Group>
-          
-          <Button 
-            variant="success" 
-            type="submit"
-            disabled={loading || !formData.password}
-          >
-            {loading ? "Updating..." : "Save Changes"}
-          </Button>
-        </Form>
+          <Button variant="success">Save</Button>
+        </>
       ),
     },
+   
   ];
 
   const activeCard = cards.find((c) => c.key === active);
@@ -167,11 +83,7 @@ const DefaultTheme = () => {
           <Button
             variant="link"
             className="mb-3 back-btn d-flex align-items-center gap-2"
-            onClick={() => {
-              setActive(null);
-              setMessage({ type: '', text: '' });
-              setFormData({ password: "" });
-            }}
+            onClick={() => setActive(null)}
           >
             <FaArrowLeft /> Back
           </Button>
@@ -204,7 +116,7 @@ const DefaultTheme = () => {
             <h4 className="fw-bold mb-4">
               {activeCard.icon} {activeCard.title}
             </h4>
-            {activeCard.form}
+            <Form>{activeCard.form}</Form>
           </Card>
         )}
       </div>

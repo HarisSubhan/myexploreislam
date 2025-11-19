@@ -1,20 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ColorChanging from "../../../components/parent/ColorChangeing";
 import { Card, Button, Form, Row, Col, Alert } from "react-bootstrap";
 import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
-import { useUser } from "../../../context/UserContext"; // Import your actual UserContext
-import { setPasswordApi } from "../../../services/api";
+import axios from "axios";
+
+// Assuming you have an AuthContext or similar context
+import { AuthContext } from "../../../context/AuthContext";
+
+// API function (you can keep this in a separate file)
+const setPasswordApi = async (email, password) => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/auth/set-password`,
+      { email, password }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Server error. Try again later."
+    );
+  }
+};
 
 const DefaultTheme = () => {
   const [active, setActive] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [formData, setFormData] = useState({
+    email: "",
     password: ""
   });
 
-  // Get email from your UserContext
-  const { user } = useUser();
+  // Get email from context
+  const { user } = useContext(AuthContext);
   const userEmail = user?.email || "";
 
   const handleInputChange = (e) => {
@@ -27,16 +45,6 @@ const DefaultTheme = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate password length
-    if (formData.password.length < 6) {
-      setMessage({ 
-        type: 'danger', 
-        text: 'Password must be at least 6 characters long' 
-      });
-      return;
-    }
-
     setLoading(true);
     setMessage({ type: '', text: '' });
 
@@ -47,7 +55,7 @@ const DefaultTheme = () => {
         type: 'success', 
         text: 'Password updated successfully!' 
       });
-      setFormData({ password: "" });
+      setFormData(prev => ({ ...prev, password: "" }));
     } catch (error) {
       setMessage({ 
         type: 'danger', 
@@ -87,7 +95,7 @@ const DefaultTheme = () => {
           </Form.Group>
           
           <Form.Group className="mb-3">
-            <Form.Label>New Password</Form.Label>
+            <Form.Label>Change Password</Form.Label>
             <Form.Control 
               type="password" 
               name="password"
@@ -170,7 +178,7 @@ const DefaultTheme = () => {
             onClick={() => {
               setActive(null);
               setMessage({ type: '', text: '' });
-              setFormData({ password: "" });
+              setFormData({ email: "", password: "" });
             }}
           >
             <FaArrowLeft /> Back

@@ -278,6 +278,16 @@ const ParentSupports = () => {
     }
   }, [currentUser]);
 
+  const fetchSummary = useCallback(async () => {
+    if (!currentUser?.id) return;
+
+    try {
+      const response = await ticketApi.getSummary();
+      setSummary(response.data);
+    } catch (err) {
+      console.error("Error fetching summary:", err);
+    }
+  }, [currentUser]);
 
   const handleRefresh = useCallback(async () => {
     if (!currentUser?.id) {

@@ -251,14 +251,14 @@ const ParentSupports = () => {
     checkAuth();
   }, [checkAuth]);
 
+  // Memoized API calls
   const fetchTickets = useCallback(async () => {
     if (!currentUser?.id) return;
 
     setLoading(true);
     setError("");
     try {
-      // Use getById instead of getAll to fetch parent-specific tickets
-      const response = await ticketApi.getById(currentUser.id);
+      const response = await ticketApi.getAll();
       setTickets(response.tickets || []);
     } catch (err) {
       setError(err.message);
@@ -277,7 +277,6 @@ const ParentSupports = () => {
       console.error("Error fetching summary:", err);
     }
   }, [currentUser]);
-
 
   const handleRefresh = useCallback(async () => {
     if (!currentUser?.id) {
