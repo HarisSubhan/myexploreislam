@@ -10,7 +10,7 @@ const getCurrentChildName = (req, res) => {
     }
 
     const child = results[0];
-    res.json({ name: child.name, email: child.email });
+    res.json({ name: child.name, email: child.email, age: child.age, avatar: child.avatar });
   });
 };
 
