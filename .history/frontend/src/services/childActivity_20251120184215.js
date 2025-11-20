@@ -1,9 +1,14 @@
-// services/childActivity.js
 import axios from "axios";
 import { baseUrl, getToken } from "./config";
 
 export const dashboardApi = {
-  getChildActivity: async (childId) => {
+
+   getChildrenStats: (parentId) =>
+    const = response
+    apiClient.get(`/parent-dashboard/${parentId}/children-stats`),
+
+
+   getChildActivity: async (childId) => {
     try {
       const token = getToken();
       const response = await axios.get(
@@ -20,7 +25,7 @@ export const dashboardApi = {
       throw error;
     }
   },
-  
+  // Get children activity data for chart
   getChildrenActivity: async (parentId) => {
     try {
       const token = getToken();
@@ -39,6 +44,7 @@ export const dashboardApi = {
     }
   },
 
+  // Get recent activity timeline
   getRecentActivity: async (parentId) => {
     try {
       const token = getToken();
@@ -57,32 +63,9 @@ export const dashboardApi = {
     }
   },
 
-  getChildrenStats: async (parentId) => {
-    try {
-      const token = getToken();
-      const response = await axios.get(
-        `${baseUrl}/api/parent-dashboard/${parentId}/children-stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response;
-    } catch (error) {
-      console.error('Error fetching children stats:', error);
-      return {
-        data: {
-          data: {
-            active_subscriptions_7days: 0,
-            new_signups_7days: 0,
-            open_tickets_7days: 0
-          }
-        }
-      };
-    }
-  },
+  
 
+  // Log video watch activity
   logVideoWatch: async (childId, videoId, videoTitle) => {
     try {
       const token = getToken();

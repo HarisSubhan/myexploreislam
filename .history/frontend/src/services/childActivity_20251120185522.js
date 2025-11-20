@@ -57,31 +57,43 @@ export const dashboardApi = {
     }
   },
 
-  getChildrenStats: async (parentId) => {
-    try {
-      const token = getToken();
-      const response = await axios.get(
-        `${baseUrl}/api/parent-dashboard/${parentId}/children-stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response;
-    } catch (error) {
-      console.error('Error fetching children stats:', error);
-      return {
+  // Temporary debug version
+getChildrenStats: async (parentId) => {
+  try {
+    const token = getToken();
+    console.log('🔍 Debug getChildrenStats:', { parentId, baseUrl, token: !!token });
+    
+    const response = await axios.get(
+      `${baseUrl}/api/parent-dashboard/${parentId}/children-stats`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    
+    console.log('✅ getChildrenStats response:', response.data);
+    return response;
+  } catch (error) {
+    console.error('❌ getChildrenStats error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      url: error.config?.url
+    });
+    
+    // Return fallback data
+    return {
+      data: {
         data: {
-          data: {
-            active_subscriptions_7days: 0,
-            new_signups_7days: 0,
-            open_tickets_7days: 0
-          }
+          active_subscriptions_7days: 0,
+          new_signups_7days: 0,
+          open_tickets_7days: 0
         }
-      };
-    }
-  },
+      }
+    };
+  }
+},
 
   logVideoWatch: async (childId, videoId, videoTitle) => {
     try {

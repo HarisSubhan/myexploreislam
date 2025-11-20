@@ -71,5 +71,29 @@ apiClient.interceptors.response.use(
   }
 );
 
+getChildrenStats: (parentId) =>
+    apiClient.get(`/parent-dashboard/${parentId}/children-stats`),
 
+  // Fetch combined activity data
+  getCombinedActivity: (parentId, range) =>
+    apiClient.get(`/parent/${parentId}/children-activity`, {
+      params: { range },
+    }),
+
+
+  // Fetch timeline activities
+  getTimeline: (parentId, limit = 10) =>
+    apiClient.get(`/activity/${parentId}/children-activity`, {
+      params: { limit },
+    }),
+
+  // Fetch subscription details
+  getSubscription: (parentId) =>
+    apiClient.get(`/parent-dashboard/${parentId}/subscription`),
+
+// API functions
+export const dashboardApi = {
+  // Fetch children stats
+  
+};
 

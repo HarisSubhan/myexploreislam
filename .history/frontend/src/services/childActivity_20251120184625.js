@@ -1,8 +1,8 @@
-// services/childActivity.js
 import axios from "axios";
 import { baseUrl, getToken } from "./config";
 
 export const dashboardApi = {
+    
   getChildActivity: async (childId) => {
     try {
       const token = getToken();
@@ -21,6 +21,7 @@ export const dashboardApi = {
     }
   },
   
+  // Get children activity data for chart
   getChildrenActivity: async (parentId) => {
     try {
       const token = getToken();
@@ -39,6 +40,7 @@ export const dashboardApi = {
     }
   },
 
+  // Get recent activity timeline
   getRecentActivity: async (parentId) => {
     try {
       const token = getToken();
@@ -57,6 +59,7 @@ export const dashboardApi = {
     }
   },
 
+  // Get children statistics for parent dashboard
   getChildrenStats: async (parentId) => {
     try {
       const token = getToken();
@@ -70,19 +73,12 @@ export const dashboardApi = {
       );
       return response;
     } catch (error) {
-      console.error('Error fetching children stats:', error);
-      return {
-        data: {
-          data: {
-            active_subscriptions_7days: 0,
-            new_signups_7days: 0,
-            open_tickets_7days: 0
-          }
-        }
-      };
+      console.error("Error fetching children stats:", error);
+      throw error;
     }
   },
 
+  // Log video watch activity
   logVideoWatch: async (childId, videoId, videoTitle) => {
     try {
       const token = getToken();

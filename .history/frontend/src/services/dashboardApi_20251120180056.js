@@ -71,5 +71,16 @@ apiClient.interceptors.response.use(
   }
 );
 
+export const dashboardApi = {
+  getChildrenStats: (parentId) =>
+    apiClient.get(`/parent-dashboard/${parentId}/children-stats`),
+
+  getChildrenActivity: (parentId) =>
+    apiClient.get(`/parent/${parentId}/children-activity`),
+
+  getRecentActivity: (parentId) =>
+    apiClient.get(`/activity/${parentId}/children-activity`),
+};
+
 
 

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { transformChildrenActivityToChartData } from './../../utils/activityDataTransformer';
-import {dashboardApi} from '../../services/childActivity'
+import {dashboardApi} from '../../services/'
 
 // useParentMetrics.js
 export const useParentMetrics = (range, parentId) => {

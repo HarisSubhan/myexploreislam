@@ -252,7 +252,7 @@ const ParentalControls = () => {
         <VideoControler />
       </Row>
 
-      <Modal className="mt-4" show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+      <Modal className="mt-5" show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Action</Modal.Title>
         </Modal.Header>

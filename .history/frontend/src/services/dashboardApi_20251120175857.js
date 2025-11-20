@@ -71,5 +71,9 @@ apiClient.interceptors.response.use(
   }
 );
 
-
+// API functions
+export const dashboardApi = {
+  // Fetch children stats
+  
+};
 

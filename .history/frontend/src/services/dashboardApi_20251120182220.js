@@ -4,21 +4,21 @@ import { baseUrl } from "../services/config";
 
 const API_BASE_URL = `${baseUrl}/api`;
 
-export const dashboardAPI = {
-  getSummary: async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API_BASE_URL}/dashboard/summary`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching dashboard summary:", error);
-      throw error;
-    }
-  },
+// export const dashboardAPI = {
+//   getSummary: async () => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       const response = await axios.get(`${API_BASE_URL}/dashboard/summary`, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+//       return response.data;
+//     } catch (error) {
+//       console.error("Error fetching dashboard summary:", error);
+//       throw error;
+//     }
+//   },
 
   getStats: async () => {
     try {
@@ -71,5 +71,27 @@ apiClient.interceptors.response.use(
   }
 );
 
+// API functions
+export const dashboardApi = {
+  // Fetch children stats
+  getChildrenStats: (parentId) =>
+    apiClient.get(`/parent-dashboard/${parentId}/children-stats`),
 
+  // Fetch combined activity data
+  getCombinedActivity: (parentId, range) =>
+    apiClient.get(`/parent/${parentId}/children-activity`, {
+      params: { range },
+    }),
+
+
+  // Fetch timeline activities
+  getTimeline: (parentId, limit = 10) =>
+    apiClient.get(`/activity/${parentId}/children-activity`, {
+      params: { limit },
+    }),
+
+  // Fetch subscription details
+  getSubscription: (parentId) =>
+    apiClient.get(`/parent-dashboard/${parentId}/subscription`),
+};
 

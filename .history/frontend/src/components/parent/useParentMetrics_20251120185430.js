@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { transformChildrenActivityToChartData } from './../../utils/activityDataTransformer';
-import {dashboardApi} from '../../services/childActivity'
-
 // useParentMetrics.js
+import { useState, useEffect } from "react";
+import { dashboardApi } from "../../services/childActivity";
+import { transformChildrenActivityToChartData } from "../../utils/activityDataTransformer";
+
 export const useParentMetrics = (range, parentId) => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -30,13 +30,14 @@ export const useParentMetrics = (range, parentId) => {
         setLoading(true);
         setError(null);
 
+        // Fetch all data in parallel for better performance
         const [childrenActivityResponse, recentActivityResponse, childrenStatsResponse] = await Promise.allSettled([
           dashboardApi.getChildrenActivity(parentId),
           dashboardApi.getRecentActivity(parentId),
           dashboardApi.getChildrenStats(parentId)
         ]);
 
-        // Process children activity data (this seems to work fine)
+        // Process children activity data
         if (childrenActivityResponse.status === 'fulfilled') {
           const childrenData = childrenActivityResponse.value?.data?.data || [];
           
@@ -56,24 +57,28 @@ export const useParentMetrics = (range, parentId) => {
               active,
               inactive: totalChildren - active,
             }));
+          } else {
+            setCombinedActivity([]);
+            setChildren([]);
+            setStats(prev => ({
+              ...prev,
+              totalChildren: 0,
+              active: 0,
+              inactive: 0,
+            }));
           }
+        } else {
+          console.warn("Failed to fetch children activity:", childrenActivityResponse.reason);
         }
 
-        // FIXED: Process children stats data with correct field mapping
+        // Process children stats data
         if (childrenStatsResponse.status === 'fulfilled') {
           const statsData = childrenStatsResponse.value?.data?.data || {};
-          console.log('📊 Raw children stats data:', statsData); // Debug log
-          
           setStats(prev => ({
             ...prev,
-            // Map the API response fields to your expected fields
-            totalChildren: parseInt(statsData.total_children) || 0,
-            active: parseInt(statsData.active_children) || 0,
-            inactive: parseInt(statsData.inactive_children) || 0,
-            // These might come from a different endpoint or be calculated
-            activeSubscriptions: prev.activeSubscriptions, // Keep existing or set to 0
-            newSignups: prev.newSignups, // Keep existing or set to 0
-            openTickets: prev.openTickets // Keep existing or set to 0
+            activeSubscriptions: statsData.active_subscriptions_7days || 0,
+            newSignups: statsData.new_signups_7days || 0,
+            openTickets: statsData.open_tickets_7days || 0
           }));
         } else {
           console.warn("Failed to fetch children stats:", childrenStatsResponse.reason);
@@ -83,6 +88,8 @@ export const useParentMetrics = (range, parentId) => {
         if (recentActivityResponse.status === 'fulfilled') {
           const timelineData = recentActivityResponse.value?.data?.data || [];
           setTimeline(timelineData);
+        } else {
+          console.warn("Failed to fetch recent activity:", recentActivityResponse.reason);
         }
 
       } catch (err) {

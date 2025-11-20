@@ -70,7 +70,8 @@ export const dashboardApi = {
       );
       return response;
     } catch (error) {
-      console.error('Error fetching children stats:', error);
+      console.error("Error fetching children stats:", error);
+      // Return a default structure instead of throwing
       return {
         data: {
           data: {

@@ -4,6 +4,7 @@ import { baseUrl } from "../services/config";
 
 const API_BASE_URL = `${baseUrl}/api`;
 
+
 export const dashboardAPI = {
   getSummary: async () => {
     try {
@@ -58,18 +59,7 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Add response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem("authToken");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
+
 
 
 
