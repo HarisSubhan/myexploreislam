@@ -197,7 +197,14 @@ const login = (req, res) => {
               res.json({
                 message: 'Login successful',
                 token,
-                user: child
+                user: {
+                  id: child.id,
+                  name: child.name,
+                  username: child.username,
+                  email: child.email,
+                  role: 'child',
+                  parent_id: child.parent_id
+                }
               });
             });
           }
