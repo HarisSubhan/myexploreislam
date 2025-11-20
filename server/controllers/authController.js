@@ -168,13 +168,7 @@ const login = (req, res) => {
           return res.json({
             message: 'Login successful',
             token,
-            user: {
-              id: user.id,
-              name: user.name,
-              username: user.username,
-              email: user.email,
-              role: user.role
-            }
+            user: user
           });
         });
       } else {
