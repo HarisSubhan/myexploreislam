@@ -218,7 +218,6 @@ const initDB = () => {
     if (err) {
       console.log('Error creating users table:', err.code, err.message);
     } else {
-      console.log(' Users table ready.');
       db.query("SELECT * FROM users WHERE role = 'admin'", (err, results) => {
         if (err) return console.log('Admin check error:', err.message);
         if (results.length === 0) {
