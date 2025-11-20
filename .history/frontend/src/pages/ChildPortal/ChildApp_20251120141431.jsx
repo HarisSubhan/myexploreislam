@@ -5,6 +5,7 @@ import {
   FaBars,
   FaUser,
   FaBook,
+  FaEnvelope,
   FaHistory,
   FaQuestionCircle,
 } from "react-icons/fa";

@@ -287,6 +287,15 @@ const VideoModules = () => {
         </Alert>
       )}
 
+      {!loading && !error && (
+        <div className="alert alert-info mb-4">
+          <h6 className="alert-heading">Welcome to your assigned content! 🎉</h6>
+          <p className="mb-0">
+            Here you'll find all the videos and series that have been assigned to you by your parent.
+          </p>
+        </div>
+      )}
+
       <Tabs
         activeKey={activeTab}
         onSelect={(tab) => setActiveTab(tab)}
@@ -365,6 +374,15 @@ const VideoModules = () => {
           </Row>
         </Tab>
       </Tabs>
+
+      {!loading && !error && (
+        <div className="text-center mt-5 pt-4 border-top">
+          <small className="text-muted">
+            Showing {filteredContent.length} of {allContent.length} assigned items •
+            {series.length} series • {singleVideos.length} single videos
+          </small>
+        </div>
+      )}
     </Container>
   );
 };

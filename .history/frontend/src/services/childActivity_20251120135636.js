@@ -2,25 +2,6 @@ import axios from "axios";
 import { baseUrl, getToken } from "./config";
 
 export const dashboardApi = {
-
-
-   getChildActivity: async (childId) => {
-    try {
-      const token = getToken();
-      const response = await axios.get(
-        `${baseUrl}/api/activity/${childId}/all-logs`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response;
-    } catch (error) {
-      console.error("Error fetching recent activity:", error);
-      throw error;
-    }
-  },
   // Get children activity data for chart
   getChildrenActivity: async (parentId) => {
     try {
@@ -59,7 +40,23 @@ export const dashboardApi = {
     }
   },
 
-  
+   getChildActivity: async (parentId) => {
+    try {
+      const token = getToken();
+      const response = await axios.get(
+        `${baseUrl}/api/parent/${parentId}/recent-activity`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error fetching recent activity:", error);
+      throw error;
+    }
+  },
 
   // Log video watch activity
   logVideoWatch: async (childId, videoId, videoTitle) => {

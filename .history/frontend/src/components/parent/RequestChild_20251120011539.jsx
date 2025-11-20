@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { Container, Form, Button, Card } from "react-bootstrap";
+import { Container, Form, Button, Card, Row, Col } from "react-bootstrap";
 import { requestedChildApi } from "../../services/parentApi";
 
 const RequestChild = () => {
+  const [requests, setRequests] = useState([]);
   const [requestedChildren, setRequestedChildren] = useState("");
   const parentId = localStorage.getItem("userId");
+
+  // Clear requests when parentId changes (happens during logout/login)
+  useEffect(() => {
+    return () => {
+      setRequests([]); // Cleanup on unmount
+    };
+  }, [parentId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,12 +29,20 @@ const RequestChild = () => {
         requested_children: Number(requestedChildren),
       };
 
-      await requestedChildApi(requestData);
+      const newRequest = await requestedChildApi(requestData);
+
+      setRequests((prev) => [...prev, newRequest]);
       setRequestedChildren("");
       toast.success("Request submitted successfully.");
     } catch (err) {
       toast.error(err.message || "Failed to send request.");
     }
+  };
+
+  // Format date helper function
+  const formatRequestDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString))) return "N/A";
+    return new Date(dateString).toLocaleString();
   };
 
   return (
@@ -49,6 +65,7 @@ const RequestChild = () => {
           </Button>
         </Form>
       </Card>
+
     </Container>
   );
 };

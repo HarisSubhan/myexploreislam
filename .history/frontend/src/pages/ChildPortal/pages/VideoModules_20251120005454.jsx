@@ -365,6 +365,15 @@ const VideoModules = () => {
           </Row>
         </Tab>
       </Tabs>
+
+      {!loading && !error && (
+        <div className="text-center mt-5 pt-4 border-top">
+          <small className="text-muted">
+            Showing {filteredContent.length} of {allContent.length} assigned items •
+            {series.length} series • {singleVideos.length} single videos
+          </small>
+        </div>
+      )}
     </Container>
   );
 };

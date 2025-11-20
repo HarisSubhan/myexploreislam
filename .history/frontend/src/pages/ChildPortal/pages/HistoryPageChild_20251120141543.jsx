@@ -23,19 +23,13 @@ const HistoryPageChild = () => {
         setLoading(true);
         const response = await dashboardApi.getChildActivity(childId);
         
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-        const transformedLogs = response.data.data
-          .map(item => ({
-            id: item.log_id,
-            type: "Activity",
-            title: item.action,
-            date: new Date(item.created_at).toLocaleDateString('en-CA'),
-            timestamp: item.created_at,
-          }))
-          .filter(item => new Date(item.timestamp) >= threeDaysAgo)
-          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        const transformedLogs = response.data.data.map(item => ({
+          id: item.log_id,
+          type: "Activity",
+          title: item.action,
+          date: new Date(item.created_at).toLocaleDateString('en-CA'),
+          timestamp: item.created_at,
+        }));
 
         setActivityLogs(transformedLogs);
         setError(null);
@@ -88,10 +82,10 @@ const HistoryPageChild = () => {
   if (activityLogs.length === 0) {
     return (
       <>
-        <h3 className="mb-4">Your Activity History (Last 3 Days)</h3>
+        <h3 className="mb-4">Your Activity History</h3>
         <Card className="p-4 text-center">
           <div className="text-muted">
-            No activity found in the last 3 days.
+            No activity history found. Your activities will appear here as you use the app!
           </div>
         </Card>
       </>
@@ -100,7 +94,7 @@ const HistoryPageChild = () => {
 
   return (
     <>
-      <h3 className="mb-4">Your Activity History (Last 3 Days)</h3>
+      <h3 className="mb-4">Your Activity History</h3>
       <div className="mb-3 text-muted">
         Showing {activityLogs.length} activity log{activityLogs.length !== 1 ? 's' : ''}
       </div>
