@@ -202,6 +202,8 @@ const login = (req, res) => {
                   name: child.name,
                   username: child.username,
                   email: child.email,
+                  is_active: child.is_active,
+                  age: child.age,
                   role: 'child',
                   parent_id: child.parent_id
                 }
