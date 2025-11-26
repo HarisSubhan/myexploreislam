@@ -17,7 +17,7 @@ const CartoonModules = lazy(
   () => import("../pages/ChildPortal/pages/CartoonModules")
 );
 const VideoModules = lazy(
-  () => import("../pages/ChildPortal/pages/VideoModules")
+  () => import("../pages/Childcd Portal/pages/VideoModules")
 );
 const HistoryPageChild = lazy(
   () => import("../pages/ChildPortal/pages/HistoryPageChild")
