@@ -1,3 +1,7 @@
 node_modules
 .env
 .history
+server/uploads/
+uploads/
+server/uploads/videos/
+server/uploads/thumbnails/

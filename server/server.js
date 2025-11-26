@@ -29,6 +29,18 @@ const moduleRoutes = require("./routes/moduleRoutes");
 
 const seriesRoutes = require('./routes/seriesRoutes');
 
+const ticketRoutes = require("./routes/ticketRoutes");
+
+const couponRoutes = require("./routes/couponRoutes");
+
+const dashboardRoutes = require("./routes/dashboardRoutes");
+
+const parentDashboardRoutes = require("./routes/parentDashboardRoutes");
+
+const parentChildrenRoutes = require("./routes/parentChildrenRoutes");
+
+const childActivityRoutes = require("./routes/childActivityRoutes");
+
 
 initDB();
 dotenv.config();
@@ -82,6 +94,24 @@ app.use("/api/videos", videoRoutes);
 // app.use("/api", videoRoutes);
 
 app.use('/api/series', seriesRoutes);
+
+app.use("/api/tickets", ticketRoutes);
+
+app.use("/api/coupons", couponRoutes);
+
+app.use("/api/dashboard", dashboardRoutes);
+
+app.use("/api/parent-dashboard", parentDashboardRoutes);
+
+app.use("/api/parent-dashboard", parentDashboardRoutes);
+
+app.use("/api/parent", parentChildrenRoutes);
+
+app.use("/api/children", parentChildrenRoutes);
+
+app.use("/api/activity", childActivityRoutes);
+
+app.use("/stripe", require("./routes/stripeWebhook"));
 
 // Test route
 app.get('/', (req, res) => {

@@ -11,22 +11,24 @@ const getSeriesById = (id, callback) => {
 };
 
 // Add new series
-const createSeries = (title, description, thumbnail_url, callback) => {
+const createSeries = (title, description, age, thumbnail_url, callback) => {
   db.query(
-    'INSERT INTO series (title, description, thumbnail_url) VALUES (?, ?, ?)',
-    [title, description, thumbnail_url],
+    'INSERT INTO series (title, description, age, thumbnail_url) VALUES (?, ?, ?, ?)',
+    [title, description, age, thumbnail_url],
     callback
   );
 };
 
+
 // Update series
-const updateSeries = (id, title, description, thumbnail_url, callback) => {
+const updateSeries = (id, title, description, age, thumbnail_url, callback) => {
   db.query(
-    'UPDATE series SET title = ?, description = ?, thumbnail_url = ? WHERE id = ? AND is_deleted = 0',
-    [title, description, thumbnail_url, id],
+    'UPDATE series SET title = ?, description = ?, age = ?, thumbnail_url = ? WHERE id = ? AND is_deleted = 0',
+    [title, description, age, thumbnail_url, id],
     callback
   );
 };
+
 
 // Soft delete series
 const softDeleteSeries = (id, callback) => {

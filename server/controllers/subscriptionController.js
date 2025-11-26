@@ -1,4 +1,78 @@
 const Subscription = require('../models/subscriptionModel');
+const Stripe = require('stripe');
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// const createCheckoutSession = async (req, res) => {
+//   const { plan_name, price, max_children, stripe_price_id, parent_id } = req.body;
+
+//   if (!plan_name || !price || !stripe_price_id || !parent_id) {
+//     return res.status(400).json({ error: 'Missing required fields' });
+//   }
+
+//   try {
+//     const session = await stripe.checkout.sessions.create({
+//       mode: 'subscription',
+//       payment_method_types: ['card'],
+//       line_items: [
+//         { price: stripe_price_id, quantity: 1 }
+//       ],
+//       success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: `http://localhost:5173/payment-cancel`,
+//       metadata: { parent_id, plan_name, price }
+//     });
+
+//     const data = {
+//       parent_id,
+//       plan_name,
+//       price,
+//       max_children,
+//       start_date: null,
+//       end_date: null
+//     };
+
+//     Subscription.create(data, (err) => {
+//       if (err) return res.status(500).json({ error: 'Subscription creation failed' });
+//       res.status(201).json({ url: session.url });
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Stripe checkout session creation failed' });
+//   }
+// };
+
+const createCheckoutSession = async (req, res) => {
+  const { plan_name, price, max_children, stripe_price_id, parent_id } = req.body;
+
+  if (!plan_name || !price || !stripe_price_id || !parent_id) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [
+        { price: stripe_price_id, quantity: 1 }
+      ],
+      success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:5173/payment-cancel`,
+      metadata: { 
+        parent_id, 
+        plan_name, 
+        price, 
+        max_children 
+      }
+    });
+
+    res.status(201).json({ url: session.url });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Stripe checkout session creation failed' });
+  }
+};
+
 
 const subscribe = (req, res) => {
   const { plan_name, price, max_children, start_date, end_date } = req.body;
@@ -79,5 +153,7 @@ module.exports = {
   cancelSubscription,
   updateSubscription,
   activeInactiveSubscription,
+  getAllActiveSubscriptions,
+  createCheckoutSession,
   getAllActiveSubscriptions
 };
