@@ -17,12 +17,11 @@ import {
   FaPlusCircle,
   FaTicketAlt,
   FaQuestionCircle,
-  FaEnvelope,
   FaCheckCircle,
   FaTimesCircle,
-  FaSync,
   FaExclamationCircle,
   FaUser,
+  FaHistory,
 } from "react-icons/fa";
 import ticketApi from "../../../services/ticketApi";
 
@@ -49,10 +48,8 @@ const StatusBadge = React.memo(({ status }) => {
   );
 });
 
-
-
 // Memoized Ticket Row Component
-const TicketRow = React.memo(({ ticket }) => {
+const TicketRow = React.memo(({ ticket, onClick }) => {
   const formatDate = useCallback((dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -64,7 +61,7 @@ const TicketRow = React.memo(({ ticket }) => {
   }, []);
 
   return (
-    <tr>
+    <tr onClick={() => onClick(ticket)} style={{ cursor: "pointer" }}>
       <td>
         <Badge bg="light" text="dark">
           {ticket.ticket_number}
@@ -89,21 +86,18 @@ const TicketRow = React.memo(({ ticket }) => {
       <td>
         <small>{formatDate(ticket.created_at)}</small>
       </td>
-      <td>
-        <small>{formatDate(ticket.updated_at)}</small>
-      </td>
     </tr>
   );
 });
 
 // Memoized Tickets Table Component
 const TicketsTable = React.memo(
-  ({ tickets, loading, currentUser, onOpenTicket, onRefresh }) => {
+  ({ tickets, loading, currentUser, onOpenTicket, onTicketClick }) => {
     if (loading) {
       return (
         <div className="text-center py-4">
           <Spinner animation="border" variant="primary" />
-          <p className="mt-2">Loading tickets...</p>
+          <p className="mt-2">Loading your tickets...</p>
         </div>
       );
     }
@@ -111,31 +105,21 @@ const TicketsTable = React.memo(
     return (
       <>
         <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
-          <small className="text-muted">
-            Showing {tickets.length} ticket(s)
-            
-          </small>
-          <div className="d-flex gap-2 flex-shrink-0">
-            <Button
-              variant="outline-primary"
-              onClick={onRefresh}
-              disabled={loading}
-              size="sm"
-              className="d-flex align-items-center"
-            >
-              <FaSync className="me-1" />
-              Refresh
-            </Button>
-            <Button
-              variant="primary"
-              onClick={onOpenTicket}
-              className="d-flex align-items-center"
-              size="sm"
-            >
-              <FaPlusCircle className="me-1" />
-              New Ticket
-            </Button>
+          <div>
+            <h6 className="fw-bold mb-1">Your Support Tickets</h6>
+            <small className="text-muted">
+              {tickets.length} ticket{tickets.length !== 1 ? 's' : ''} in total
+            </small>
           </div>
+          <Button
+            variant="primary"
+            onClick={onOpenTicket}
+            className="d-flex align-items-center"
+            size="sm"
+          >
+            <FaPlusCircle className="me-1" />
+            New Ticket
+          </Button>
         </div>
 
         <div className="table-responsive">
@@ -143,22 +127,29 @@ const TicketsTable = React.memo(
             <thead className="table-light">
               <tr>
                 <th>Ticket #</th>
-                <th>Subject</th>
+                <th>Subject & Description</th>
                 <th>Status</th>
-                <th className="d-none d-md-table-cell">Created</th>
-                <th className="d-none d-lg-table-cell">Updated</th>
+                <th>Created</th>
               </tr>
             </thead>
             <tbody>
               {tickets.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-muted text-center py-4">
-                    No tickets found. Create your first ticket!
+                  <td colSpan="4" className="text-muted text-center py-4">
+                    <div className="mb-2">
+                      <FaTicketAlt size={32} className="text-muted" />
+                    </div>
+                    <p className="mb-2">No support tickets yet</p>
+                    <small>Create your first ticket to get help</small>
                   </td>
                 </tr>
               ) : (
                 tickets.map((ticket) => (
-                  <TicketRow key={ticket.id} ticket={ticket} />
+                  <TicketRow 
+                    key={ticket.id} 
+                    ticket={ticket} 
+                    onClick={onTicketClick}
+                  />
                 ))
               )}
             </tbody>
@@ -185,11 +176,77 @@ const AuthRequired = React.memo(({ onManualLogin }) => (
   </Card>
 ));
 
+// Ticket Details Modal Component
+const TicketDetailsModal = React.memo(({ show, ticket, onHide }) => {
+  if (!ticket) return null;
+
+  const formatDate = useCallback((dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, []);
+
+  return (
+    <Modal show={show} onHide={onHide} centered size="lg">
+      <Modal.Header closeButton className="border-bottom-0">
+        <Modal.Title className="fw-bold d-flex align-items-center">
+          <FaTicketAlt className="me-2 text-primary" />
+          Ticket Details
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="mb-4">
+          <div className="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <Badge bg="light" text="dark" className="fs-6">
+                {ticket.ticket_number}
+              </Badge>
+              <h5 className="mt-2 mb-1">{ticket.subject}</h5>
+              <StatusBadge status={ticket.status} />
+            </div>
+            <div className="text-end">
+              <small className="text-muted d-block">Created</small>
+              <small className="fw-semibold">{formatDate(ticket.created_at)}</small>
+            </div>
+          </div>
+          
+          <div className="mb-3">
+            <h6 className="fw-bold mb-2">Description</h6>
+            <div className="p-3 bg-light rounded">
+              {ticket.description || "No description provided."}
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-6">
+              <small className="text-muted d-block">Last Updated</small>
+              <small className="fw-semibold">{formatDate(ticket.updated_at)}</small>
+            </div>
+            {ticket.priority && (
+              <div className="col-6">
+                <small className="text-muted d-block">Priority</small>
+                <small className="fw-semibold text-capitalize">
+                  {ticket.priority}
+                </small>
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+});
+
 const ParentSupports = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const [tickets, setTickets] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -200,25 +257,17 @@ const ParentSupports = () => {
     description: "",
   });
 
+  // Auto-refresh interval in milliseconds (5 minutes)
+  const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000;
+
   const checkAuth = useCallback(() => {
     try {
       const userData = localStorage.getItem("user");
       const token = localStorage.getItem("token");
 
-      console.log("🔍 ParentSupports - Checking auth...");
-      console.log("🔍 User data from localStorage:", userData);
-
       if (userData && token) {
         const user = JSON.parse(userData);
-
-        // TEMPORARY FIX: If no ID found, use email or create a fallback
-        const userId =
-          user.id ||
-          user.userId ||
-          user._id ||
-          user.user_id ||
-          user.email ||
-          `user-${Date.now()}`;
+        const userId = user.id || user.userId || user._id || user.user_id || user.email;
 
         if (userId) {
           const userWithId = {
@@ -228,17 +277,11 @@ const ParentSupports = () => {
             email: user.email || "",
             role: user.role || "user",
           };
-
-          console.log("✅ Setting current user:", userWithId);
           setCurrentUser(userWithId);
-          fetchTickets();
-          fetchSummary();
         } else {
-          console.error("❌ No user identifier found");
           setError("User data incomplete - please log in again");
         }
       } else {
-        console.log("❌ No user data or token found");
         setError("Please log in to access support tickets");
       }
     } catch (error) {
@@ -247,49 +290,45 @@ const ParentSupports = () => {
     }
   }, []);
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
   const fetchTickets = useCallback(async () => {
-    if (!currentUser?.id) return;
+    if (!currentUser?.id) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     setError("");
     try {
-      // Use getById instead of getAll to fetch parent-specific tickets
       const response = await ticketApi.getById(currentUser.id);
       setTickets(response.tickets || []);
     } catch (err) {
-      setError(err.message);
+      console.error("Error fetching tickets:", err);
+      setError("Failed to load tickets. Please try again.");
     } finally {
       setLoading(false);
     }
   }, [currentUser]);
 
-  const fetchSummary = useCallback(async () => {
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      fetchTickets();
+    }
+  }, [currentUser, fetchTickets]);
+
+  // Auto-refresh tickets periodically
+  useEffect(() => {
     if (!currentUser?.id) return;
 
-    try {
-      const response = await ticketApi.getSummary();
-      setSummary(response.data);
-    } catch (err) {
-      console.error("Error fetching summary:", err);
-    }
-  }, [currentUser]);
+    const interval = setInterval(() => {
+      fetchTickets();
+    }, AUTO_REFRESH_INTERVAL);
 
-
-  const handleRefresh = useCallback(async () => {
-    if (!currentUser?.id) {
-      setError("Please log in to refresh tickets");
-      return;
-    }
-
-    setError("");
-    setSuccess("");
-    await Promise.all([fetchTickets(), fetchSummary()]);
-    setSuccess("Tickets refreshed successfully!");
-  }, [currentUser, fetchTickets, fetchSummary]);
+    return () => clearInterval(interval);
+  }, [currentUser, fetchTickets]);
 
   const handleOpenTicket = useCallback(() => {
     if (!currentUser?.id) {
@@ -305,57 +344,56 @@ const ParentSupports = () => {
     setError("");
   }, []);
 
- const handleSubmitTicket = useCallback(
-  async (e) => {
-    e.preventDefault();
+  const handleSubmitTicket = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    if (!currentUser?.id) {
-      setError("Please log in to create a ticket");
-      return;
-    }
-
-    setSubmitting(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      console.log("🔍 Creating ticket with data:", {
-        user: currentUser,
-        ticket: newTicket,
-        parent_id: currentUser.id, // Add parent_id
-        token: localStorage.getItem('token') ? 'Present' : 'Missing'
-      });
-      
-      // Create ticket data with parent_id
-      const ticketData = {
-        subject: newTicket.subject,
-        description: newTicket.description,
-        parent_id: currentUser.id // Add the parent_id here
-      };
-      
-      await ticketApi.create(ticketData);
-      setSuccess("Ticket created successfully!");
-      await Promise.all([fetchTickets(), fetchSummary()]);
-      handleCloseTicket();
-    } catch (err) {
-      console.error("❌ Ticket creation error details:", err);
-      setError(err.message);
-      
-      // If authentication error, clear storage and redirect
-      if (err.message.includes('authenticated') || err.message.includes('login')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setCurrentUser(null);
-        setError("Session expired. Please log in again.");
+      if (!currentUser?.id) {
+        setError("Please log in to create a ticket");
+        return;
       }
-    } finally {
-      setSubmitting(false);
-    }
-  },
-  [currentUser, newTicket, fetchTickets, fetchSummary, handleCloseTicket]
-);
 
- 
+      setSubmitting(true);
+      setError("");
+      setSuccess("");
+
+      try {
+        const ticketData = {
+          subject: newTicket.subject,
+          description: newTicket.description,
+          parent_id: currentUser.id
+        };
+        
+        await ticketApi.create(ticketData);
+        setSuccess("Ticket created successfully!");
+        await fetchTickets();
+        handleCloseTicket();
+      } catch (err) {
+        console.error("Ticket creation error:", err);
+        setError(err.message);
+        
+        if (err.message.includes('authenticated') || err.message.includes('login')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setCurrentUser(null);
+          setError("Session expired. Please log in again.");
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [currentUser, newTicket, fetchTickets, handleCloseTicket]
+  );
+
+  const handleTicketClick = useCallback((ticket) => {
+    setSelectedTicket(ticket);
+    setShowDetailsModal(true);
+  }, []);
+
+  const handleCloseDetailsModal = useCallback(() => {
+    setShowDetailsModal(false);
+    setSelectedTicket(null);
+  }, []);
 
   const handleManualLogin = useCallback(() => {
     window.location.href = "/login";
@@ -365,27 +403,35 @@ const ParentSupports = () => {
   const headerContent = useMemo(
     () => (
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
-        <h2 className="fw-bold text-primary mb-0">Support Center</h2>
-        <div className="d-flex align-items-center gap-2 flex-wrap">
-          {currentUser && (
-            <div className="d-flex align-items-center gap-2">
-              <Badge
-                bg="light"
-                text="dark"
-                className="p-2 d-flex align-items-center"
-              >
-                <FaUser className="me-1" />
-                <span className="d-none d-sm-inline">{currentUser.name}</span>
-                <span className="d-sm-none">ID: {currentUser.id}</span>
-              </Badge>
-              
-            </div>
-          )}
+        <div>
+          <h2 className="fw-bold text-primary mb-1">Support Center</h2>
+          <p className="text-muted mb-0">Get help and manage your support tickets</p>
         </div>
+        {currentUser && (
+          <div className="d-flex align-items-center gap-2">
+            <Badge
+              bg="light"
+              text="dark"
+              className="p-2 d-flex align-items-center"
+            >
+              <FaUser className="me-1" />
+              <span>{currentUser.name}</span>
+            </Badge>
+          </div>
+        )}
       </div>
     ),
     [currentUser]
   );
+
+  // Stats summary
+  const ticketStats = useMemo(() => {
+    const openTickets = tickets.filter(t => t.status === 'OPEN').length;
+    const inProgressTickets = tickets.filter(t => t.status === 'IN_PROGRESS').length;
+    const resolvedTickets = tickets.filter(t => t.status === 'RESOLVED').length;
+
+    return { openTickets, inProgressTickets, resolvedTickets };
+  }, [tickets]);
 
   return (
     <Container
@@ -422,20 +468,61 @@ const ParentSupports = () => {
         <AuthRequired onManualLogin={handleManualLogin} />
       ) : (
         <Row className="g-3">
+          {/* Stats Overview */}
+          <Col lg={12} className="mb-3">
+            <Row className="g-2">
+              <Col md={4}>
+                <Card className="border-0 bg-primary text-white">
+                  <Card.Body className="py-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 className="mb-0">Open Tickets</h6>
+                        <h4 className="mb-0 fw-bold">{ticketStats.openTickets}</h4>
+                      </div>
+                      <FaHistory size={24} />
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col md={4}>
+                <Card className="border-0 bg-warning text-dark">
+                  <Card.Body className="py-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 className="mb-0">In Progress</h6>
+                        <h4 className="mb-0 fw-bold">{ticketStats.inProgressTickets}</h4>
+                      </div>
+                      <FaHistory size={24} />
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col md={4}>
+                <Card className="border-0 bg-success text-white">
+                  <Card.Body className="py-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 className="mb-0">Resolved</h6>
+                        <h4 className="mb-0 fw-bold">{ticketStats.resolvedTickets}</h4>
+                      </div>
+                      <FaCheckCircle size={24} />
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </Col>
 
+          {/* Tickets Table */}
           <Col xl={8} lg={7}>
             <Card className="shadow-sm border-0 rounded-3 h-100">
               <Card.Body>
-                <div className="d-flex align-items-center mb-3">
-                  <FaTicketAlt size={20} className="text-primary me-2" />
-                  <h5 className="fw-bold m-0">Support Tickets</h5>
-                </div>
                 <TicketsTable
                   tickets={tickets}
                   loading={loading}
                   currentUser={currentUser}
                   onOpenTicket={handleOpenTicket}
-                  onRefresh={handleRefresh}
+                  onTicketClick={handleTicketClick}
                 />
               </Card.Body>
             </Card>
@@ -447,56 +534,57 @@ const ParentSupports = () => {
               <Card.Body>
                 <div className="d-flex align-items-center mb-3">
                   <FaQuestionCircle size={20} className="text-primary me-2" />
-                  <h5 className="fw-bold m-0">FAQs & Help</h5>
+                  <h5 className="fw-bold m-0">Help & Resources</h5>
                 </div>
 
                 <Accordion flush className="mb-3">
                   {[
                     {
                       key: "0",
-                      header: "🔑 How do I reset my password?",
+                      header: "🔑 Password Reset",
                       body: "Go to Account Settings → Reset Password and follow the steps.",
                     },
                     {
                       key: "1",
-                      header: "💳 How can I manage my subscription?",
+                      header: "💳 Subscription Management",
                       body: "Visit Subscriptions & Billing to change your plan or payment method.",
                     },
                     {
                       key: "2",
-                      header: "🕒 How do I set screen-time limits?",
+                      header: "🕒 Screen Time Limits",
                       body: "Navigate to Parental Controls and configure screen-time settings for each child.",
                     },
                   ].map(({ key, header, body }) => (
                     <Accordion.Item key={key} eventKey={key}>
                       <Accordion.Header className="py-2">
-                        {header}
+                        <small>{header}</small>
                       </Accordion.Header>
-                      <Accordion.Body className="py-2">{body}</Accordion.Body>
+                      <Accordion.Body className="py-2">
+                        <small>{body}</small>
+                      </Accordion.Body>
                     </Accordion.Item>
                   ))}
                 </Accordion>
 
-                <div className="p-3 bg-light rounded mb-3">
-                  <h6 className="fw-bold mb-2">Quick Actions</h6>
-                  <div className="d-grid gap-1">
+                <div className="p-3 bg-light rounded">
+                  <h6 className="fw-bold mb-2">Need Help?</h6>
+                  <p className="small text-muted mb-3">
+                    Can't find what you're looking for? Our support team is here to help you with any issues or questions.
+                  </p>
+                  <div className="d-grid">
                     <Button
                       variant="primary"
                       onClick={handleOpenTicket}
                       size="sm"
                     >
                       <FaPlusCircle className="me-1" />
-                      Open New Ticket
+                      Create Support Ticket
                     </Button>
-                   
                   </div>
                 </div>
-
-               
               </Card.Body>
             </Card>
           </Col>
-          
         </Row>
       )}
 
@@ -512,8 +600,7 @@ const ParentSupports = () => {
           {currentUser && (
             <div className="mb-3 p-2 bg-light rounded">
               <small>
-                <strong>Creating ticket as:</strong> {currentUser.name} (ID:{" "}
-                {currentUser.id})
+                <strong>Creating ticket as:</strong> {currentUser.name}
               </small>
             </div>
           )}
@@ -539,7 +626,7 @@ const ParentSupports = () => {
               <Form.Control
                 as="textarea"
                 rows={4}
-                placeholder="Please provide detailed information about your issue..."
+                placeholder="Please provide detailed information about your issue. Include any error messages, steps to reproduce, and what you were trying to accomplish."
                 value={newTicket.description}
                 onChange={(e) =>
                   setNewTicket((prev) => ({
@@ -565,6 +652,13 @@ const ParentSupports = () => {
           </Form>
         </Modal.Body>
       </Modal>
+
+      {/* Ticket Details Modal */}
+      <TicketDetailsModal
+        show={showDetailsModal}
+        ticket={selectedTicket}
+        onHide={handleCloseDetailsModal}
+      />
     </Container>
   );
 };
