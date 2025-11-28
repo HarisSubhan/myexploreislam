@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ColorChanging from "../../../components/parent/ColorChangeing";
 import { Card, Button, Form, Row, Col, Alert } from "react-bootstrap";
 import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
-import { useUser } from "../../../context/UserContext"; // Import your actual UserContext
+import { useUser } from "../../../context/UserContext"; 
 import { setEmailPasswordApi } from "../../../services/api";
 
 const DefaultTheme = () => {
