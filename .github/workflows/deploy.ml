@@ -13,7 +13,7 @@ jobs:
       with:
         host:  184.168.31.204 
         username: exploreislam
-        key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB15scMSswR2i03cnvAHZ8f5eiD6C2fGLyrdICmK1/U8 hp@DESKTOP-AV07TF6
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           cd /var/www/myexploreislam
           ./deploy.sh
