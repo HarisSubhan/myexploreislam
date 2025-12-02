@@ -49,69 +49,94 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// app.use('/api/auth', authRoutes);
+
+// app.use('/api', authRoutes);
+
+// app.use('/api/parent', parentRoutes);
+
+// app.use('/api/admin', adminRoutes);
+
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// app.use('/api/videos', videoRoutes);
+
+// app.use('/api/books', bookRoutes);
+
+// app.use('/api/blogs', blogRoutes);
+
+// app.use('/api/subscriptions', subscriptionRoutes);
+
+// app.use('/api/quizzes', quizRoutes);
+
+// app.use('/api/assignments', assignmentsRoutes);
+
+// app.use("/api/Category", categoryRoutes);
+
+// app.use('/api', userRoutes);
+
+// app.use('/api/child-requests', childRequestsRoutes);
+
+// app.use('/api/child', childRoutes);
+
+// app.use('/api/quiz-submissions', quizSubmissionRoutes);
+
+// app.use('/api/assignment-submissions', assignmentSubmissionRoutes);
+
+// app.use("/api/modules", moduleRoutes);
+
+// app.use('/uploads', express.static('uploads'));
+
+// // app.use('/api', adminRoutes);
+
+// app.use("/api/videos", videoRoutes);
+
+// // app.use("/api", videoRoutes);
+
+// app.use('/api/series', seriesRoutes);
+
+// app.use("/api/tickets", ticketRoutes);
+
+// app.use("/api/coupons", couponRoutes);
+
+// app.use("/api/dashboard", dashboardRoutes);
+
+// app.use("/api/parent-dashboard", parentDashboardRoutes);
+
+// app.use("/api/parent-dashboard", parentDashboardRoutes);
+
+// app.use("/api/parent", parentChildrenRoutes);
+
+// app.use("/api/children", parentChildrenRoutes);
+
+// app.use("/api/activity", childActivityRoutes);
+
+// app.use("/stripe", require("./routes/stripeWebhook"));
+
 app.use('/api/auth', authRoutes);
-
-app.use('/api', authRoutes);
-
 app.use('/api/parent', parentRoutes);
-
 app.use('/api/admin', adminRoutes);
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 app.use('/api/videos', videoRoutes);
-
 app.use('/api/books', bookRoutes);
-
 app.use('/api/blogs', blogRoutes);
-
 app.use('/api/subscriptions', subscriptionRoutes);
-
 app.use('/api/quizzes', quizRoutes);
-
 app.use('/api/assignments', assignmentsRoutes);
-
-app.use("/api/Category", categoryRoutes);
-
-app.use('/api', userRoutes);
-
+app.use('/api/category', categoryRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/child-requests', childRequestsRoutes);
-
 app.use('/api/child', childRoutes);
-
 app.use('/api/quiz-submissions', quizSubmissionRoutes);
-
 app.use('/api/assignment-submissions', assignmentSubmissionRoutes);
-
-app.use("/api/modules", moduleRoutes);
-
-app.use('/uploads', express.static('uploads'));
-
-// app.use('/api', adminRoutes);
-
-app.use("/api/videos", videoRoutes);
-
-// app.use("/api", videoRoutes);
-
+app.use('/api/modules', moduleRoutes);
 app.use('/api/series', seriesRoutes);
-
-app.use("/api/tickets", ticketRoutes);
-
-app.use("/api/coupons", couponRoutes);
-
-app.use("/api/dashboard", dashboardRoutes);
-
-app.use("/api/parent-dashboard", parentDashboardRoutes);
-
-app.use("/api/parent-dashboard", parentDashboardRoutes);
-
-app.use("/api/parent", parentChildrenRoutes);
-
-app.use("/api/children", parentChildrenRoutes);
-
-app.use("/api/activity", childActivityRoutes);
-
-app.use("/stripe", require("./routes/stripeWebhook"));
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/parent-dashboard', parentDashboardRoutes);
+app.use('/api/parent', parentChildrenRoutes);
+app.use('/api/children', parentChildrenRoutes);
+app.use('/api/activity', childActivityRoutes);
 
 // Test route
 app.get('/', (req, res) => {
