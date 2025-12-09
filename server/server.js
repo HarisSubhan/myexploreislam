@@ -46,6 +46,16 @@ initDB();
 dotenv.config();
 const app = express();
 
+app.set('trust proxy', 1);
+
+app.use((req, res, next) => {
+  if (!req.secure && process.env.NODE_ENV === 'production') {
+    return res.redirect('https://' + req.headers.host + req.url);
+  }
+  next();
+});
+
+
 app.use(cors());
 app.use(bodyParser.json());
 
