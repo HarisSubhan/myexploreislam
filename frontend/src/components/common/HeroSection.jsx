@@ -8,7 +8,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const handleClickButton = () => {
-    navigate("/subscription"); // Programmatic navigation
+    navigate("/subscription"); 
   };
   return (
     <div
@@ -16,8 +16,8 @@ const HeroSection = () => {
       style={{
         position: "relative",
         height: "80vh",
-        minHeight: "600px", // Added minimum height for smaller screens
-        maxHeight: "900px", // Added maximum height for larger screens
+        minHeight: "600px", 
+        maxHeight: "900px", 
       }}
     >
       <Container
@@ -33,7 +33,7 @@ const HeroSection = () => {
         {/* Main Content */}
         <Row className="align-items-center h-100 g-0">
           <Col lg={6} className="order-lg-1 order-2 position-relative ">
-            <Image
+            <Image 
               src={MaryamMuazImage}
               alt="Maryam & Muaz"
               fluid
@@ -41,7 +41,7 @@ const HeroSection = () => {
               style={{
                 maxHeight: "40vh",
                 minHeight: "200px", 
-                marginBottom: "0.5rem",
+                marginBottom: "4rem",
                 position: "relative",
                 zIndex: 2,
                 width: "auto",
@@ -57,6 +57,7 @@ const HeroSection = () => {
               }}
             >
               <Image
+                
                 src={DecorativeImage}
                 alt="Decorative element"
                 style={{
@@ -65,7 +66,7 @@ const HeroSection = () => {
                   right: 0,
                   maxWidth: "950px", 
                   width: "auto", 
-                  marginTop: "-1rem",
+                  
                 }}
               />
             </div>
@@ -120,7 +121,6 @@ const HeroSection = () => {
           </Col>
         </Row>
 
-        {/* Gradient Inside Container */}
         <div
           style={{
             position: "absolute",
@@ -128,7 +128,7 @@ const HeroSection = () => {
             left: 0,
             right: 0,
             height: "20%",
-            maxHeight: "200px", // Added maximum height
+            maxHeight: "200px",
             background:
               "linear-gradient(to bottom, rgba(47, 170, 64, 1) 0%, rgba(11, 165, 18, 0.7) 100%)",
             zIndex: 1,

@@ -18,12 +18,7 @@ const HowItWorks = () => {
       fluid
       className="py-5 "
       style={{
-        backgroundImage: `url(${background})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        
-        minHeight: '350px',
+        backgroundColor:"#e7fcff",
       }}
     >
       <h1 style={{color: "#F1066C"}} className="text-center display-lg-1 display-1 mb-5 fw-bold">How It Works</h1>

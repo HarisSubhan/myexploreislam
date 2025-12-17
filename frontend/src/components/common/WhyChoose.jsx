@@ -25,6 +25,18 @@ const WhyChoose = () => {
   return (
     <Container fluid className="p-0" style={{ backgroundColor: "#e7fcff",  }}>
       <Row className="g-0">
+         <h1
+            className="fw-bold text-center display-3"
+            style={{
+              color: "#fb5607",
+              fontSize: "3rem",
+              lineHeight: 1.2,
+              margin: "1rem 0 0 0",
+              padding: 0,
+            }}
+          >
+            Why Choose Explore Islam?
+          </h1>
         
         <Col
           xs={12}
@@ -41,19 +53,7 @@ const WhyChoose = () => {
               display: "block",
             }}
           />
-          <h1
-            className="fw-bold text-center"
-            style={{
-              color: "#fb5607",
-              fontSize: "3rem",
-              lineHeight: 1.2,
-              margin: "1rem 0 0 0",
-              padding: 0,
-            }}
-          >
-            Why Choose <br />
-            Explore Islam?
-          </h1>
+         
         </Col>
 
         <Col
@@ -63,7 +63,7 @@ const WhyChoose = () => {
           style={{  }}
         >
           {features.map((feature, index) => (
-            <div key={index} className="mb-4 text-center text-md-start">
+            <div key={index} className="mb-4 display-3 text-center text-md-start">
               <p className="mb-1" style={{ fontSize: "1.1rem" }}>
                 <span style={{ color: "#0f5132", fontSize: "2rem" }}>✔</span>{" "}
                 <span

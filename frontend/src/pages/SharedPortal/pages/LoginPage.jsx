@@ -119,18 +119,26 @@ function LoginPage() {
       <Header />
       <Container fluid className="vh-100">
         <Row className="h-100">
-          <Col
-            md={6}
-            className="d-none d-md-flex align-items-center justify-content-center bg-dark text-white p-0 position-relative"
-          >
-            <Image
-              src={logo}
-              alt="Explore Islam"
-              fluid
-              className="position-absolute w-100 h-100"
-              style={{ objectFit: "cover", opacity: 0.75 }}
-            />
-          </Col>
+         <Col
+  md={6}
+  className="d-none d-md-flex flex-column align-items-center justify-content-center text-white p-4"
+  style={{ backgroundColor: "#F1066C" }}
+>
+  <Image
+    src={logo}
+    alt="Explore Islam"
+    fluid
+    style={{ maxWidth: "300px" }}
+  />
+
+  <p className="mt-3 text-center">
+    An interactive learning platform for children. Animated cartoons,
+    worksheets, books and more all in one place!
+  </p>
+</Col>
+
+
+          
 
           <Col
             md={6}

@@ -89,10 +89,10 @@ const ChildProfilePage = () => {
         <Col md={8} lg={6}>
           <Card className="profile-card">
             <Card.Header
-              style={{ backgroundColor: "red" }}
+              style={{ backgroundColor: "#FB5607" }}
               className="profile-header"
             >
-              <Card.Title>My Awesome Profile</Card.Title>
+              <Card.Title>About Me!</Card.Title>
             </Card.Header>
 
             <Card.Body>

@@ -1,14 +1,12 @@
 // components/ChildFormModal.js
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Row, Col, Alert, Button, Image } from "react-bootstrap";
-
-// Import the image directly
 import avatar1 from "../../assets/add-child-avatar/avatar1.png";
+import avatar2 from "../../assets/add-child-avatar/avatar2.png";
 
 const AVAILABLE_AVATARS = [
-  { id: "avatar1", image: avatar1, label: "Avatar 1" },
-  { id: "avatar2", image: avatar1, label: "Avatar 2" },
-  { id: "avatar3", image: avatar1, label: "Avatar 3" },
+  { id: "avatar1", image: avatar1, label: "Muaz" },
+  { id: "avatar2", image: avatar2, label: "Maryam" }, // Fixed: now uses avatar2
 ];
 
 const ChildFormModal = ({ show, onHide, onSave, editing, submitting }) => {

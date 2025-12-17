@@ -6,51 +6,55 @@ const FaqsPage = () => {
     {
       question: "What is Explore Islam?",
       answer:
-        "Explore Islam is an online educational platform designed to teach children aged 8–12 about Islam through animated videos, interactive lessons, and fun quizzes - all based on authentic Islamic teachings.",
+        "Explore Islam is an interactive online learning platform that helps children learn Islam in a fun and engaging way. Through animated lessons, written modules, activities, and quizzes, kids builda strong foundation in their faith while learning in a safe and kid friendly space.",
     },
     {
       question: "How does the platform work?",
       answer:
-        "Children watch engaging episodes featuring the characters Maryam and Muaz, who explore Islamic values, stories, and everyday situations through animated adventures. Each module ends with a quiz to help reinforce learning in a fun and easy way.",
+        "Parents subscribe and create child profiles from their Parent Dashboard. Each child receives their own Kid Dashboard, where they can watch lessons, complete modules, read the content, and take quizzes. All progress is saved, and parents can track scores, time spent, and completed learning anytime.",
     },
     {
       question: "Is this a good homeschooling tool?",
       answer:
-        "Yes! Explore Islam is perfect for homeschooling families looking for structured, child-friendly Islamic education. Our platform covers essential Islamic topics in a way that keeps kids excited to learn, while helping parents stay involved",
+        "Yes. Explore Islam is an excellent supplement for homeschooling families. The structured modules, step by step lessons, and interactive exercises make it easy to include Islamic studies in a child’s daily routine. Parents can monitor learning and ensure their child is progressing at a healthy pace.",
     },
     {
       question: "Is the content suitable for beginners?",
       answer:
-        "Yes. Whether your child is new to learning about Islam or already familiar with the basics, our platform is designed to be easy to understand, engaging, and rooted in authentic teachings - making it helpful even for families just starting their Islamic journey.",
+        "Absolutely. Our lessons are designed for children with little to no prior Islamic education. Concepts are introduced using simple explanations, clear visuals, and age appropriate examples so beginners can understand and enjoy the learning process",
+    },
+    {
+      question: " Is the content tailored to different age groups?",
+      answer:
+        "Yes. Explore Islam adjusts content based on your child’s age. Younger children receive simpler explanations and shorter activities, while older children receive deeper lessons, broader topics, and more challenging quizzes. This ensures every child learns at the level that suits them best.",
     },
     {
       question: "What makes Explore Islam different from other platforms?",
       answer:
-        "We combine visual storytelling, child-friendly language, and interactive tools in one place. The cartoon series Maryam and Muaz is unique to our platform and helps children connect emotionally with the content, while the built-in quizzes make learning active, not passive.",
+        "Explore Islam combines authentic Islamic knowledge with a child focused learning experience. Every lesson is based on the Quran and Sunnah and taught through animations, activities, and quizzes that keep children engaged. The platform also includes a Parent Dashboard that lets families stay involved and track progress easily.",
     },
     {
       question: "What kind of topics are covered?",
       answer:
-        "We cover topics like the Five Pillars of Islam, stories of the Prophets, good manners (Akhlaq), understanding Allah’s names, and more - all taught through storytelling, activities, and child-appropriate explanations",
+        "Explore Islam includes foundational Islamic topics such as prayer, wudu, Islamic manners and character, tawhid, pillars of Islam and iman, and lessons from the Quran and Sunnah. Each topic is taught using a mix of videos, written content, assignments, and quizzes to help children understand and remember what they learn",
     },
     {
       question: "Can parents track their child’s progress?",
       answer:
-        "Yes. Parents can create a separate login to track their child’s learning progress, quiz scores,and lesson completion. This helps you stay involved in their Islamic education and support their growth.",
+        "Yes. Parents can view completed lessons, quiz scores, time spent learning, and areas where their child may need more support.",
     },
     {
       question: "Can multiple children use the platform?",
       answer:
-        "Yes, you can create multiple child profiles under one parent account. Each child can go through the modules at their own pace and have separate progress tracking.",
+        "Yes. One parent account can include multiple children. Each child has their own personalized Kid Dashboard and progress tracking.",
     },
     {
       question: "Is the platform helpful for families new to practicing Islam?",
-      answer:
-        "Absolutely. If you’re a new Muslim or returning to Islamic teachings and want your child to start learning with you, Explore Islam provides a gentle, structured path to start building Islamic knowledge together",
-    },
-    {
+      answer : "Yes. Explore Islam is designed to support families at every stage of their journey. Lessons are simple, clear, and practical, making it easy for both parents and children who are new to Islamic learning to grow with confidence."
+     },
+     {
       question: "Is the platform mobile friendly?",
-      answer : "Yes! You can access Explore Islam on your phone, tablet, or computer - making it easy for kids to learn from anywhere, anytime."
+      answer : "Yes. Explore Islam works on phones, tablets, and computers, so children can learn anytime and anywhere."
      },
   ];
 

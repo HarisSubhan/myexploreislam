@@ -17,10 +17,8 @@ import AboutIslam from "./pages/SharedPortal/pages/AboutIslam";
 import { Toaster } from "react-hot-toast";
 import StripeCancelPage from "./components/common/StripeCancelPage";
 import StripeSuccessPage from "./components/common/StripeSuccessPage";
-
-
-
-
+import HowItWorks from "./pages/SharedPortal/pages/HowItWorks";
+import AboutUs from "./pages/SharedPortal/pages/AboutUs";
 
 
 function RequireAuth({ children, allowedRoles }) {
@@ -45,6 +43,8 @@ function App() {
       <Routes>
         <Route element={<StaticApp />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/about-us" element={<AboutUs />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:titleSlug" element={<BlogDetail />} />
           <Route path="/Subscription" element={<Subscription />} />

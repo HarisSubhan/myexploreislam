@@ -5,12 +5,13 @@ import {
   FaBars,
   FaUser,
   FaBook,
-  FaHistory,
   FaQuestionCircle,
 } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
 import logo from "@images/logo.png";
 import { authAPI } from "../../services/api";
+import { MdForwardToInbox } from "react-icons/md";
+
 
 
 const ChildApp = () => {
@@ -36,9 +37,9 @@ const ChildApp = () => {
     },
     
     {
-      icon: <FaHistory size={50} />,
-      label: "History",
-      path: "/child/history",
+      icon: <MdForwardToInbox size={50} />,
+      label: "Inbox",
+      path: "/child/inbox",
       color: "#3A86FF",
     },
     {

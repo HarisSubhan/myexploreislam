@@ -47,7 +47,7 @@ export const addChildApi = async (childData) => {
 
 export const getChildrenByParentIdApi = async (parentId) => {
   const response = await axios.get(
-    `${baseUrl}/api/parent/${parentId}/children`,
+    `${baseUrl}/api/children/${parentId}/children`,
     { headers: getAuthHeaders() }
   );
   return response.data;
