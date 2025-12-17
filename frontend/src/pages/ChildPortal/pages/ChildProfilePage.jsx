@@ -10,6 +10,8 @@ import "../../../components/child/ChildProfilePage.css";
 import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
 import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
+import avatar2 from "../../../assets/add-child-avatar/avatar2.png";
+
 
 const ChildProfilePage = () => {
   const { user } = useUser();
@@ -23,7 +25,9 @@ const ChildProfilePage = () => {
 
   // Map avatar names from backend to imported images
   const avatarImages = {
-    avatar1: avatar1
+    avatar1: avatar1,
+    avatar2: avatar2
+
   };
 
   useEffect(() => {
