@@ -8,7 +8,7 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
-import logo from "@images/logo.png";
+import logo from "@images/Black_logo.png";
 import { authAPI } from "../../services/api";
 import { MdForwardToInbox } from "react-icons/md";
 
@@ -93,7 +93,7 @@ const ChildApp = () => {
         <Image
           src={logo}
           alt="Fun Learning Logo"
-          height={40}
+          height={50}
           className="me-2"
           loading="lazy"
         />

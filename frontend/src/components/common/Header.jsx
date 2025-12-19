@@ -8,7 +8,7 @@ import {
   NavDropdown,
   Accordion,
 } from "react-bootstrap";
-import logo from "@images/logo.png";
+import logo from "@images/Black_logo.png";
 import { LinkContainer } from 'react-router-bootstrap';
 
 const Header = () => {
@@ -26,7 +26,7 @@ const Header = () => {
             <img
               src={logo}
               alt="Explore Islam"
-              height="40"
+              height="50"
               className="d-inline-block align-top"
             />
           </Navbar.Brand>

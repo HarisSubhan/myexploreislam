@@ -12,7 +12,7 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import logo from "@images/logo.png";
+import logo from "@images/Black_logo.png";
 import { LoginApi } from "../../../services/api";
 import { useUser } from "../../../context/UserContext";
 import Header from "../../../components/common/Header";
@@ -131,14 +131,11 @@ function LoginPage() {
     style={{ maxWidth: "300px" }}
   />
 
-  <p className="mt-3 text-center">
-    An interactive learning platform for children. Animated cartoons,
+  <p style={{color: "black"}} className="mt-3 text-center">
+    An interactive learning platform for children.<br></br> Animated cartoons,
     worksheets, books and more all in one place!
   </p>
-</Col>
-
-
-          
+</Col>   
 
           <Col
             md={6}
@@ -152,8 +149,7 @@ function LoginPage() {
                   alt="Explore Islam Logo"
                   style={{ width: 300 }}
                 />
-                <h2 className="mt-2 mb-1">Explore Islam</h2>
-                <div className="text-muted">Platform for Young Minds</div>
+                
               </div>
 
               {error && (
