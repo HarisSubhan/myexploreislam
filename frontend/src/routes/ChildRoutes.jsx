@@ -88,7 +88,7 @@ const ChildRoutes = () => {
           {/* BACKWARD COMPATIBLE ROUTES */}
           <Route path="singles" element={<CartoonModules />} />
           <Route path="singles/:videoId" element={<VideoWatch />} />
-          <Route path="history" element={<HistoryPageChild />} />
+          <Route path="inbox" element={<HistoryPageChild />} />
           <Route path="help-support" element={<HelpPageChild />} />
         </Route>
       </Routes>

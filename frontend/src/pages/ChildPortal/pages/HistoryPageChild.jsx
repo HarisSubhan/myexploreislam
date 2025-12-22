@@ -88,7 +88,7 @@ const HistoryPageChild = () => {
   if (activityLogs.length === 0) {
     return (
       <>
-        <h3 className="mb-4">Your Activity History (Last 3 Days)</h3>
+        <h3 className="mb-4">Your Activity Inbox (Last 3 Days)</h3>
         <Card className="p-4 text-center">
           <div className="text-muted">
             No activity found in the last 3 days.
@@ -100,7 +100,7 @@ const HistoryPageChild = () => {
 
   return (
     <>
-      <h3 className="mb-4">Your Activity History (Last 3 Days)</h3>
+      <h3 className="mb-4">Your Activity Inbox (Last 3 Days)</h3>
       <div className="mb-3 text-muted">
         Showing {activityLogs.length} activity log{activityLogs.length !== 1 ? 's' : ''}
       </div>

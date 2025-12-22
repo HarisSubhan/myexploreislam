@@ -15,24 +15,17 @@ const HelpPageChild = () => {
           </Accordion.Body>
         </Accordion.Item>
 
-        <Accordion.Item eventKey="1">
-          <Accordion.Header>Where can I see what I have watched?</Accordion.Header>
-          <Accordion.Body>
-            Visit the "History" section from the sidebar. You'll see the list of modules, cartoons, and videos you’ve previously accessed.
-          </Accordion.Body>
-        </Accordion.Item>
-
         <Accordion.Item eventKey="2">
           <Accordion.Header>How will I know if there’s something new?</Accordion.Header>
           <Accordion.Body>
-            New content or reminders will appear in the "Notifications" section. Make sure to check it regularly!
+           New content or reminders will appear in the "Inbox" section. Make sure to check it regularly!
           </Accordion.Body>
         </Accordion.Item>
 
         <Accordion.Item eventKey="3">
           <Accordion.Header>Who can I contact if I need help?</Accordion.Header>
           <Accordion.Body>
-            You can contact your teacher or guardian, or click the contact icon (if available) to reach out to support.
+            Ask your parent/guardianfor help and if there is a problem, your parent/guardian can submit a ticket.
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

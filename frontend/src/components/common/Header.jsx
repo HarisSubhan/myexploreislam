@@ -8,7 +8,8 @@ import {
   NavDropdown,
   Accordion,
 } from "react-bootstrap";
-import logo from "@images/logo.png";
+import logo from "@images/Black_logo.png";
+import { LinkContainer } from 'react-router-bootstrap';
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -25,7 +26,7 @@ const Header = () => {
             <img
               src={logo}
               alt="Explore Islam"
-              height="40"
+              height="50"
               className="d-inline-block align-top"
             />
           </Navbar.Brand>
@@ -39,18 +40,30 @@ const Header = () => {
             ☰
           </Button>
 
-          <Nav className="mx-auto d-none d-lg-flex gap-4 align-items-center">
-            <Nav.Link href="/">Home</Nav.Link>
-            <NavDropdown title="How It Works" id="how-it-works-dropdown">
-              <NavDropdown.Item href="/Subscription">Subscription</NavDropdown.Item>
-            </NavDropdown>
-            <NavDropdown title="About Us" id="about-us-dropdown">
-              <NavDropdown.Item href="/blog">Blog</NavDropdown.Item>
-              <NavDropdown.Item href="/faqs">FAQs</NavDropdown.Item>
-            </NavDropdown>
-            <Nav.Link href="/about-islam">About Islam</Nav.Link>
-            <Nav.Link href="/Contact">Contact Us</Nav.Link>
-          </Nav>
+          
+<Nav className="mx-auto d-none d-lg-flex gap-4 align-items-center">
+  <Nav.Link href="/">Home</Nav.Link>
+
+  {/* About Us as clickable link AND dropdown */}
+ <NavDropdown
+  title={
+    <LinkContainer to="/about-us" style={{ cursor: 'pointer' }}>
+      <span>About Us</span>
+    </LinkContainer>
+  }
+  id="about-us-dropdown"
+>
+  <LinkContainer to="/how-it-works">
+    <NavDropdown.Item>How It Works</NavDropdown.Item>
+  </LinkContainer>
+  <LinkContainer to="/faqs">
+    <NavDropdown.Item>FAQs</NavDropdown.Item>
+  </LinkContainer>
+</NavDropdown>
+
+  <Nav.Link href="/about-islam">About Islam</Nav.Link>
+  <Nav.Link href="/Contact">Contact Us</Nav.Link>
+</Nav>
 
           <div className="d-none d-lg-block">
             <Button variant="warning" href="/login">

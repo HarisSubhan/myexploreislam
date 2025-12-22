@@ -36,9 +36,9 @@ const SubscriptionModel = () => {
           <Col xs={12} md={7} className="p-4 p-md-5 bg-gradient-to-br from-sky-100 to-blue-50">
             <ListGroup variant="flush">
               {features.map((feature) => (
-                <ListGroup.Item key={feature.id} className="bg-transparent border-0 px-0 py-3">
+                <ListGroup.Item key={feature.id} style={{ fontSize: "1.1rem" }} className="bg-transparent border-0 px-0 py-3">
                   <h5 className="fw-semibold text-primary text-lg mb-2">{feature.title}</h5>
-                  <p className="text-muted small lh-base">{feature.description}</p>
+                  <p className="">{feature.description}</p>
                 </ListGroup.Item>
               ))}
             </ListGroup>
@@ -60,9 +60,7 @@ const SubscriptionModel = () => {
           >
             <div className="bg-opacity-75 p-3 w-100 text-primary d-flex flex-column align-items-center justify-content-center">
               <h1 className="fw-bold fs-2 mb-3">Subscription Model</h1>
-              <p className="fs-1 fw-bold mb-3 text-dark">
-                $39 <span className="fs-5 fw-semibold text-muted">/month</span>
-              </p>
+             
               <Button
               onClick={handleClickButton}
                 variant="light"

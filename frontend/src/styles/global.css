@@ -1,0 +1,27 @@
+/* Import Noto Serif fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Serif+Ethiopic:wght@400;700&display=swap');
+
+/* Apply Noto Serif to entire website */
+* {
+  font-family: 'Noto Serif', 'Noto Serif Ethiopic', serif !important;
+}
+
+body {
+  font-family: 'Noto Serif', 'Noto Serif Ethiopic', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+/* Ensure all Bootstrap elements use Noto Serif */
+.btn, .form-control, .modal-title, .nav-link, .dropdown-menu,
+.card-title, .card-text, .alert, .badge, .list-group-item,
+.h1, .h2, .h3, .h4, .h5, .h6, .table, .form-label {
+  font-family: 'Noto Serif', 'Noto Serif Ethiopic', serif !important;
+}
+
+/* Headings with bolder weight */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}

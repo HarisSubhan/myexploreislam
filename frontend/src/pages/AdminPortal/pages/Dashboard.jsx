@@ -14,7 +14,6 @@ import RecentActivity from "../../../components/admin/RecentActivity";
 import UsersTable from "../../../components/admin/UsersTable";
 import TopPerformingStudents from "../../../components/admin/TopPerformingStudents";
 import HealthMetricCard from "../../../components/admin/HealthMetricCard";
-import LearningEngagementSection from "../../../components/admin/LearningEngagementSection";
 import { dashboardAPI } from "../../../services/dashboardApi";
 
 const Dashboard = () => {

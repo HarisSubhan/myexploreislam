@@ -62,15 +62,15 @@ export const useParentMetrics = (range, parentId) => {
         // FIXED: Process children stats data with correct field mapping
         if (childrenStatsResponse.status === 'fulfilled') {
           const statsData = childrenStatsResponse.value?.data?.data || {};
-          console.log('📊 Raw children stats data:', statsData); // Debug log
+          
           
           setStats(prev => ({
             ...prev,
-            // Map the API response fields to your expected fields
+            
             totalChildren: parseInt(statsData.total_children) || 0,
             active: parseInt(statsData.active_children) || 0,
             inactive: parseInt(statsData.inactive_children) || 0,
-            // These might come from a different endpoint or be calculated
+            
             activeSubscriptions: prev.activeSubscriptions, // Keep existing or set to 0
             newSignups: prev.newSignups, // Keep existing or set to 0
             openTickets: prev.openTickets // Keep existing or set to 0

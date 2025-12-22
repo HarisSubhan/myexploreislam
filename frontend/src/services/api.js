@@ -85,7 +85,7 @@ export const RegisterApi = async (userData) => {
   try {
     console.log("Sending registration data:", userData);
     
-    const response = await fetch('/api/register', {
+    const response = await fetch(`${baseUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export const CreateStripeCheckoutSession = async (checkoutData) => {
   try {
     console.log("Sending simplified checkout data:", checkoutData);
     
-    const response = await fetch('/api/subscriptions/create-checkout-session', {
+    const response = await fetch(`${baseUrl}/api/subscriptions/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

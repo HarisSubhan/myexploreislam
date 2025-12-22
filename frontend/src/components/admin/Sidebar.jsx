@@ -6,7 +6,7 @@ import { MdQuiz, MdAssignment, MdSubscriptions, MdDashboard, MdOutlineViewModule
 import { FaUserFriends, FaChild, FaVideo, FaBookOpen, FaBlogger, FaTrashAlt  } from "react-icons/fa";
 import { BiSolidCategory } from "react-icons/bi";
 import { IoSettings } from "react-icons/io5";
-import whiteLogo from '@images/white_logo.png';
+import whiteLogo from '@images/white_Copy.png';
 import { SiSteelseries } from "react-icons/si";
 
 const Sidebar = () => {
@@ -23,10 +23,9 @@ const Sidebar = () => {
       <img
         src={whiteLogo}
         alt="Explore Islam Logo"
-        style={{ height: "50px", marginBottom: "10px" }}
+        style={{ width: "150px",height: "80px", marginBottom: "10px", display:"block", margin:"auto",  }}
       />
-      <h4 className="mb-4"> Explore Islam</h4>
-      <Nav className="flex-column">
+      <Nav className="flex-column mt-4">
         <Nav.Link as={Link} to="/admin/dashboard" className="text-white">
           <MdDashboard /> Dashboard
         </Nav.Link>
