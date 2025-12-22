@@ -112,7 +112,7 @@ const ChildProfilePage = () => {
               </div>
 
               <div className="profile-details text-center">
-                <Card.Title className="profile-name">
+                <Card.Title className="profile-name text-capitalize">
                   {profile.name || "Explorer"}
                 </Card.Title>
                 <Card.Subtitle className="mb-2 text-muted profile-age">

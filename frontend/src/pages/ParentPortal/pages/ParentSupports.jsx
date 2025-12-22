@@ -551,8 +551,8 @@ const ParentSupports = () => {
                     },
                     {
                       key: "2",
-                      header: "🕒 Screen Time Limits",
-                      body: "Navigate to the Dashboard to watch the screen time for each child.",
+                      header: "🕒How do I check each child's Screen Time",
+                      body: " ",
                     },
                   ].map(({ key, header, body }) => (
                     <Accordion.Item key={key} eventKey={key}>

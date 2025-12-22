@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useParentMetrics } from "../../../components/parent/useParentMetrics";
-import DateRangeFilter from "../../../components/parent/DateRangeFilter";
 import StatCards from "../../../components/parent/StatCards";
 import SubscriptionWidget from "../../../components/parent/SubscriptionWidget";
 import ActivityTimeline from "../../../components/parent/ActivityTimeline";
@@ -40,7 +39,7 @@ const ParentDashboard = () => {
         {/* Header & Date Range */}
         <div className="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
           <h2 className="h4 mb-0 fw-semibold">Parent Dashboard</h2>
-          <DateRangeFilter range={range} onChange={setRange} />
+          
         </div>
         
         {/* Stat Cards */}
