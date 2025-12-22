@@ -10,7 +10,7 @@ import {
   Badge,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "@images/logo.png";
+import logo from "@images/Black_logo.png";
 import { CiBellOn, CiMenuBurger } from "react-icons/ci";
 import {
   FaBookOpen,

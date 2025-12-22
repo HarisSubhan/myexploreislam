@@ -15,7 +15,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import logo from "@images/logo.png";
+import logo from "@images/Black_logo.png";
 import { authAPI } from "../../services/api";
 import Dashboard from './../../pages/AdminPortal/pages/Dashboard';
 
@@ -77,11 +77,10 @@ const ParentHeader = ({ toggleSidebar, darkMode, toggleTheme }) => {
           src={logo}
           alt="Logo"
           sx={{
-            height: { xs: 30, sm: 40, lg: 60 },
+            height: { xs: 30, sm: 40, lg: 50 },
             mr: 2,
           }}
         />
-
         <Typography
           variant="h6"
           noWrap
@@ -91,7 +90,7 @@ const ParentHeader = ({ toggleSidebar, darkMode, toggleTheme }) => {
             display: { xs: "none", sm: "block" },
           }}
         >
-          Explore Islam
+          
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

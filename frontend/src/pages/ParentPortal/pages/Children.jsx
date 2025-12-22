@@ -42,8 +42,6 @@ const Children = () => {
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // UI states
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [showForm, setShowForm] = useState(false);
@@ -53,13 +51,13 @@ const Children = () => {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  // Get parent ID from your auth context or localStorage
+
   const getParentId = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     return user.id || user.parentId;
   };
 
-  // Load children data from API
+  
   const loadChildren = async () => {
     try {
       setLoading(true);
@@ -72,7 +70,7 @@ const Children = () => {
 
       const response = await getChildrenByParentIdApi(parentId);
 
-      // Transform API response to match expected format
+      
       const transformedChildren =
         response.data?.map((child) => ({
           id: child.id || child._id,
@@ -94,12 +92,12 @@ const Children = () => {
     }
   };
 
-  // Load children on component mount
+  
   useEffect(() => {
     loadChildren();
   }, []);
 
-  // Add new child via API
+  
   const addChild = async (childData) => {
     try {
       setSubmitting(true);
@@ -113,7 +111,7 @@ const Children = () => {
     }
   };
 
-  // Update existing child via API
+  
   const updateChild = async (childData) => {
     try {
       setSubmitting(true);

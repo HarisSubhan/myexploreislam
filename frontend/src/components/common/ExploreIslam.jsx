@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import topLeftImage from "@images/MARYAM1.png";
+import topLeftImage from "@images/8.png";
 import bottomRightImage from "@images/Muaz_Side_Page.png";
 
 const ExploreIslam = () => {
@@ -92,7 +92,7 @@ const ExploreIslam = () => {
             className="display-3 display-lg-1 text-center fw-bold mb-4"
             style={{ color: "#f1066c" }}
           >
-            About <span className="d-block d-md-inline">Explore Islam</span>
+            About <span className="d-block d-md-inline"><br></br>Explore Islam</span>
           </h1>
         </Col>
       </Row>

@@ -22,7 +22,7 @@ const AddVideo = () => {
     const fetchSeries = async () => {
       try {
         const response = await getSeriesApi();
-        console.log("Series API response:", response);
+        
 
         const seriesData = Array.isArray(response) ? response : response.data;
         setSeriesList(seriesData || []); 

@@ -10,6 +10,8 @@ import "../../../components/child/ChildProfilePage.css";
 import { useUser } from "../../../context/UserContext";
 import { getUserChildDataApi } from "../../../services/api";
 import avatar1 from "../../../assets/add-child-avatar/avatar1.png";
+import avatar2 from "../../../assets/add-child-avatar/avatar2.png";
+
 
 const ChildProfilePage = () => {
   const { user } = useUser();
@@ -23,7 +25,9 @@ const ChildProfilePage = () => {
 
   // Map avatar names from backend to imported images
   const avatarImages = {
-    avatar1: avatar1
+    avatar1: avatar1,
+    avatar2: avatar2
+
   };
 
   useEffect(() => {
@@ -89,10 +93,10 @@ const ChildProfilePage = () => {
         <Col md={8} lg={6}>
           <Card className="profile-card">
             <Card.Header
-              style={{ backgroundColor: "red" }}
+              style={{ backgroundColor: "#FB5607" }}
               className="profile-header"
             >
-              <Card.Title>My Awesome Profile</Card.Title>
+              <Card.Title>About Me!</Card.Title>
             </Card.Header>
 
             <Card.Body>
@@ -108,7 +112,7 @@ const ChildProfilePage = () => {
               </div>
 
               <div className="profile-details text-center">
-                <Card.Title className="profile-name">
+                <Card.Title className="profile-name text-capitalize">
                   {profile.name || "Explorer"}
                 </Card.Title>
                 <Card.Subtitle className="mb-2 text-muted profile-age">

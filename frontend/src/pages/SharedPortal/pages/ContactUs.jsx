@@ -1,6 +1,16 @@
 import React from 'react';
 import { Container, Card, Form, Button, Row, Col, Badge, Alert, ListGroup } from 'react-bootstrap';
 import { EnvelopeFill, TelephoneFill, GeoAltFill } from 'react-bootstrap-icons';
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+  Whatsapp,
+  Telegram,
+  RssFill
+} from 'react-bootstrap-icons';
 
 const ContactUs = () => {
   return (
@@ -24,7 +34,7 @@ const ContactUs = () => {
 </h1>
       
       <p className="text-center fs-4 mb-5 text-primary">
-        We'd love to hear from you, little explorers!
+       We’d love to hear from you…”
       </p>
 
       <Row className="g-4">
@@ -63,46 +73,48 @@ const ContactUs = () => {
         </Col>
 
         <Col md={6}>
-          <Card className="h-100 border-warning">
-            <Card.Header className="bg-warning text-dark">
-              <h3>Our Contact Info</h3>
-            </Card.Header>
-            <Card.Body>
-              <Alert variant="info" className="d-flex align-items-center">
-                <EnvelopeFill className="me-3 fs-3" />
-                <div>
-                  <h5>Email Us</h5>
-                  <p className="mb-0">kids@explorefun.com</p>
-                </div>
-              </Alert>
+  <Card className="h-100 border-warning">
+    <Card.Header className="bg-warning text-dark">
+      <h3>Our Contact Info</h3>
+    </Card.Header>
+    <Card.Body>
+      <Alert variant="info" className="d-flex align-items-center">
+        <EnvelopeFill className="me-3 fs-3" />
+        <div>
+          <h5>Email Us</h5>
+          <p className="mb-0">myexploreislam@gmail.com</p>
+        </div>
+      </Alert>
 
-              <Alert variant="primary" className="d-flex align-items-center mt-3">
-                <TelephoneFill className="me-3 fs-3" />
-                <div>
-                  <h5>Call Us</h5>
-                  <p className="mb-0">1-800-KID-FUN</p>
-                </div>
-              </Alert>
+      <div className="mt-4">
+        <h5>Connect With Us</h5>
+        <div className="d-flex flex-wrap gap-3">
+          <Button variant="outline-primary" className="d-flex align-items-center">
+            <Facebook className="me-2" />
+            Facebook
+          </Button>
+          <Button variant="outline-info" className="d-flex align-items-center">
+            <Twitter className="me-2" />
+            Twitter
+          </Button>
+          <Button variant="outline-danger" className="d-flex align-items-center">
+            <Instagram className="me-2" />
+            Instagram
+          </Button>
+          <Button variant="outline-primary" className="d-flex align-items-center">
+            <Linkedin className="me-2" />
+            LinkedIn
+          </Button>
+          <Button variant="outline-dark" className="d-flex align-items-center">
+            <Youtube className="me-2" />
+            YouTube
+          </Button>
+        </div>
+      </div>
 
-              <Alert variant="success" className="d-flex align-items-center mt-3">
-                <GeoAltFill className="me-3 fs-3" />
-                <div>
-                  <h5>Visit Us</h5>
-                  <p className="mb-0">123 Discovery Lane, Adventure City</p>
-                </div>
-              </Alert>
-
-              <div className="mt-4">
-                <h5>Office Hours</h5>
-                <ListGroup>
-                  <ListGroup.Item>Monday-Friday: 9am - 5pm</ListGroup.Item>
-                  <ListGroup.Item>Saturday: 10am - 4pm</ListGroup.Item>
-                  <ListGroup.Item>Sunday: Closed</ListGroup.Item>
-                </ListGroup>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
+    </Card.Body>
+  </Card>
+</Col>
       </Row>
 
       
